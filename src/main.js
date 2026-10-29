@@ -28,12 +28,14 @@ const GESTIONE = ['titolare', 'gestore', 'lettore'];
 
 // barra: 'basso' = barra in basso su telefono; 'lato' = colonna laterale su PC
 const SEZIONI = {
-  home: { titolo: 'Riepilogo', icona: 'casa', mostra: mostraHome, ruoli: GESTIONE, barra: ['basso', 'lato'] },
-  mesi: { titolo: 'Presenze', titoloLungo: 'Presenze e cedolini', icona: 'calendario', mostra: mostraMesi, ruoli: GESTIONE, barra: ['basso', 'lato'] },
-  scadenze: { titolo: 'Scadenze', icona: 'campana', mostra: mostraScadenze, ruoli: GESTIONE, barra: ['basso', 'lato'] },
+  // ordine del menu scelto dall'utente: Documenti, Report, Simulatore, Presenze, Riepilogo, Scadenze, Impostazioni
+  // (sul telefono i primi quattro sono nella barra in basso, gli altri in "Altro")
   documenti: { titolo: 'Documenti', icona: 'documento', mostra: mostraDocumenti, ruoli: GESTIONE, barra: ['basso', 'lato'] },
-  report: { titolo: 'Report', icona: 'grafico', mostra: mostraReport, ruoli: GESTIONE, barra: ['lato'] },
-  simulatore: { titolo: 'Simulatore', icona: 'bilancia', mostra: mostraSimulatore, ruoli: GESTIONE, barra: ['lato'] },
+  report: { titolo: 'Report', icona: 'grafico', mostra: mostraReport, ruoli: GESTIONE, barra: ['basso', 'lato'] },
+  simulatore: { titolo: 'Simulatore', icona: 'bilancia', mostra: mostraSimulatore, ruoli: GESTIONE, barra: ['basso', 'lato'] },
+  mesi: { titolo: 'Presenze', titoloLungo: 'Presenze e cedolini', icona: 'calendario', mostra: mostraMesi, ruoli: GESTIONE, barra: ['basso', 'lato'] },
+  home: { titolo: 'Riepilogo', icona: 'casa', mostra: mostraHome, ruoli: GESTIONE, barra: ['lato'] },
+  scadenze: { titolo: 'Scadenze', icona: 'campana', mostra: mostraScadenze, ruoli: GESTIONE, barra: ['lato'] },
   impostazioni: { titolo: 'Impostazioni', icona: 'ingranaggio', mostra: mostraImpostazioni, ruoli: GESTIONE, barra: ['lato'] },
   altro: { titolo: 'Altro', icona: 'altro', mostra: mostraAltro, ruoli: GESTIONE, barra: ['basso'] },
   info: { titolo: 'Informazioni', icona: 'documento', mostra: mostraInfo, ruoli: [...GESTIONE, 'lavoratrice'], barra: [] },
@@ -86,6 +88,9 @@ export async function scegliRapporto(id) {
 export function vai(nome) {
   sezione = nome;
   root.querySelectorAll('[data-s]').forEach((x) => x.toggleAttribute('aria-current', x.dataset.s === nome));
+  // sul telefono le sezioni fuori dalla barra in basso evidenziano "Altro"
+  const basso = root.querySelector('.barra-bassa');
+  if (basso && !basso.querySelector(`[data-s="${nome}"]`)) basso.querySelector('[data-s=altro]')?.setAttribute('aria-current', '');
   const el = root.querySelector('#contenuto');
   el.innerHTML = '';
   window.scrollTo(0, 0);
@@ -97,7 +102,8 @@ function disegnaApp() {
   const ruolo = app.rapporto.ruolo;
   const lav = ruolo === 'lavoratrice';
   const visibili = Object.entries(SEZIONI).filter(([, s]) => s.ruoli.includes(ruolo));
-  if (!sezione || !SEZIONI[sezione]?.ruoli.includes(ruolo)) sezione = app.rapporto.dati || lav ? visibili[0][0] : 'impostazioni';
+  // si apre sul Riepilogo (la lavoratrice sui suoi cedolini)
+  if (!sezione || !SEZIONI[sezione]?.ruoli.includes(ruolo)) sezione = lav ? visibili[0][0] : app.rapporto.dati ? 'home' : 'impostazioni';
   const piu = app.rapporti.length > 1;
 
   root.innerHTML = `

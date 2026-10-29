@@ -3,6 +3,9 @@ export const VERSIONE = __VERSIONE__;
 export const DATA_BUILD = __DATA_BUILD__;
 
 export const NOVITA = [
+  { versione: '1.5.1', data: '2026-10-29', voci: [
+    'Nuovo ordine del menu: Documenti, Report, Simulatore, Presenze, Riepilogo, Scadenze, Impostazioni',
+  ] },
   { versione: '1.5.0', data: '2026-10-29', voci: [
     'Accesso rapido: "Resta collegato" e sblocco con Face ID, Touch ID o impronta',
     'Dati per il bonifico dello stipendio con causale e QR code per l\'app della banca',
