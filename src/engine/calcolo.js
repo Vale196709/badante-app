@@ -123,7 +123,26 @@ export function calcolaCedolino(rapporto, presenze, stato = {}) {
     tfrAccantonato: stato.tfrAccantonato ?? 0,
     tredicesimaMaturata: stato.anno === anno ? stato.tredicesimaMaturata ?? 0 : 0,
     giorniMalattiaAnno: stato.anno === anno ? stato.giorniMalattiaAnno ?? 0 : 0,
+    tfrFondoInizioAnno: stato.tfrFondoInizioAnno ?? 0,
+    anticipoTfrAnno: stato.anno === anno ? stato.anticipoTfrAnno ?? 0 : 0,
   };
+  if (t.provvisorie) {
+    avvisi.push(`Tabelle ${anno} non ancora inserite: calcolo provvisorio con i valori ${t.annoTabelle}.`);
+  }
+
+  // Rivalutazione annuale del TFR: al primo mese di un nuovo anno si rivaluta il fondo
+  // esistente al 31/12 dell'anno prima di quello appena chiuso.
+  let rivalutazioneTfr = 0;
+  if (stato.anno && stato.anno < anno) {
+    const infl = tabelleAnno(stato.anno).inflazioneTfr;
+    const tasso = R.rivalutazioneTfrFissa + (infl != null ? R.rivalutazioneTfrQuotaIstat * infl : 0);
+    rivalutazioneTfr = euro(s.tfrFondoInizioAnno * tasso);
+    if (infl == null && s.tfrFondoInizioAnno > 0) {
+      avvisi.push(`Rivalutazione TFR ${stato.anno} calcolata solo sulla quota fissa 1,5%: manca il dato ISTAT di dicembre.`);
+    }
+    s.tfrAccantonato = euro(s.tfrAccantonato + rivalutazioneTfr);
+    s.tfrFondoInizioAnno = s.tfrAccantonato;
+  }
 
   // Controllo minimo contrattuale
   const minimo = t.minimiOrariNonConviventi[rapporto.livello];
@@ -173,8 +192,9 @@ export function calcolaCedolino(rapporto, presenze, stato = {}) {
   const oreFest = nFest * (settimanali / R.divisoreFestivita);
   imponibile += voce('FES', `Festività retribuite (${nFest})`, oreFest, paga);
 
-  // --- Ferie ---
+  // --- Ferie e permessi retribuiti ---
   imponibile += voce('FER', 'Ferie godute', oreFerie, paga);
+  imponibile += voce('PER', 'Permessi retribuiti', presenze.orePermessi || 0, paga);
 
   // --- Malattia ---
   imponibile += voce('MAL50', 'Malattia giorni 1-3 (50%)', oreMalattia50, paga * R.malattiaPercentuali.primiTreGiorni);
@@ -209,10 +229,20 @@ export function calcolaCedolino(rapporto, presenze, stato = {}) {
 
   const lordo = euro(imponibile + straord + tredicesimaPagata);
 
+  // --- Anticipo TFR (non soggetto a contributi, pagato insieme allo stipendio) ---
+  const anticipoTfr = euro(presenze.anticipoTfr || 0);
+  if (anticipoTfr > 0) {
+    const max = euro(s.tfrAccantonato * R.anticipoTfrMassimo);
+    if (anticipoTfr > max) avvisi.push(`Anticipo TFR oltre il 70% del maturato (massimo ${max.toFixed(2)} €).`);
+    if (s.anticipoTfrAnno > 0) avvisi.push('Il CCNL prevede un solo anticipo TFR l\'anno.');
+    s.tfrAccantonato = euro(s.tfrAccantonato - anticipoTfr);
+    s.anticipoTfrAnno = euro(s.anticipoTfrAnno + anticipoTfr);
+  }
+
   // --- Contributi ---
   const fascia = fasciaContributiva(rapporto, anno);
   const oreContributive = ore2(
-    oreOrdinarie + (presenze.oreAggiuntive || 0) + oreFest + oreFerie + oreMalattia50 + oreMalattia100 +
+    oreOrdinarie + (presenze.oreAggiuntive || 0) + oreFest + oreFerie + (presenze.orePermessi || 0) + oreMalattia50 + oreMalattia100 +
     (st.diurno || 0) + (st.notturno || 0) + (st.festivo || 0) + (presenze.festivitaLavorate || 0)
   );
   const inpsLavoratore = euro(oreContributive * fascia.lavoratoreOrario);
@@ -228,7 +258,7 @@ export function calcolaCedolino(rapporto, presenze, stato = {}) {
     trattenute.push({ codice: 'CCOLF', descrizione: `Cassa Colf a carico lavoratrice (${oreContributive} h × ${cc.lavoratore.toFixed(2)} €)`, importo: cassaLavoratore });
   }
   const totTrattenute = euro(trattenute.reduce((x, v) => x + v.importo, 0));
-  const netto = euro(lordo - totTrattenute);
+  const netto = euro(lordo - totTrattenute + anticipoTfr);
 
   // --- TFR: (imponibile del mese + rateo 13ª) / 13,5 ---
   const tfrMese = euro((imponibile + rateo13) / R.divisoreTfr);
@@ -260,7 +290,10 @@ export function calcolaCedolino(rapporto, presenze, stato = {}) {
       cassaColfDatore: cassaDatore,
       daVersareAInps: euro(inpsLavoratore + inpsDatore + cassaLavoratore + cassaDatore),
     },
+    anticipoTfr,
+    oreLavorate: ore2(oreOrdinarie + (presenze.oreAggiuntive || 0) + (st.diurno || 0) + (st.notturno || 0) + (st.festivo || 0) + (presenze.festivitaLavorate || 0)),
     accantonamenti: {
+      rivalutazioneTfr,
       rateoTredicesima: rateo13,
       tfrMese,
       ferieMaturateOre: ore2(ferieMaturateMese),
