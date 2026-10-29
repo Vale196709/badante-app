@@ -2,6 +2,7 @@ import { fmtEur, fmtNum, fmtOre } from './formato.js';
 // Scadenze e avvisi di monitoraggio del rapporto.
 import { euro, isoDate, oreSettimanali } from './calcolo.js';
 import { festivitaAnno, tabelleAnno, REGOLE_CCNL as R } from './tabelle.js';
+import { variazioniOrdinate } from './variazioni.js';
 
 const addGiorni = (iso, n) => new Date(new Date(iso + 'T00:00:00Z').getTime() + n * 86400000).toISOString().slice(0, 10);
 const ultimoGiorno = (a, m) => isoDate(a, m, new Date(Date.UTC(a, m, 0)).getUTCDate());
@@ -115,6 +116,26 @@ export function generaScadenze(rapporto, catena, oggi, fatte = new Set()) {
   // Scadenza documento di soggiorno della lavoratrice
   if (rapporto.scadenzaDocumento) {
     add({ chiave: `doc-${rapporto.scadenzaDocumento}`, data: addGiorni(rapporto.scadenzaDocumento, -60), categoria: 'Contratto', titolo: 'Rinnovo documento della lavoratrice', descrizione: `Il documento scade il ${rapporto.scadenzaDocumento.split('-').reverse().join('/')}: verificare per tempo il rinnovo.` });
+  }
+
+  // Pratiche INPS: assunzione, variazioni, cessazione
+  add({
+    chiave: 'inps-assunzione', data: addGiorni(rapporto.dataAssunzione, -1), informativa: true, categoria: 'Pratiche INPS',
+    titolo: 'Comunicare l\'assunzione all\'INPS',
+    descrizione: 'Entro le ore 24 del giorno prima dell\'inizio del lavoro. La guida con i dati da inserire è in Documenti → Pratiche INPS.',
+  });
+  for (const v of variazioniOrdinate(rapporto)) {
+    add({
+      chiave: `inps-var-${v.dal}`, data: addGiorni(v.dal, 4), categoria: 'Pratiche INPS',
+      titolo: `Comunicare all'INPS la variazione dal ${v.dal.split('-').reverse().join('/')}`,
+      descrizione: 'Nuova paga, orario o livello: va comunicata con il servizio INPS di variazione del rapporto di lavoro domestico. Consigliato entro 5 giorni. Guida in Documenti → Pratiche INPS.',
+    });
+  }
+  if (rapporto.dataCessazione) {
+    const dc = rapporto.dataCessazione;
+    add({ chiave: 'cess-inps', data: addGiorni(dc, 5), categoria: 'Pratiche INPS', titolo: 'Comunicare la cessazione all\'INPS', descrizione: 'Entro 5 giorni dalla fine del rapporto. Guida in Documenti → Pratiche INPS.' });
+    add({ chiave: 'cess-spettanze', data: dc, categoria: 'Stipendio', titolo: 'Pagare le spettanze finali', descrizione: 'Ultimo stipendio, ferie non godute, ratei di 13ª, TFR ed eventuale preavviso: conteggi nel Simulatore.' });
+    add({ chiave: 'cess-dich', data: dc, categoria: 'Documenti', titolo: 'Consegnare la dichiarazione dei compensi', descrizione: 'Alla fine del rapporto, con le ultime spettanze.' });
   }
 
   // Contratto a termine

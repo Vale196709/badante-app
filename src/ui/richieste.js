@@ -4,6 +4,7 @@ import { app, puoModificare, esc, dataIt, toast } from '../stato.js';
 import { decidiRichiesta, salvaCedolino, caricaRichieste } from '../lib/dati.js';
 import { calcolaCatena } from '../engine/catena.js';
 import { calendarioMese } from '../engine/calcolo.js';
+import { condizioniMese } from '../engine/variazioni.js';
 
 const giorniTra = (dal, al) => {
   const out = [];
@@ -26,7 +27,7 @@ export async function applicaRichiesta(r) {
     const esistente = app.cedolini.find((c) => c.anno === anno && c.mese === mese);
     if (esistente && esistente.stato !== 'bozza') { bloccati.push(k); continue; }
     const giorni = structuredClone(esistente?.presenze?.giorni ?? {});
-    const cal = calendarioMese(d, anno, mese);
+    const cal = calendarioMese(condizioniMese(d, anno, mese), anno, mese);
     for (const data of date) {
       const g = cal.find((x) => x.data === data);
       if (!g || !g.attivo || g.festivita || g.oreProgrammate <= 0) continue;

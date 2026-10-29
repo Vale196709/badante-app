@@ -3,6 +3,7 @@ import { app, catenaCorrente, puoModificare, eur, num, esc, dataIt, oggiIso, nom
 import { calcolaCatena, chiaveMese } from '../engine/catena.js';
 import { giorniMese, TIPI } from '../engine/presenze.js';
 import { nomeFestivita } from '../engine/tabelle.js';
+import { condizioniMese } from '../engine/variazioni.js';
 import { salvaCedolino } from '../lib/dati.js';
 import { stampaCedolino } from './stampe.js';
 import { cardRichieste } from './richieste.js';
@@ -52,6 +53,7 @@ export function mostraMesi(root, ctx) {
 
 function editorMese(root, ctx, anno, mese) {
   const d = app.rapporto.dati;
+  const dm = condizioniMese(d, anno, mese); // orario e paga in vigore nel mese
   const salvato = app.cedolini.find((c) => c.anno === anno && c.mese === mese) || null;
   const giorniSalvati = structuredClone(salvato?.presenze?.giorni ?? {});
   const extra = structuredClone(salvato?.presenze?.extra ?? {});
@@ -93,7 +95,7 @@ function editorMese(root, ctx, anno, mese) {
   const st = root.querySelector('.stato-editor');
 
   function disegna() {
-    const giorni = giorniMese(d, anno, mese, giorniSalvati);
+    const giorni = giorniMese(dm, anno, mese, giorniSalvati);
     const vuoti = giorni[0].giornoSettimana - 1;
     const mod = modificabile();
     root.querySelector('.suggerimento-tocco').textContent = mod ? 'Tocca un giorno per modificarlo' : '';
@@ -140,7 +142,7 @@ function editorMese(root, ctx, anno, mese) {
         </tbody>
       </table>
       <div class="cifre piccole">
-        <div><span class="etichetta">Contributi da versare</span><span class="valore">${eur(r.contributi.daVersareAInps)}</span><span class="sotto">${r.contributi.oreContributive} h · ${esc(r.contributi.fascia)}</span></div>
+        <div><span class="etichetta">Contributi da versare</span><span class="valore">${eur(r.contributi.daVersareAInps)}</span><span class="sotto">${num(r.contributi.oreContributive)} h · ${esc(r.contributi.fascia)}</span></div>
         <div><span class="etichetta">Costo per te</span><span class="valore">${eur(r.costoDatore)}</span></div>
         <div><span class="etichetta">Ferie residue</span><span class="valore">${num(r.contatori.ferieResidueOre, 1)} h</span></div>
         <div><span class="etichetta">TFR accantonato</span><span class="valore">${eur(r.contatori.tfrAccantonato)}</span></div>
@@ -200,7 +202,7 @@ function editorMese(root, ctx, anno, mese) {
   }
 
   function apriGiorno(data) {
-    const g = giorniMese(d, anno, mese, giorniSalvati).find((x) => x.data === data);
+    const g = giorniMese(dm, anno, mese, giorniSalvati).find((x) => x.data === data);
     const [a, m, gg] = data.split('-');
     dlg.innerHTML = `
       <form method="dialog" class="form-giorno">

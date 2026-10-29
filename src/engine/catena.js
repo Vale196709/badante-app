@@ -4,6 +4,7 @@
 
 import { calcolaCedolino } from './calcolo.js';
 import { presenzeDaGiorni } from './presenze.js';
+import { condizioniMese } from './variazioni.js';
 
 export const chiaveMese = (anno, mese) => `${anno}-${String(mese).padStart(2, '0')}`;
 
@@ -35,12 +36,13 @@ export function calcolaCatena(rapporto, cedolini, fino) {
   let malattiaAperta = null;
   for (const { anno, mese } of mesiTra(rapporto.dataAssunzione, ultimoMese.anno, ultimoMese.mese)) {
     const salvato = perMese.get(chiaveMese(anno, mese));
-    const presenze = presenzeDaGiorni(rapporto, anno, mese, salvato?.presenze?.giorni, salvato?.presenze?.extra, malattiaAperta);
+    const cond = condizioniMese(rapporto, anno, mese); // paga, orario e livello del mese
+    const presenze = presenzeDaGiorni(cond, anno, mese, salvato?.presenze?.giorni, salvato?.presenze?.extra, malattiaAperta);
     let risultato;
     if (salvato && salvato.stato !== 'bozza' && salvato.risultato?.contatori) {
       risultato = salvato.risultato; // congelato
     } else {
-      risultato = calcolaCedolino(rapporto, presenze, stato);
+      risultato = calcolaCedolino(cond, presenze, stato);
     }
     out.push({ anno, mese, risultato, presenze, salvato: salvato || null, stato: salvato?.stato ?? 'da fare', statoPrima: stato });
     stato = risultato.contatori;

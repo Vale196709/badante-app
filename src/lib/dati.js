@@ -194,3 +194,23 @@ export async function importaTutto(rapportoId, b) {
   if (b.versamenti?.length) ok(await supabase.from('versamenti').upsert(conId(b.versamenti)));
   return rapporto;
 }
+
+// ---------- Promemoria e notifiche ----------
+export async function caricaPromemoria(rapportoId) {
+  const r = await facoltativo(supabase.from('promemoria').select('*').eq('rapporto_id', rapportoId).maybeSingle(), null);
+  return r;
+}
+export async function salvaPromemoria(rapportoId, p) {
+  ok(await supabase.from('promemoria').upsert({ rapporto_id: rapportoId, ...p, updated_at: new Date().toISOString() }));
+}
+export async function caricaDispositivi(rapportoId) {
+  return facoltativo(supabase.from('notifiche_dispositivi').select('endpoint, email, dispositivo, created_at, user_id').eq('rapporto_id', rapportoId), []);
+}
+export async function iscriviDispositivo(rapportoId, sub, dispositivo) {
+  const j = sub.toJSON();
+  await supabase.from('notifiche_dispositivi').delete().eq('endpoint', j.endpoint);
+  ok(await supabase.from('notifiche_dispositivi').insert({ endpoint: j.endpoint, rapporto_id: rapportoId, chiavi: j.keys, dispositivo }));
+}
+export async function togliDispositivo(endpoint) {
+  ok(await supabase.from('notifiche_dispositivi').delete().eq('endpoint', endpoint));
+}

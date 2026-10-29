@@ -4,19 +4,24 @@ import { mostraRapporto } from './rapporto.js';
 import { mostraTabelle } from './tabelle.js';
 import { mostraAccessi } from './accessi.js';
 import { mostraBackup } from './backup.js';
+import { mostraVariazioni } from './variazioni.js';
+import { mostraPromemoria } from './promemoria.js';
 
 let attiva = 'rapporto';
 
 export function mostraImpostazioni(root, ctx) {
   const voci = [
     ['rapporto', 'Rapporto', mostraRapporto],
-    ['tabelle', 'Tabelle annuali', mostraTabelle],
+    ['variazioni', 'Variazioni', mostraVariazioni],
+    ['tabelle', 'Tabelle', mostraTabelle],
+    ...(app.rapporto?.ruolo !== 'lettore' ? [['promemoria', 'Promemoria', mostraPromemoria]] : []),
     ...(isTitolare() ? [['accessi', 'Accessi', mostraAccessi]] : []),
     ['backup', 'Backup', mostraBackup],
   ];
   if (!app.rapporto?.dati) attiva = 'rapporto';
   if (!voci.some(([k]) => k === attiva)) attiva = 'rapporto';
   root.innerHTML = `
+    <h1 class="titolo-pagina">${app.rapporto?.dati ? 'Impostazioni' : 'Nuovo rapporto'}</h1>
     <div class="sotto-schede" role="tablist">
       ${voci.map(([k, n]) => `<button type="button" data-k="${k}" ${k === attiva ? 'aria-current="page"' : ''} ${!app.rapporto?.dati && k !== 'rapporto' ? 'disabled' : ''}>${n}</button>`).join('')}
     </div>

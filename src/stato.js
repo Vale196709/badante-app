@@ -13,6 +13,7 @@ export const app = {
   documenti: [],
 };
 
+export const nomeRapporto = (r) => r?.dati?.lavoratrice?.nome || (r?.dati ? 'Rapporto senza nome' : 'Nuovo rapporto');
 export const puoModificare = () => ['titolare', 'gestore'].includes(app.rapporto?.ruolo);
 export const isTitolare = () => app.rapporto?.ruolo === 'titolare';
 export const isLavoratrice = () => app.rapporto?.ruolo === 'lavoratrice';

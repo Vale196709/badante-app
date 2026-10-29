@@ -61,7 +61,8 @@ export async function mostraRapporto(root, { ricaricaDati, vai }) {
       </section>
 
       <section>
-        <h2>Contratto</h2>
+        <h2>Contratto all'assunzione</h2>
+        ${(d.variazioni || []).length ? '<p class="nota" style="margin:-4px 0 12px">Le condizioni sono variate nel tempo: quelle in vigore sono in Impostazioni → Variazioni.</p>' : ''}
         <div class="riga">
           <label>Livello CCNL
             <select name="livello">${LIVELLI.map((l) => `<option ${l === d.livello ? 'selected' : ''}>${l}</option>`).join('')}</select>
@@ -183,7 +184,10 @@ export async function mostraRapporto(root, { ricaricaDati, vai }) {
       app.rapporto = { ...app.rapporto, ...salvato, ruolo: app.rapporto?.ruolo ?? 'titolare' };
       await ricaricaDati();
       toast('Dati del rapporto salvati');
-      if (nuovo) location.reload();
+      if (nuovo) {
+        try { localStorage.setItem('badante-rapporto', salvato.id); } catch { /* */ }
+        location.reload();
+      }
       else esito.textContent = '';
     } catch (err) {
       esito.textContent = `Errore: ${err.message}`;

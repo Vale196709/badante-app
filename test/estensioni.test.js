@@ -189,3 +189,34 @@ test('permesso di poche ore: il resto della giornata è lavorato', () => {
   assert.equal(p.orePermessi, 1);
   assert.equal(p.oreOrdinarie, 62);
 });
+
+test('variazione di paga dal 1° del mese: vale da quel mese in poi', async () => {
+  const { condizioniMese } = await import('../src/engine/variazioni.js');
+  const rv = { ...r, variazioni: [{ dal: '2027-03-01', pagaOraria: 10, orario: { 1: 4, 2: 4, 3: 4, 4: 4, 5: 4 } }] };
+  assert.equal(condizioniMese(rv, 2027, 2).pagaOraria, 9);
+  assert.equal(condizioniMese(rv, 2027, 3).pagaOraria, 10);
+  const cat = calcolaCatena(rv, [], { anno: 2027, mese: 3 });
+  const feb = cat.find((m) => m.anno === 2027 && m.mese === 2).risultato;
+  const mar = cat.find((m) => m.anno === 2027 && m.mese === 3).risultato;
+  assert.equal(feb.voci.find((v) => v.codice === 'ORD').tariffa, 9);
+  assert.equal(mar.voci.find((v) => v.codice === 'ORD').tariffa, 10);
+  assert.equal(mar.voci.find((v) => v.codice === 'ORD').quantita, 88); // 22 giorni feriali × 4 ore
+  const sc = generaScadenze(rv, cat, '2027-03-01');
+  assert.ok(sc.some((s) => s.chiave === 'inps-var-2027-03-01' && s.data === '2027-03-05'));
+});
+
+test('promemoria: anticipo, giorno prima, giorno stesso e scadute il lunedì', async () => {
+  const { daRicordare } = await import('../scripts/promemoria.mjs');
+  const sc = [
+    { chiave: 'a', data: '2027-01-14', titolo: 'A' },   // tra 3 giorni
+    { chiave: 'b', data: '2027-01-12', titolo: 'B' },   // domani
+    { chiave: 'c', data: '2027-01-11', titolo: 'C' },   // oggi
+    { chiave: 'd', data: '2027-01-05', titolo: 'D' },   // scaduta
+    { chiave: 'e', data: '2027-01-13', titolo: 'E' },   // tra 2 giorni: no
+    { chiave: 'f', data: '2027-01-11', titolo: 'F', fatta: true },
+  ];
+  // 11/01/2027 è lunedì
+  assert.deepEqual(daRicordare(sc, '2027-01-11', 3).map((s) => s.chiave), ['a', 'b', 'c', 'd']);
+  // martedì 12/01: B è oggi, E domani; C scaduta non si ripete fuori dal lunedì
+  assert.deepEqual(daRicordare(sc, '2027-01-12', 3).map((s) => s.chiave), ['b', 'e']);
+});

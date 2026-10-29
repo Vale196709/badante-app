@@ -22,13 +22,18 @@ Online: https://vale196709.github.io/badante-app/
 - **Accessi**: titolare, gestore (familiare/consulente), sola lettura, lavoratrice (vede i suoi cedolini
   confermati, firma la ricevuta col dito, chiede ferie e permessi, vede i documenti condivisi;
   interfaccia in italiano, română, українська, русский, English).
+- **Variazioni**: paga, orario e livello che cambiano nel tempo, con decorrenza dal primo del mese.
+- **Più rapporti**: per esempio una sostituta durante le ferie, ognuno con i suoi cedolini.
+- **Lettere pronte**: licenziamento, dimissioni, anticipo TFR, accordo ferie, variazione, proroga, trasformazione.
+- **Pratiche INPS guidate**: assunzione, variazione, contributi trimestrali, cessazione, con i dati da inserire.
+- **Promemoria**: email (Gmail) e notifiche sul telefono ogni mattina, da GitHub Actions (`scripts/promemoria.mjs`).
 - **Keep-alive**: un'attività GitHub due volte a settimana tiene attivo il progetto Supabase gratuito.
 
 ## Struttura
 - `src/engine/` motore di calcolo (tabelle annuali, cedolino, presenze, catena mensile, scadenze,
   riepilogo annuo, cessazione) – coperto da test (`npm test`).
 - `src/ui/` schermate; `src/lib/` accesso a Supabase.
-- `supabase/` script SQL da eseguire nel SQL Editor, in ordine: 01, 02, 03.
+- `supabase/` script SQL da eseguire nel SQL Editor, in ordine: 01, 02, 03, 04.
 
 ## Aggiornamento annuale
 A inizio anno, in Impostazioni → Tabelle annuali: "+ Nuovo anno", aggiornare minimi CCNL e contributi INPS
@@ -39,3 +44,11 @@ e lo segnala.
     npm install
     npm test
     npm run dev
+
+## Promemoria: configurazione una tantum
+1. In Supabase crea un utente per i promemoria (Auto Confirm) e invitalo nell'app come "Sola lettura".
+2. In GitHub → Settings → Secrets and variables → Actions crea:
+   `PROMEMORIA_EMAIL`, `PROMEMORIA_PASSWORD` (l'utente del punto 1),
+   `GMAIL_USER`, `GMAIL_APP_PASSWORD` (password per le app di Google),
+   `VAPID_PRIVATE_KEY` (chiave privata delle notifiche).
+3. In Impostazioni → Promemoria attiva gli invii e, sul telefono, le notifiche.

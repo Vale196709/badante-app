@@ -6,6 +6,7 @@ import { riepilogoAnno, contributiDeducibili } from '../engine/annuale.js';
 import { MOTIVI } from '../engine/cessazione.js';
 import { REGOLE_CCNL } from '../engine/tabelle.js';
 import { voceT, meseT } from '../i18n.js';
+import { condizioniMese, condizioniAl } from '../engine/variazioni.js';
 
 const GIORNI = ['lunedì', 'martedì', 'mercoledì', 'giovedì', 'venerdì', 'sabato', 'domenica'];
 const CCNL = 'CCNL sulla disciplina del rapporto di lavoro domestico (rinnovo del 28/10/2025) sottoscritto da Fidaldo e Domina con Filcams-CGIL, Fisascat-CISL, Uiltucs e Federcolf';
@@ -52,7 +53,7 @@ export function stampaCedolino(m, salvato, { traduci = false } = {}) {
   apriStampa(titolo, `
     <h1>Prospetto paga · ${nomeMeseMaiusc(m.mese)} ${m.anno}${traduci && voceT('titolo') ? `<br><span class="trad">${esc(voceT('titolo'))} · ${esc(meseT(m.mese))} ${m.anno}</span>` : ''}</h1>
     ${parti(d)}
-    <p class="meta">Livello ${esc(d.livello)} · non convivente · ${oreSettimanali(d.orario)} ore settimanali · assunzione ${dataIt(d.dataAssunzione)}${d.codiceRapportoInps ? ` · cod. rapporto INPS ${esc(d.codiceRapportoInps)}` : ''}</p>
+    <p class="meta">Livello ${esc(condizioniMese(d, m.anno, m.mese).livello)} · non convivente · ${oreSettimanali(condizioniMese(d, m.anno, m.mese).orario)} ore settimanali · assunzione ${dataIt(d.dataAssunzione)}${d.codiceRapportoInps ? ` · cod. rapporto INPS ${esc(d.codiceRapportoInps)}` : ''}</p>
     <table class="dati">
       <thead><tr><th>Voce</th><th class="num">Ore</th><th class="num">Tariffa €</th><th class="num">Importo €</th></tr></thead>
       <tbody>

@@ -2,6 +2,7 @@
 import { app, catenaCorrente, eur, num, esc, dataIt, oggiIso, nomeMeseMaiusc } from '../stato.js';
 import { generaScadenze, avvisiRapporto } from '../engine/scadenze.js';
 import { riepilogoAnno } from '../engine/annuale.js';
+import { condizioniAl } from '../engine/variazioni.js';
 
 const STATI = { 'da fare': 'Da preparare', bozza: 'Bozza', confermato: 'Confermato', pagato: 'Pagato' };
 
@@ -46,7 +47,7 @@ export function mostraHome(root, { vai }) {
   const ra = riepilogoAnno(catena, anno);
 
   root.innerHTML = `
-    <h1 class="titolo-pagina">${esc(d.lavoratrice?.nome || 'Rapporto di lavoro')}</h1>
+    <h1 class="titolo-pagina">Riepilogo</h1>
     ${avvisi.map((a) => `<div class="avviso ${a.livello}">${esc(a.testo)}</div>`).join('')}
     ${app.richieste.some((r) => r.stato === 'in attesa') ? `<button type="button" class="avviso info avviso-link" data-vai="mesi">${app.richieste.filter((r) => r.stato === 'in attesa').length} richieste di ferie o permessi in attesa di risposta ›</button>` : ''}
 
@@ -66,7 +67,7 @@ export function mostraHome(root, { vai }) {
     <section class="card">
       <h2>Contatori</h2>
       <div class="cifre">
-        <div><span class="etichetta">Ferie residue</span><span class="valore">${num(s.ferieResidueOre, 1)} h</span><span class="sotto">≈ ${num(s.ferieResidueOre / (Object.values(d.orario).reduce((a, b) => a + b, 0) / Object.keys(d.orario).length || 1), 1)} giorni</span></div>
+        <div><span class="etichetta">Ferie residue</span><span class="valore">${num(s.ferieResidueOre, 1)} h</span><span class="sotto">≈ ${num(s.ferieResidueOre / (Object.values(condizioniAl(d, oggi).orario).reduce((a, b) => a + b, 0) / Object.keys(condizioniAl(d, oggi).orario).length || 1), 1)} giorni</span></div>
         <div><span class="etichetta">TFR accantonato</span><span class="valore">${eur(s.tfrAccantonato)}</span></div>
         <div><span class="etichetta">${d.tredicesimaMensile ? 'Tredicesima' : '13ª maturata'}</span><span class="valore">${d.tredicesimaMensile ? 'mensile' : eur(s.tredicesimaMaturata)}</span></div>
         <div><span class="etichetta">Malattia ${anno}</span><span class="valore">${s.anno === anno ? s.giorniMalattiaAnno : 0} gg</span></div>

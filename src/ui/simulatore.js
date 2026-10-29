@@ -5,11 +5,13 @@ import { calcolaCatena } from '../engine/catena.js';
 import { calcolaCessazione, MOTIVI } from '../engine/cessazione.js';
 import { tabelleAnno } from '../engine/tabelle.js';
 import { stampaCessazione } from './stampe.js';
+import { condizioniAl } from '../engine/variazioni.js';
 
 const LIVELLI = ['A', 'AS', 'B', 'BS', 'C', 'CS', 'D', 'DS'];
 
 export function mostraSimulatore(root) {
-  const d = app.rapporto?.dati;
+  const d0 = app.rapporto?.dati;
+  const d = d0 ? condizioniAl(d0, oggiIso()) : null; // condizioni in vigore oggi
   const anno = Number(oggiIso().slice(0, 4));
   const base = { pagaOraria: d?.pagaOraria ?? 9, ore: d ? oreSettimanali(d.orario) : 15, livello: d?.livello ?? 'B', tipoContratto: d?.tipoContratto ?? 'indeterminato' };
   const scenari = [
@@ -92,12 +94,12 @@ export function mostraSimulatore(root) {
     const motivo = root.querySelector('[name=motivo]').value;
     const preavvisoLavorato = root.querySelector('[name=preavvisoLavorato]').checked;
     const [a, m] = data.split('-').map(Number);
-    const rapp = { ...d, dataCessazione: data };
+    const rapp = { ...d0, dataCessazione: data };
     // contatori a fine del mese di cessazione (presenze salvate o da orario fino alla data)
     const cat = calcolaCatena(rapp, app.cedolini, { anno: a, mese: m });
     const ultimo = cat[cat.length - 1];
     if (!ultimo) { esitoCess.innerHTML = ''; return; }
-    const c = calcolaCessazione(rapp, ultimo.risultato.contatori, { dataCessazione: data, motivo, preavvisoLavorato });
+    const c = calcolaCessazione(condizioniAl(rapp, data), ultimo.risultato.contatori, { dataCessazione: data, motivo, preavvisoLavorato });
     esitoCess.innerHTML = `
       <table class="tab-cedolino">
         <tbody>

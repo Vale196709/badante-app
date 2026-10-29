@@ -20,7 +20,6 @@ export async function mostraAccessi(root) {
   }
 
   root.innerHTML = `
-    <h1 class="titolo-pagina">Accessi</h1>
     <section class="card">
       <h2>Chi può entrare</h2>
       <ul class="lista-accessi">

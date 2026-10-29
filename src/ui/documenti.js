@@ -5,6 +5,9 @@ import { caricaFile, linkFile, aggiornaDocumento, eliminaDocumento, caricaDocume
 export const CATEGORIE_DOC = ['Contratto e assunzione', 'Ricevute pagoPA INPS', 'Cedolini firmati', 'Certificati di malattia', 'Documenti della lavoratrice', 'Altro'];
 const dimensione = (b) => (b > 1048576 ? `${(b / 1048576).toFixed(1).replace('.', ',')} MB` : `${Math.max(1, Math.round(b / 1024))} KB`);
 import { stampaLetteraAssunzione, stampaPrivacy, stampaDichiarazione, stampaProspettoAnnuale, stampaTfr } from './stampe.js';
+import { ICONE, tessera } from './icone.js';
+import { LETTERE, apriLettera } from './lettere.js';
+import { apriPratica } from './pratiche.js';
 
 export function mostraDocumenti(root, { vai }) {
   const d = app.rapporto?.dati;
@@ -17,42 +20,51 @@ export function mostraDocumenti(root, { vai }) {
   if (!d.lavoratrice.cf) mancanti.push('codice fiscale della lavoratrice');
   if (!d.lavoratrice.indirizzo) mancanti.push('indirizzo della lavoratrice');
 
-  const voce = (id, titolo, descr, disabilitato = false) => `
-    <li><button type="button" class="doc" data-doc="${id}" ${disabilitato ? 'disabled' : ''}>
-      <span class="doc-titolo">${titolo}</span><span class="doc-descr">${descr}</span>
-    </button></li>`;
+  const voce = (attr, icona, colore, titolo, descr, disabilitato = false) => `
+    <li><button type="button" class="riga-lista" ${attr} ${disabilitato ? 'disabled' : ''}>${tessera(icona, colore)}
+      <span class="riga-testo">${titolo}<small>${descr}</small></span>${ICONE.chevron}</button></li>`;
 
   root.innerHTML = `
     <h1 class="titolo-pagina">Documenti</h1>
-    ${mancanti.length ? `<div class="avviso attenzione">Per documenti completi mancano: ${mancanti.join(', ')}. Si inseriscono nella scheda Rapporto.</div>` : ''}
-    <section class="card">
-      <h2>All'assunzione</h2>
-      <ul class="lista-doc">
-        ${voce('assunzione', 'Lettera di assunzione', `Contratto con le clausole del CCNL, da firmare in due copie · inizio ${dataIt(d.dataAssunzione)}`)}
-        ${voce('privacy', 'Informativa privacy', 'Da consegnare e far firmare insieme alla lettera di assunzione')}
-      </ul>
+    ${mancanti.length ? `<div class="avviso attenzione">Per documenti completi mancano: ${mancanti.join(', ')}. Si inseriscono in Impostazioni → Rapporto.</div>` : ''}
+
+    <h2 class="testa-gruppo">Pratiche INPS guidate</h2>
+    <ul class="gruppo">
+      ${voce('data-pratica="assunzione"', 'inps', '#0a7f78', 'Assunzione', 'Entro il giorno prima dell\'inizio')}
+      ${voce('data-pratica="variazione"', 'inps', '#0a7f78', 'Variazione di orario o paga', 'Dopo ogni variazione')}
+      ${voce('data-pratica="contributi"', 'euro', '#0a7f78', 'Pagamento dei contributi', 'Ogni trimestre, con i dati da inserire')}
+      ${voce('data-pratica="cessazione"', 'inps', '#0a7f78', 'Cessazione', 'Entro 5 giorni dalla fine del rapporto')}
+    </ul>
+
+    <h2 class="testa-gruppo">Contratto</h2>
+    <ul class="gruppo">
+      ${voce('data-doc="assunzione"', 'documento', '#007aff', 'Lettera di assunzione', `Da firmare in due copie · inizio ${dataIt(d.dataAssunzione)}`)}
+      ${voce('data-doc="privacy"', 'scudo', '#007aff', 'Informativa privacy', 'Da consegnare con la lettera di assunzione')}
+    </ul>
+
+    <h2 class="testa-gruppo">Lettere pronte</h2>
+    <ul class="gruppo">
+      ${Object.entries(LETTERE).map(([k, l]) => voce(`data-lettera="${k}"`, 'busta', '#ff9500', esc(l.titolo), esc(l.descr))).join('')}
+    </ul>
+
+    <h2 class="testa-gruppo">Ogni anno</h2>
+    <section class="card" style="padding-bottom:4px">
+      <label>Anno<select name="anno">${anni.map((a) => `<option ${a === (anni.includes(annoOggi - 1) ? annoOggi - 1 : anni[0]) ? 'selected' : ''}>${a}</option>`).join('')}</select></label>
     </section>
-    <section class="card">
-      <h2>Ogni anno</h2>
-      <div class="riga"><label>Anno<select name="anno">${anni.map((a) => `<option ${a === (anni.includes(annoOggi - 1) ? annoOggi - 1 : anni[0]) ? 'selected' : ''}>${a}</option>`).join('')}</select></label></div>
-      <ul class="lista-doc">
-        ${voce('dichiarazione', 'Dichiarazione dei compensi', 'Per la lavoratrice: serve per la sua dichiarazione dei redditi, ISEE e permesso di soggiorno', !anni.length)}
-        ${voce('annuale', 'Prospetto costi e contributi deducibili', 'Per te: costi mese per mese e contributi da dedurre nel 730', !anni.length)}
-      </ul>
-    </section>
-    <section class="card">
-      <h2>In qualsiasi momento</h2>
-      <ul class="lista-doc">
-        ${voce('tfr', 'Prospetto TFR', 'Quote accantonate, rivalutazioni e anticipi dall\'assunzione', !catena.length)}
-        ${voce('cedolini', 'Cedolini mensili', 'Si stampano dal singolo mese in Presenze e cedolini')}
-        ${voce('cessazione', 'Conteggi di fine rapporto', 'Si calcolano e stampano dal Simulatore')}
-      </ul>
-    </section>
-    <p class="nota">Ogni documento si apre in anteprima: con "Stampa / PDF" puoi stamparlo o salvarlo come PDF (su iPhone: Condividi → Salva su File).</p>
-    <section class="card archivio"></section>`;
+    <ul class="gruppo">
+      ${voce('data-doc="dichiarazione"', 'documento', '#34c759', 'Dichiarazione dei compensi', 'Per la lavoratrice: dichiarazione dei redditi, ISEE, permesso di soggiorno', !anni.length)}
+      ${voce('data-doc="annuale"', 'grafico', '#34c759', 'Prospetto costi', 'Per te: costi mese per mese e contributi da dedurre nel 730', !anni.length)}
+      ${voce('data-doc="tfr"', 'tabella', '#34c759', 'Prospetto TFR', 'Quote, rivalutazioni e anticipi dall\'assunzione', !catena.length)}
+    </ul>
+    <p class="nota" style="margin:-6px 16px 18px">Ogni documento si apre in anteprima. "Stampa / PDF" lo stampa o lo salva in PDF; su iPhone: Condividi → Salva su File. I cedolini si stampano dal singolo mese, i conteggi di fine rapporto dal Simulatore.</p>
+
+    <section class="card archivio"></section>
+    <dialog class="dlg-lettera"></dialog>`;
   disegnaArchivio(root.querySelector('.archivio'));
 
   const anno = () => Number(root.querySelector('[name=anno]')?.value);
+  root.querySelectorAll('[data-pratica]').forEach((b) => b.addEventListener('click', () => apriPratica(b.dataset.pratica)));
+  root.querySelectorAll('[data-lettera]').forEach((b) => b.addEventListener('click', () => apriLettera(root.querySelector('.dlg-lettera'), b.dataset.lettera)));
   root.querySelectorAll('[data-doc]').forEach((b) => b.addEventListener('click', () => {
     switch (b.dataset.doc) {
       case 'assunzione': return stampaLetteraAssunzione();
@@ -60,8 +72,6 @@ export function mostraDocumenti(root, { vai }) {
       case 'dichiarazione': return stampaDichiarazione(catena, anno());
       case 'annuale': return stampaProspettoAnnuale(catena, anno());
       case 'tfr': return stampaTfr(catena);
-      case 'cedolini': return vai('mesi');
-      case 'cessazione': return vai('simulatore');
     }
   }));
 }
@@ -83,7 +93,7 @@ function disegnaArchivio(box) {
   const docs = app.documenti;
   const gruppi = CATEGORIE_DOC.map((c) => [c, docs.filter((d) => (CATEGORIE_DOC.includes(d.categoria) ? d.categoria : 'Altro') === c)]).filter(([, l]) => l.length);
   box.innerHTML = `
-    <h2>Archivio</h2>
+    <h2>Archivio file</h2>
     <p class="nota">Conserva qui i file del rapporto: ricevute dei versamenti, ricevuta INPS di assunzione, lettera firmata, certificati di malattia, copia dei documenti. Massimo 10 MB per file.</p>
     ${mod ? `<form class="form-carica">
       <label>File (PDF o foto)<input type="file" name="file" accept=".pdf,image/*" required /></label>
