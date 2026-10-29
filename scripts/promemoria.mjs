@@ -83,19 +83,19 @@ async function principale() {
     const righe = elenco.map((s) => `• ${s.titolo}${s.importo != null ? ` (${fmtEur(s.importo)})` : ''}: ${quando(s.tra)}, ${dataIt(s.data)}`);
     if (inAttesa) righe.push(`• ${inAttesa} ${inAttesa === 1 ? 'richiesta' : 'richieste'} di ferie o permessi in attesa di risposta`);
     const oggetto = elenco.length
-      ? `Badante – ${elenco.length === 1 ? elenco[0].titolo : `${elenco.length} scadenze`} (${nome})`
-      : `Badante – richieste in attesa (${nome})`;
+      ? `Badante di Maria – ${elenco.length === 1 ? elenco[0].titolo : `${elenco.length} scadenze`} (${nome})`
+      : `Badante di Maria – richieste in attesa (${nome})`;
     const testo = `Promemoria per ${nome}:\n\n${righe.join('\n')}\n\nApri l'app: ${URL_APP}\n`;
     const html = `<div style="font-family:-apple-system,Segoe UI,Roboto,sans-serif;font-size:15px;color:#111">
       <p>Promemoria per <strong>${nome}</strong>:</p>
       <ul style="padding-left:18px">${righe.map((x) => `<li style="margin-bottom:6px">${x.slice(2)}</li>`).join('')}</ul>
-      <p><a href="${URL_APP}" style="display:inline-block;background:#0a7f78;color:#fff;padding:10px 16px;border-radius:10px;text-decoration:none">Apri l'app</a></p>
+      <p><a href="${URL_APP}" style="display:inline-block;background:#1e4e8c;color:#fff;padding:10px 16px;border-radius:10px;text-decoration:none">Apri l'app</a></p>
       <p style="color:#6c6c70;font-size:12px">Puoi cambiare destinatari e anticipo in Impostazioni → Promemoria.</p></div>`;
 
     if (PROVA) { console.log(`[PROVA] email a ${p.email.join(', ')}\n${oggetto}\n${testo}`); continue; }
 
     if (posta && p.email?.length) {
-      await posta.sendMail({ from: `Badante <${process.env.GMAIL_USER}>`, to: p.email.join(', '), subject: oggetto, text: testo, html });
+      await posta.sendMail({ from: `Badante di Maria <${process.env.GMAIL_USER}>`, to: p.email.join(', '), subject: oggetto, text: testo, html });
       console.log(`Email inviata a ${p.email.length} destinatari.`);
     }
     if (process.env.VAPID_PRIVATE_KEY) {

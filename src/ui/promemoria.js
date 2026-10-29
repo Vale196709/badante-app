@@ -103,7 +103,7 @@ export async function mostraPromemoria(root) {
   });
   root.querySelector('[data-a=prova]')?.addEventListener('click', async () => {
     const reg = await navigator.serviceWorker.ready;
-    reg.showNotification('Badante', { body: 'Le notifiche funzionano: qui arriveranno i promemoria delle scadenze.', icon: `${import.meta.env.BASE_URL}icons/icon-192.png` });
+    reg.showNotification('Badante di Maria', { body: 'Le notifiche funzionano: qui arriveranno i promemoria delle scadenze.', icon: `${import.meta.env.BASE_URL}icons/icon-192.png` });
   });
   root.querySelector('[data-a=disattiva]')?.addEventListener('click', async () => {
     try {

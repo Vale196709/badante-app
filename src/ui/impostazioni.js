@@ -18,12 +18,12 @@ export function mostraImpostazioni(root, ctx) {
     ...(isTitolare() ? [['accessi', 'Accessi', mostraAccessi]] : []),
     ['backup', 'Backup', mostraBackup],
   ];
-  if (!app.rapporto?.dati) attiva = 'rapporto';
+  if (!app.rapporto?.dati && attiva !== 'backup') attiva = 'rapporto';
   if (!voci.some(([k]) => k === attiva)) attiva = 'rapporto';
   root.innerHTML = `
     <h1 class="titolo-pagina">${app.rapporto?.dati ? 'Impostazioni' : 'Nuovo rapporto'}</h1>
     <div class="sotto-schede" role="tablist">
-      ${voci.map(([k, n]) => `<button type="button" data-k="${k}" ${k === attiva ? 'aria-current="page"' : ''} ${!app.rapporto?.dati && k !== 'rapporto' ? 'disabled' : ''}>${n}</button>`).join('')}
+      ${voci.map(([k, n]) => `<button type="button" data-k="${k}" ${k === attiva ? 'aria-current="page"' : ''} ${!app.rapporto?.dati && !['rapporto', 'backup'].includes(k) ? 'disabled' : ''}>${n}</button>`).join('')}
     </div>
     <div class="sotto-contenuto"></div>`;
   const box = root.querySelector('.sotto-contenuto');

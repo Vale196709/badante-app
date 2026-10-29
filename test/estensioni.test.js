@@ -220,3 +220,20 @@ test('promemoria: anticipo, giorno prima, giorno stesso e scadute il lunedì', a
   // martedì 12/01: B è oggi, E domani; C scaduta non si ripete fuori dal lunedì
   assert.deepEqual(daRicordare(sc, '2027-01-12', 3).map((s) => s.chiave), ['b', 'e']);
 });
+
+test('report: consuntivo fino al mese corrente, previsione fino a dicembre, impegni e uscite', async () => {
+  const { reportAnno, sommaReport, componentiCosto } = await import('../src/engine/report.js');
+  const rep = reportAnno(r, [], 2027, '2027-04-15');
+  assert.equal(rep.mesi.length, 12);
+  assert.equal(rep.mesi.filter((m) => m.consuntivo).length, 4);       // gennaio-aprile
+  assert.ok(rep.previsione.costo > rep.consuntivo.costo);
+  const m = rep.mesi[0];
+  assert.equal(Math.round((m.retribuzione + m.tredicesima + m.contributi + m.tfr) * 100) / 100, m.costo);
+  assert.equal(rep.impegni.totale, Math.round((rep.impegni.tfr + rep.impegni.ferie + rep.impegni.tredicesima) * 100) / 100);
+  assert.ok(rep.uscite.some((u) => u.tipo === 'Contributi'));        // 2° trimestre a luglio
+  assert.ok(rep.uscite.every((u) => u.data >= '2027-04-15' && u.data <= '2027-07-14'));
+  assert.ok(rep.costoAnnoPrecedente == null);                         // 2026 incompleto
+  const due = sommaReport([rep, rep]);
+  assert.equal(due.previsione.costo, Math.round(rep.previsione.costo * 2 * 100) / 100);
+  assert.ok(componentiCosto(rep.mesi.length ? calcolaCatena(r, [], { anno: 2027, mese: 1 }).at(-1).risultato : null).contributi > 0);
+});

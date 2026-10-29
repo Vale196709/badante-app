@@ -14,6 +14,9 @@ import { mostraSimulatore } from './ui/simulatore.js';
 import { mostraDocumenti } from './ui/documenti.js';
 import { mostraScadenze } from './ui/scadenze.js';
 import { mostraAltro } from './ui/altro.js';
+import { mostraInfo } from './ui/info.js';
+import { mostraReport } from './ui/report.js';
+import { VERSIONE, dataBuildIt } from './novita.js';
 import { mostraLavoratrice, mostraRichiesteLavoratrice, mostraDocumentiLavoratrice } from './ui/lavoratrice.js';
 
 const root = document.getElementById('app');
@@ -27,9 +30,11 @@ const SEZIONI = {
   mesi: { titolo: 'Presenze', titoloLungo: 'Presenze e cedolini', icona: 'calendario', mostra: mostraMesi, ruoli: GESTIONE, barra: ['basso', 'lato'] },
   scadenze: { titolo: 'Scadenze', icona: 'campana', mostra: mostraScadenze, ruoli: GESTIONE, barra: ['basso', 'lato'] },
   documenti: { titolo: 'Documenti', icona: 'documento', mostra: mostraDocumenti, ruoli: GESTIONE, barra: ['basso', 'lato'] },
+  report: { titolo: 'Report', icona: 'grafico', mostra: mostraReport, ruoli: GESTIONE, barra: ['lato'] },
   simulatore: { titolo: 'Simulatore', icona: 'bilancia', mostra: mostraSimulatore, ruoli: GESTIONE, barra: ['lato'] },
   impostazioni: { titolo: 'Impostazioni', icona: 'ingranaggio', mostra: mostraImpostazioni, ruoli: GESTIONE, barra: ['lato'] },
   altro: { titolo: 'Altro', icona: 'altro', mostra: mostraAltro, ruoli: GESTIONE, barra: ['basso'] },
+  info: { titolo: 'Informazioni', icona: 'documento', mostra: mostraInfo, ruoli: [...GESTIONE, 'lavoratrice'], barra: [] },
   lavoratrice: { titolo: () => t('tabCedolini'), icona: 'euro', mostra: mostraLavoratrice, ruoli: ['lavoratrice'], barra: ['basso', 'lato'] },
   lavRichieste: { titolo: () => t('tabRichieste'), icona: 'valigia', mostra: mostraRichiesteLavoratrice, ruoli: ['lavoratrice'], barra: ['basso', 'lato'] },
   lavDocumenti: { titolo: () => t('tabDocumenti'), icona: 'documento', mostra: mostraDocumentiLavoratrice, ruoli: ['lavoratrice'], barra: ['basso', 'lato'] },
@@ -98,7 +103,7 @@ function disegnaApp() {
       <aside class="lato" aria-label="Menu">
         <div class="lato-testa">
           <img src="${import.meta.env.BASE_URL}icons/icon-192.png" alt="" width="34" height="34" />
-          <div><strong>Badante</strong><small>${esc(RUOLI[ruolo])}</small></div>
+          <div><strong>Badante di Maria</strong><small>${esc(RUOLI[ruolo])}</small></div>
         </div>
         ${piu || ruolo === 'titolare' ? `<label class="scelta-rapporto">Rapporto
           <select class="sel-rapporto">
@@ -112,13 +117,14 @@ function disegnaApp() {
         <div class="lato-piede">
           ${lav ? `<select class="lingua" aria-label="${t('lingua')}">${Object.entries(LINGUE).map(([k, v]) => `<option value="${k}" ${k === linguaCorrente() ? 'selected' : ''}>${v}</option>`).join('')}</select>` : ''}
           <small>${esc(user.email)}</small>
+          <button type="button" class="link versione" data-s="info">Versione ${esc(VERSIONE)} · ${esc(dataBuildIt().split(' alle')[0])}</button>
           <button type="button" class="esci">${ICONE.esci}<span>${lav ? t('esci') : 'Esci'}</span></button>
         </div>
       </aside>
 
       <div class="principale">
         <header class="barra-alta">
-          <span class="barra-alta-titolo">${esc(app.rapporto.dati ? nomeRapporto(app.rapporto) : 'Badante')}</span>
+          <span class="barra-alta-titolo">${esc(app.rapporto.dati ? nomeRapporto(app.rapporto) : 'Badante di Maria')}</span>
           ${lav ? `<select class="lingua" aria-label="${t('lingua')}">${Object.entries(LINGUE).map(([k, v]) => `<option value="${k}" ${k === linguaCorrente() ? 'selected' : ''}>${v}</option>`).join('')}</select>
                    <button type="button" class="esci tondo" aria-label="${t('esci')}">${ICONE.esci}</button>` : ''}
         </header>

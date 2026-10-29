@@ -49,7 +49,7 @@ export function mostraHome(root, { vai }) {
   root.innerHTML = `
     <h1 class="titolo-pagina">Riepilogo</h1>
     ${avvisi.map((a) => `<div class="avviso ${a.livello}">${esc(a.testo)}</div>`).join('')}
-    ${app.richieste.some((r) => r.stato === 'in attesa') ? `<button type="button" class="avviso info avviso-link" data-vai="mesi">${app.richieste.filter((r) => r.stato === 'in attesa').length} richieste di ferie o permessi in attesa di risposta ›</button>` : ''}
+    ${app.richieste.some((r) => r.stato === 'in attesa') ? `<button type="button" class="avviso info avviso-link" data-vai="mesi">${((n) => `${n} ${n === 1 ? 'richiesta' : 'richieste'} di ferie o permessi in attesa di risposta`)(app.richieste.filter((r) => r.stato === 'in attesa').length)} ›</button>` : ''}
 
     <section class="card evidenza">
       <div class="card-testa">

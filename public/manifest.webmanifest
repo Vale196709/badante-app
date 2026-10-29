@@ -1,12 +1,12 @@
 {
-  "name": "Badante – lavoro domestico",
-  "short_name": "Badante",
+  "name": "Badante di Maria",
+  "short_name": "Badante di Maria",
   "lang": "it",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#f2f2f7",
-  "theme_color": "#0a7f78",
+  "background_color": "#f2f4f8",
+  "theme_color": "#1e4e8c",
   "icons": [
     { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
     { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }

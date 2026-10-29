@@ -1,4 +1,5 @@
 import { supabase } from '../lib/supabase.js';
+import { VERSIONE, dataBuildIt } from '../novita.js';
 
 export function mostraLogin(root) {
   root.innerHTML = `
@@ -6,7 +7,7 @@ export function mostraLogin(root) {
       <div class="login-card">
         <div class="brand">
           <img src="${import.meta.env.BASE_URL}icons/icon-192.png" alt="" width="56" height="56" />
-          <h1>Badante</h1>
+          <h1>Badante di Maria</h1>
           <p>Cedolini, costi e scadenze del lavoro domestico</p>
         </div>
         <form id="f-login" novalidate>
@@ -19,6 +20,7 @@ export function mostraLogin(root) {
           <p class="errore" role="alert" hidden></p>
           <button type="submit" class="primario">Accedi</button>
         </form>
+        <p class="nota centro" style="margin-top:18px">Versione ${VERSIONE} · aggiornata il ${dataBuildIt()}</p>
       </div>
     </main>`;
 

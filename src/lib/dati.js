@@ -156,43 +156,108 @@ export async function firmaRicevutaConFirma(cedolinoId, firmaPng) {
 }
 
 // ---------- Backup ----------
-export async function esportaTutto(rapporto) {
+const aBase64 = (blob) => new Promise((ok_, ko) => {
+  const r = new FileReader();
+  r.onload = () => ok_(String(r.result).split(',')[1]);
+  r.onerror = () => ko(r.error);
+  r.readAsDataURL(blob);
+});
+const daBase64 = (b64, tipo) => {
+  const bin = atob(b64);
+  const arr = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
+  return new Blob([arr], { type: tipo || 'application/octet-stream' });
+};
+
+/** Esporta tutti i dati del rapporto; con includiFile anche il contenuto dei file dell'archivio. */
+export async function esportaTutto(rapporto, { includiFile = false, versioneApp = '', avanzamento = () => {} } = {}) {
   const id = rapporto.id;
-  const [cedolini, fatte, tabelle, versamenti, richieste, documenti] = await Promise.all([
+  const [cedolini, fatte, tabelle, versamenti, richieste, documenti, promemoria] = await Promise.all([
     caricaCedolini(id),
     facoltativo(supabase.from('scadenze_fatte').select('chiave, fatto_at, nota').eq('rapporto_id', id), []),
     facoltativo(supabase.from('tabelle_annuali').select('anno, dati').eq('rapporto_id', id), []),
     caricaVersamenti(id),
     caricaRichieste(id),
     caricaDocumenti(id),
+    caricaPromemoria(id),
   ]);
+  const docs = [];
+  for (const [i, { id: _i, rapporto_id: _r, ...x }] of documenti.entries()) {
+    const voce = { ...x };
+    if (includiFile) {
+      avanzamento(`File ${i + 1} di ${documenti.length}…`);
+      const { data, error } = await supabase.storage.from('documenti').download(x.percorso);
+      if (!error && data) voce.contenuto = await aBase64(data);
+    }
+    docs.push(voce);
+  }
   return {
     formato: 'badante-backup',
-    versione: 1,
+    versione: 2,
+    versioneApp,
     esportato_il: new Date().toISOString(),
     rapporto: { dati: rapporto.dati, contatori: rapporto.contatori ?? {} },
-    cedolini: cedolini.map(({ id: _i, ...c }) => c),
+    cedolini: cedolini.map(({ id: _i, rapporto_id: _r, user_id: _u, ...c }) => c),
     scadenze_fatte: fatte,
     tabelle_annuali: tabelle,
     versamenti,
     richieste: richieste.map(({ id: _i, rapporto_id: _r, ...x }) => x),
-    documenti: documenti.map(({ id: _i, rapporto_id: _r, ...x }) => x), // solo l'elenco: i file restano nell'archivio
+    documenti: docs,
+    promemoria: promemoria ? { attivo: promemoria.attivo, email: promemoria.email, giorni_anticipo: promemoria.giorni_anticipo } : null,
+    fileInclusi: includiFile,
   };
 }
 
-/** Ripristina un backup nel rapporto indicato (o ne crea uno). Restituisce il rapporto. */
-export async function importaTutto(rapportoId, b) {
+/** Riepilogo leggibile di un file di backup, prima del ripristino. */
+export function descriviBackup(b) {
   if (b?.formato !== 'badante-backup') throw new Error('Il file non è un backup di questa app.');
+  return {
+    data: b.esportato_il,
+    versioneApp: b.versioneApp || '',
+    lavoratrice: b.rapporto?.dati?.lavoratrice?.nome || 'senza nome',
+    assunzione: b.rapporto?.dati?.dataAssunzione,
+    cedolini: b.cedolini?.length ?? 0,
+    documenti: b.documenti?.length ?? 0,
+    conFile: (b.documenti || []).filter((d) => d.contenuto).length,
+    versamenti: b.versamenti?.length ?? 0,
+    richieste: b.richieste?.length ?? 0,
+  };
+}
+
+/**
+ * Ripristina un backup.
+ * @param rapportoId id del rapporto da sostituire, oppure null per creare un nuovo rapporto
+ */
+export async function importaTutto(rapportoId, b, { avanzamento = () => {} } = {}) {
+  descriviBackup(b);
+  avanzamento('Dati del rapporto…');
   const rapporto = await salvaRapporto(rapportoId, b.rapporto.dati);
   const id = rapporto.id;
   const conId = (arr) => (arr || []).map((x) => ({ ...x, rapporto_id: id }));
   if (b.cedolini?.length) {
-    ok(await supabase.from('cedolini').upsert(conId(b.cedolini).map(({ ricevuta_at, ricevuta_da, ricevuta_firma, updated_at, ...c }) => c), { onConflict: 'rapporto_id,anno,mese' }));
+    avanzamento('Cedolini…');
+    ok(await supabase.from('cedolini').upsert(conId(b.cedolini).map(({ id: _i, user_id: _u, ricevuta_at, ricevuta_da, ricevuta_firma, updated_at, created_at, ...c }) => c), { onConflict: 'rapporto_id,anno,mese' }));
   }
   if (b.scadenze_fatte?.length) ok(await supabase.from('scadenze_fatte').upsert(conId(b.scadenze_fatte)));
   if (b.tabelle_annuali?.length) ok(await supabase.from('tabelle_annuali').upsert(conId(b.tabelle_annuali)));
   if (b.versamenti?.length) ok(await supabase.from('versamenti').upsert(conId(b.versamenti)));
-  return rapporto;
+  if (b.promemoria) await facoltativo(supabase.from('promemoria').upsert({ rapporto_id: id, ...b.promemoria }), null);
+  if (b.richieste?.length && !rapportoId) {
+    // solo su un rapporto nuovo, per non duplicare le richieste esistenti
+    await facoltativo(supabase.from('richieste').insert(conId(b.richieste).map(({ created_at, ...r }) => r)), null);
+  }
+  let fileRipristinati = 0;
+  const esistenti = rapportoId ? await caricaDocumenti(id) : [];
+  for (const [i, d] of (b.documenti || []).entries()) {
+    if (!d.contenuto) continue;
+    if (esistenti.some((e) => e.nome === d.nome && e.dimensione === d.dimensione)) continue; // già presente
+    avanzamento(`File ${i + 1} di ${b.documenti.length}…`);
+    const nomeFile = d.percorso.split('/').pop().replace(/^[0-9a-f-]{36}-/, '');
+    const file = new File([daBase64(d.contenuto, d.tipo_file)], nomeFile, { type: d.tipo_file || 'application/octet-stream' });
+    await caricaFile(id, file, { categoria: d.categoria, visibile: d.visibile_lavoratrice, nome: d.nome });
+    fileRipristinati++;
+  }
+  return { rapporto, fileRipristinati };
 }
 
 // ---------- Promemoria e notifiche ----------

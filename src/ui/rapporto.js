@@ -39,7 +39,7 @@ export async function mostraRapporto(root, { ricaricaDati, vai }) {
   const nuovo = !app.rapporto?.dati;
 
   root.innerHTML = `
-    ${nuovo ? '<div class="avviso info"><strong>Benvenuto.</strong> Inserisci i dati del rapporto di lavoro e premi Salva: da qui partono cedolini, scadenze e documenti.</div>' : ''}
+    ${nuovo ? '<div class="avviso info"><strong>Nuovo rapporto.</strong> Inserisci i dati e premi Salva: da qui partono cedolini, scadenze e documenti. Hai già un backup? Lo ripristini dalla scheda <button type="button" class="link vai-backup" style="padding:0">Backup</button>.</div>' : ''}
     <form id="f-rapporto" class="scheda" novalidate>
       <fieldset ${mod ? '' : 'disabled'} class="tutto">
       <section>
@@ -112,6 +112,7 @@ export async function mostraRapporto(root, { ricaricaDati, vai }) {
       </div>` : '<p class="nota centro">Hai un accesso in sola lettura.</p>'}
     </form>`;
 
+  root.querySelector('.vai-backup')?.addEventListener('click', () => document.querySelector('.sotto-schede [data-k=backup]')?.click());
   const f = root.querySelector('#f-rapporto');
   const riep = root.querySelector('.riepilogo');
   const esito = root.querySelector('.esito');

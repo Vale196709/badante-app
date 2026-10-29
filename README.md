@@ -1,4 +1,4 @@
-# App Badante – gestione del lavoro domestico (CCNL)
+# Badante di Maria – gestione del lavoro domestico (CCNL)
 
 Web app installabile su PC e iPhone per gestire un rapporto di lavoro domestico non convivente:
 presenze, cedolini, costi, contributi, scadenze, documenti e accessi profilati.
@@ -6,6 +6,7 @@ presenze, cedolini, costi, contributi, scadenze, documenti e accessi profilati.
 Online: https://vale196709.github.io/badante-app/
 
 ## Funzioni
+- **Report**: consuntivo e previsione dell'anno, composizione dei costi, maturato verso la lavoratrice, uscite dei prossimi 90 giorni, anche per più rapporti; stampa.
 - **Riepilogo**: mese corrente, contatori (ferie, TFR, 13ª, malattia), scadenze, avvisi, costi dell'anno.
 - **Presenze e cedolini**: calendario giorno per giorno (lavorato, ferie, malattia, permessi, assenze,
   ore extra e straordinari), cedolino calcolato in tempo reale, bozza → confermato → pagato, stampa/PDF.
@@ -17,6 +18,7 @@ Online: https://vale196709.github.io/badante-app/
 - **Archivio**: file del rapporto (ricevute pagoPA, certificati, documenti) su Supabase Storage, condivisibili con la lavoratrice.
 - **Versamenti INPS**: registrazione dei pagamenti trimestrali, confronto con il dovuto, deduzione calcolata sul pagato.
 - **Richieste di ferie e permessi**: la lavoratrice chiede, titolare o gestore approvano e le presenze si aggiornano.
+- **Backup e ripristino**: copia completa anche con i file dell'archivio; ripristino con anteprima, nel rapporto attuale o come nuovo.
 - **Impostazioni**: dati del rapporto, tabelle annuali modificabili (minimi CCNL, contributi INPS, Cassa Colf,
   inflazione per il TFR), accessi, backup (JSON completo, CSV per Excel, ripristino).
 - **Accessi**: titolare, gestore (familiare/consulente), sola lettura, lavoratrice (vede i suoi cedolini
@@ -28,6 +30,9 @@ Online: https://vale196709.github.io/badante-app/
 - **Pratiche INPS guidate**: assunzione, variazione, contributi trimestrali, cessazione, con i dati da inserire.
 - **Promemoria**: email (Gmail) e notifiche sul telefono ogni mattina, da GitHub Actions (`scripts/promemoria.mjs`).
 - **Keep-alive**: un'attività GitHub due volte a settimana tiene attivo il progetto Supabase gratuito.
+
+## Versioni
+La versione è in `package.json` e le novità in `src/novita.js`; versione e data di aggiornamento compaiono in Altro → Informazioni.
 
 ## Struttura
 - `src/engine/` motore di calcolo (tabelle annuali, cedolino, presenze, catena mensile, scadenze,

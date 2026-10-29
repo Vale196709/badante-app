@@ -22,7 +22,7 @@ export function apriStampa(titolo, corpo) {
       <button type="button" class="primario stampa">Stampa / PDF</button>
     </div>
     <div class="stampa-area"><article class="foglio">${corpo}
-      <footer class="foglio-piede">Documento generato il ${dataIt(oggiIso())} con l'app Badante · verificare i dati prima della firma</footer>
+      <footer class="foglio-piede">Documento generato il ${dataIt(oggiIso())} con l'app Badante di Maria (v${__VERSIONE__}) · verificare i dati prima della firma</footer>
     </article></div>`;
   document.body.appendChild(el);
   document.body.classList.add('in-stampa');

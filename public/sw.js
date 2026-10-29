@@ -1,5 +1,5 @@
 // Service worker: apre l'interfaccia anche senza rete e mostra le notifiche dei promemoria.
-const CACHE = 'badante-v2';
+const CACHE = 'badante-v3';
 self.addEventListener('install', () => self.skipWaiting());
 self.addEventListener('activate', (e) => {
   e.waitUntil(caches.keys().then((k) => Promise.all(k.filter((n) => n !== CACHE).map((n) => caches.delete(n)))).then(() => self.clients.claim()));
@@ -16,7 +16,7 @@ self.addEventListener('fetch', (e) => {
 self.addEventListener('push', (e) => {
   let d = {};
   try { d = e.data ? e.data.json() : {}; } catch { d = { body: e.data?.text() }; }
-  e.waitUntil(self.registration.showNotification(d.title || 'Badante', {
+  e.waitUntil(self.registration.showNotification(d.title || 'Badante di Maria', {
     body: d.body || '',
     icon: `${self.registration.scope}icons/icon-192.png`,
     badge: `${self.registration.scope}icons/icon-192.png`,

@@ -2,6 +2,7 @@
 import { app, isTitolare, esc, nomeRapporto } from '../stato.js';
 import { ICONE, tessera } from './icone.js';
 import { supabase } from '../lib/supabase.js';
+import { VERSIONE, dataBuildIt } from '../novita.js';
 
 const RUOLI = { titolare: 'Titolare', gestore: 'Gestore', lettore: 'Sola lettura', lavoratrice: 'Lavoratrice' };
 
@@ -12,19 +13,23 @@ export function mostraAltro(root, { vai, scegliRapporto }) {
   root.innerHTML = `
     <h1 class="titolo-pagina">Altro</h1>
     <ul class="gruppo">
-      ${riga('data-vai="simulatore"', 'bilancia', '#5856d6', 'Simulatore', 'Scenari di costo e fine rapporto')}
+      ${riga('data-vai="report"', 'grafico', '#e0a100', 'Report', 'Consuntivo, previsione e uscite in arrivo')}
+      ${riga('data-vai="simulatore"', 'bilancia', '#1e4e8c', 'Simulatore', 'Scenari di costo e fine rapporto')}
       ${riga('data-vai="impostazioni"', 'ingranaggio', '#8e8e93', 'Impostazioni', 'Rapporto, variazioni, tabelle, promemoria, accessi, backup')}
     </ul>
     <h2 class="testa-gruppo">Rapporti di lavoro</h2>
     <ul class="gruppo">
       ${app.rapporti.map((r) => riga(`data-rapporto="${r.id}"`, 'persona', r.id === app.rapporto.id ? 'var(--tinta)' : '#aeaeb2', esc(nomeRapporto(r)),
         `${RUOLI[r.ruolo]}${r.dati?.tipoContratto === 'determinato' ? ' · a termine' : ''}${r.id === app.rapporto.id ? ' · in uso' : ''}`, r.id !== app.rapporto.id)).join('')}
-      ${isTitolare() || !app.rapporti.length ? riga('data-nuovo', 'piu', '#34c759', 'Aggiungi rapporto', 'Per esempio una sostituta durante le ferie') : ''}
+      ${isTitolare() || !app.rapporti.length ? riga('data-nuovo', 'piu', '#2e9f5a', 'Aggiungi rapporto', 'Per esempio una sostituta durante le ferie') : ''}
     </ul>
     <h2 class="testa-gruppo">Account</h2>
     <ul class="gruppo">
       <li class="riga-info"><span>${esc(app.user.email)}</span><small>${RUOLI[app.rapporto.ruolo]}</small></li>
       ${riga('data-esci', 'esci', '#ff3b30', 'Esci', '', false)}
+    </ul>
+    <ul class="gruppo">
+      ${riga('data-vai="info"', 'documento', '#8691a8', 'Informazioni', `Versione ${VERSIONE} · aggiornata il ${dataBuildIt()}`)}
     </ul>`;
   root.querySelectorAll('[data-vai]').forEach((b) => b.addEventListener('click', () => vai(b.dataset.vai)));
   root.querySelectorAll('[data-rapporto]').forEach((b) => b.addEventListener('click', () => { if (b.dataset.rapporto !== app.rapporto.id) scegliRapporto(b.dataset.rapporto); }));

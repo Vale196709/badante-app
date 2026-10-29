@@ -30,10 +30,10 @@ export function mostraDocumenti(root, { vai }) {
 
     <h2 class="testa-gruppo">Pratiche INPS guidate</h2>
     <ul class="gruppo">
-      ${voce('data-pratica="assunzione"', 'inps', '#0a7f78', 'Assunzione', 'Entro il giorno prima dell\'inizio')}
-      ${voce('data-pratica="variazione"', 'inps', '#0a7f78', 'Variazione di orario o paga', 'Dopo ogni variazione')}
-      ${voce('data-pratica="contributi"', 'euro', '#0a7f78', 'Pagamento dei contributi', 'Ogni trimestre, con i dati da inserire')}
-      ${voce('data-pratica="cessazione"', 'inps', '#0a7f78', 'Cessazione', 'Entro 5 giorni dalla fine del rapporto')}
+      ${voce('data-pratica="assunzione"', 'inps', '#1e4e8c', 'Assunzione', 'Entro il giorno prima dell\'inizio')}
+      ${voce('data-pratica="variazione"', 'inps', '#1e4e8c', 'Variazione di orario o paga', 'Dopo ogni variazione')}
+      ${voce('data-pratica="contributi"', 'euro', '#1e4e8c', 'Pagamento dei contributi', 'Ogni trimestre, con i dati da inserire')}
+      ${voce('data-pratica="cessazione"', 'inps', '#1e4e8c', 'Cessazione', 'Entro 5 giorni dalla fine del rapporto')}
     </ul>
 
     <h2 class="testa-gruppo">Contratto</h2>
@@ -44,7 +44,7 @@ export function mostraDocumenti(root, { vai }) {
 
     <h2 class="testa-gruppo">Lettere pronte</h2>
     <ul class="gruppo">
-      ${Object.entries(LETTERE).map(([k, l]) => voce(`data-lettera="${k}"`, 'busta', '#ff9500', esc(l.titolo), esc(l.descr))).join('')}
+      ${Object.entries(LETTERE).map(([k, l]) => voce(`data-lettera="${k}"`, 'busta', '#e0a100', esc(l.titolo), esc(l.descr))).join('')}
     </ul>
 
     <h2 class="testa-gruppo">Ogni anno</h2>
@@ -52,9 +52,9 @@ export function mostraDocumenti(root, { vai }) {
       <label>Anno<select name="anno">${anni.map((a) => `<option ${a === (anni.includes(annoOggi - 1) ? annoOggi - 1 : anni[0]) ? 'selected' : ''}>${a}</option>`).join('')}</select></label>
     </section>
     <ul class="gruppo">
-      ${voce('data-doc="dichiarazione"', 'documento', '#34c759', 'Dichiarazione dei compensi', 'Per la lavoratrice: dichiarazione dei redditi, ISEE, permesso di soggiorno', !anni.length)}
-      ${voce('data-doc="annuale"', 'grafico', '#34c759', 'Prospetto costi', 'Per te: costi mese per mese e contributi da dedurre nel 730', !anni.length)}
-      ${voce('data-doc="tfr"', 'tabella', '#34c759', 'Prospetto TFR', 'Quote, rivalutazioni e anticipi dall\'assunzione', !catena.length)}
+      ${voce('data-doc="dichiarazione"', 'documento', '#2e9f5a', 'Dichiarazione dei compensi', 'Per la lavoratrice: dichiarazione dei redditi, ISEE, permesso di soggiorno', !anni.length)}
+      ${voce('data-doc="annuale"', 'grafico', '#2e9f5a', 'Prospetto costi', 'Per te: costi mese per mese e contributi da dedurre nel 730', !anni.length)}
+      ${voce('data-doc="tfr"', 'tabella', '#2e9f5a', 'Prospetto TFR', 'Quote, rivalutazioni e anticipi dall\'assunzione', !catena.length)}
     </ul>
     <p class="nota" style="margin:-6px 16px 18px">Ogni documento si apre in anteprima. "Stampa / PDF" lo stampa o lo salva in PDF; su iPhone: Condividi → Salva su File. I cedolini si stampano dal singolo mese, i conteggi di fine rapporto dal Simulatore.</p>
 
