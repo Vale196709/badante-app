@@ -3,7 +3,8 @@
 // Ogni giorno del mese può avere un record { tipo, ore, extra, extraTipo, nota }:
 //   tipo  'L' lavorato · 'F' ferie · 'M' malattia · 'P' permesso retribuito
 //         'A' assenza non retribuita · '' giorno senza lavoro programmato
-//   ore   ore lavorate (solo per 'L'); oltre l'orario programmato diventano ore aggiuntive
+//   ore   per 'L' ore lavorate (oltre l'orario programmato diventano ore aggiuntive);
+//         per 'P' ore di permesso (le restanti del giorno si considerano lavorate)
 //   extra ore di straordinario aggiunte, con extraTipo 'diurno' | 'notturno'
 // I giorni senza record seguono l'orario programmato (lavorato, o festività se festivo).
 
@@ -67,7 +68,10 @@ export function presenzeDaGiorni(rapporto, anno, mese, salvati = {}, extra = {},
     } else if (g.tipo === 'F' && !g.festivita) {
       oreFerie += g.oreProgrammate;
     } else if (g.tipo === 'P' && !g.festivita) {
-      orePermessi += Number(g.ore) || g.oreProgrammate;
+      // permesso di tutta la giornata o di poche ore: le ore restanti del giorno sono lavorate
+      const perm = Math.min(Number(g.ore) || g.oreProgrammate, g.oreProgrammate || Number(g.ore) || 0);
+      orePermessi += perm;
+      oreOrdinarie += Math.max(0, g.oreProgrammate - perm);
     }
     const ex = Number(g.extra) || 0;
     if (ex > 0) straordinari[g.extraTipo === 'notturno' ? 'notturno' : 'diurno'] += ex;

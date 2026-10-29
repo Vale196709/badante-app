@@ -29,7 +29,7 @@ export async function salvaRapporto(id, dati) {
 // ---------- Cedolini ----------
 export async function caricaCedolini(rapportoId) {
   return ok(await supabase.from('cedolini')
-    .select('id, anno, mese, presenze, risultato, stato, pagato_at, ricevuta_at, ricevuta_da, updated_at')
+    .select('*')
     .eq('rapporto_id', rapportoId).order('anno').order('mese'));
 }
 
@@ -72,4 +72,125 @@ export async function eliminaInvito(id) {
 
 export async function eliminaAccesso(rapportoId, userId) {
   ok(await supabase.from('accessi').delete().eq('rapporto_id', rapportoId).eq('user_id', userId));
+}
+
+// ---------- Tabelle annuali personalizzate ----------
+const facoltativo = async (promessa, vuoto) => {
+  try { return ok(await promessa); } catch (e) {
+    if (/does not exist|schema cache|Could not find/i.test(e.message)) return vuoto; // script 03 non ancora eseguito
+    throw e;
+  }
+};
+
+export async function caricaTabelle(rapportoId) {
+  const righe = await facoltativo(supabase.from('tabelle_annuali').select('anno, dati, updated_at').eq('rapporto_id', rapportoId), []);
+  return Object.fromEntries(righe.map((r) => [r.anno, r.dati]));
+}
+export async function salvaTabelle(rapportoId, anno, dati) {
+  ok(await supabase.from('tabelle_annuali').upsert({ rapporto_id: rapportoId, anno, dati, updated_at: new Date().toISOString() }));
+}
+export async function eliminaTabelle(rapportoId, anno) {
+  ok(await supabase.from('tabelle_annuali').delete().eq('rapporto_id', rapportoId).eq('anno', anno));
+}
+
+// ---------- Versamenti INPS ----------
+export async function caricaVersamenti(rapportoId) {
+  return facoltativo(supabase.from('versamenti').select('anno, trimestre, data_pagamento, importo, nota').eq('rapporto_id', rapportoId), []);
+}
+export async function salvaVersamento(rapportoId, v) {
+  ok(await supabase.from('versamenti').upsert({ rapporto_id: rapportoId, ...v }));
+}
+export async function eliminaVersamento(rapportoId, anno, trimestre) {
+  ok(await supabase.from('versamenti').delete().eq('rapporto_id', rapportoId).eq('anno', anno).eq('trimestre', trimestre));
+}
+
+// ---------- Archivio documenti ----------
+export async function caricaDocumenti(rapportoId) {
+  return facoltativo(supabase.from('documenti').select('*').eq('rapporto_id', rapportoId).order('created_at', { ascending: false }), []);
+}
+export async function caricaFile(rapportoId, file, { categoria, visibile, nome }) {
+  const pulito = file.name.normalize('NFD').replace(/[^\w.-]+/g, '_').slice(-80);
+  const percorso = `${rapportoId}/${crypto.randomUUID()}-${pulito}`;
+  ok(await supabase.storage.from('documenti').upload(percorso, file, { contentType: file.type || 'application/octet-stream' }));
+  try {
+    ok(await supabase.from('documenti').insert({
+      rapporto_id: rapportoId, nome: nome || file.name, categoria, percorso,
+      dimensione: file.size, tipo_file: file.type, visibile_lavoratrice: !!visibile,
+      caricato_da: (await supabase.auth.getUser()).data.user?.email,
+    }));
+  } catch (e) {
+    await supabase.storage.from('documenti').remove([percorso]);
+    throw e;
+  }
+}
+export async function linkFile(percorso) {
+  const { data, error } = await supabase.storage.from('documenti').createSignedUrl(percorso, 300);
+  if (error) throw error;
+  return data.signedUrl;
+}
+export async function aggiornaDocumento(id, campi) {
+  ok(await supabase.from('documenti').update(campi).eq('id', id));
+}
+export async function eliminaDocumento(doc) {
+  ok(await supabase.storage.from('documenti').remove([doc.percorso]));
+  ok(await supabase.from('documenti').delete().eq('id', doc.id));
+}
+
+// ---------- Richieste ferie e permessi ----------
+export async function caricaRichieste(rapportoId) {
+  return facoltativo(supabase.from('richieste').select('*').eq('rapporto_id', rapportoId).order('dal', { ascending: false }), []);
+}
+export async function creaRichiesta(rapportoId, r) {
+  ok(await supabase.from('richieste').insert({ rapporto_id: rapportoId, ...r }));
+}
+export async function decidiRichiesta(id, stato, risposta, email) {
+  ok(await supabase.from('richieste').update({ stato, risposta: risposta || null, deciso_da: email, deciso_at: new Date().toISOString() }).eq('id', id));
+}
+export async function ritiraRichiesta(id) {
+  ok(await supabase.from('richieste').delete().eq('id', id));
+}
+
+// ---------- Firma grafica ----------
+export async function firmaRicevutaConFirma(cedolinoId, firmaPng) {
+  return ok(await supabase.rpc('firma_ricevuta', { cid: cedolinoId, firma: firmaPng || null }));
+}
+
+// ---------- Backup ----------
+export async function esportaTutto(rapporto) {
+  const id = rapporto.id;
+  const [cedolini, fatte, tabelle, versamenti, richieste, documenti] = await Promise.all([
+    caricaCedolini(id),
+    facoltativo(supabase.from('scadenze_fatte').select('chiave, fatto_at, nota').eq('rapporto_id', id), []),
+    facoltativo(supabase.from('tabelle_annuali').select('anno, dati').eq('rapporto_id', id), []),
+    caricaVersamenti(id),
+    caricaRichieste(id),
+    caricaDocumenti(id),
+  ]);
+  return {
+    formato: 'badante-backup',
+    versione: 1,
+    esportato_il: new Date().toISOString(),
+    rapporto: { dati: rapporto.dati, contatori: rapporto.contatori ?? {} },
+    cedolini: cedolini.map(({ id: _i, ...c }) => c),
+    scadenze_fatte: fatte,
+    tabelle_annuali: tabelle,
+    versamenti,
+    richieste: richieste.map(({ id: _i, rapporto_id: _r, ...x }) => x),
+    documenti: documenti.map(({ id: _i, rapporto_id: _r, ...x }) => x), // solo l'elenco: i file restano nell'archivio
+  };
+}
+
+/** Ripristina un backup nel rapporto indicato (o ne crea uno). Restituisce il rapporto. */
+export async function importaTutto(rapportoId, b) {
+  if (b?.formato !== 'badante-backup') throw new Error('Il file non è un backup di questa app.');
+  const rapporto = await salvaRapporto(rapportoId, b.rapporto.dati);
+  const id = rapporto.id;
+  const conId = (arr) => (arr || []).map((x) => ({ ...x, rapporto_id: id }));
+  if (b.cedolini?.length) {
+    ok(await supabase.from('cedolini').upsert(conId(b.cedolini).map(({ ricevuta_at, ricevuta_da, ricevuta_firma, updated_at, ...c }) => c), { onConflict: 'rapporto_id,anno,mese' }));
+  }
+  if (b.scadenze_fatte?.length) ok(await supabase.from('scadenze_fatte').upsert(conId(b.scadenze_fatte)));
+  if (b.tabelle_annuali?.length) ok(await supabase.from('tabelle_annuali').upsert(conId(b.tabelle_annuali)));
+  if (b.versamenti?.length) ok(await supabase.from('versamenti').upsert(conId(b.versamenti)));
+  return rapporto;
 }

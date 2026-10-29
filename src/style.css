@@ -298,3 +298,38 @@ body.in-stampa { overflow: hidden; }
   .foglio { box-shadow: none; max-width: none; margin: 0; }
   .foglio tr, .foglio .firme { break-inside: avoid; }
 }
+
+/* ---------- v3: impostazioni, archivio, richieste, firma ---------- */
+.sotto-schede { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 14px; }
+.sotto-schede button { border: 1px solid var(--bordo); background: var(--carta); color: var(--testo); border-radius: 10px; padding: 7px 12px; font-size: .9rem; }
+.sotto-schede button[aria-current] { border-color: var(--accento); color: var(--accento); font-weight: 600; box-shadow: inset 0 -2px 0 var(--accento); }
+.sotto-schede button:disabled { opacity: .45; }
+.riga.stretta { gap: 8px; align-items: center; flex-wrap: nowrap; }
+.riga.stretta select { width: auto; }
+.riga.stretta .secondario { white-space: nowrap; }
+.griglia-livelli { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+.griglia-livelli label { margin: 0; }
+.tab-tabelle { width: 100%; border-collapse: collapse; font-size: .82rem; margin-bottom: 8px; }
+.tab-tabelle th { font-weight: 600; color: var(--tenue); text-align: left; padding: 4px; font-size: .75rem; }
+.tab-tabelle td { padding: 4px; vertical-align: middle; }
+.mini { padding: 7px 6px; min-height: 36px; font-size: .9rem; max-width: 90px; }
+.lista-file, .lista-richieste { list-style: none; padding: 0; margin: 0; }
+.lista-file li, .lista-richieste li { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 4px 12px; padding: 10px 0; border-bottom: 1px solid var(--bordo); }
+.lista-file li:last-child, .lista-richieste li:last-child { border-bottom: 0; }
+.lista-file small { color: var(--tenue); flex: 1 1 100%; }
+.lista-file .apri { text-align: left; }
+.azioni-file { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.form-carica { border: 1px dashed var(--bordo); border-radius: 10px; padding: 12px; margin-bottom: 14px; }
+.versamento { margin: 6px 0 0 32px; font-size: .88rem; color: var(--ok); display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: flex-end; }
+.form-v { color: var(--testo); }
+.form-v label { margin: 0; flex: 0 1 150px; font-size: .8rem; }
+.form-v input { min-height: 38px; padding: 7px 8px; }
+.form-v .secondario { min-height: 38px; }
+.avviso-link { display: block; width: 100%; text-align: left; font: inherit; cursor: pointer; color: var(--testo); }
+.tavola-firma { width: 100%; aspect-ratio: 600 / 220; background: #fff; border: 1px dashed #9aa; border-radius: 10px; touch-action: none; display: block; margin: 6px 0; }
+dialog.dlg-firma { border: 0; border-radius: 16px; padding: 0; width: min(560px, calc(100vw - 24px)); background: var(--carta); color: var(--testo); }
+.lingua { width: auto; min-height: 36px; padding: 4px 8px; font-size: .85rem; }
+.foglio .trad { font-size: 8pt; color: #555; font-weight: 400; font-style: italic; }
+.foglio h1 .trad { font-size: 10pt; }
+.foglio .con-firma { position: relative; }
+.foglio .con-firma img { position: absolute; bottom: 100%; left: 0; height: 52px; }

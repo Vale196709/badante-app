@@ -8,6 +8,9 @@ export const app = {
   rapporto: null,  // { id, user_id, dati, ruolo }
   cedolini: [],
   fatte: new Set(),
+  versamenti: [],
+  richieste: [],
+  documenti: [],
 };
 
 export const puoModificare = () => ['titolare', 'gestore'].includes(app.rapporto?.ruolo);
@@ -40,6 +43,7 @@ const MESI = ['Gennaio', 'Febbraio', 'Marzo', 'Aprile', 'Maggio', 'Giugno', 'Lug
 export const nomeMeseMaiusc = (m) => MESI[m - 1];
 
 export function toast(testo, tipo = 'ok') {
+  document.querySelectorAll('.toast').forEach((x) => x.remove());
   const el = document.createElement('div');
   el.className = `toast ${tipo}`;
   el.textContent = testo;

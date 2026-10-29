@@ -5,6 +5,7 @@ import { giorniMese, TIPI } from '../engine/presenze.js';
 import { nomeFestivita } from '../engine/tabelle.js';
 import { salvaCedolino } from '../lib/dati.js';
 import { stampaCedolino } from './stampe.js';
+import { cardRichieste } from './richieste.js';
 
 const STATI = { 'da fare': 'Da preparare', bozza: 'Bozza', confermato: 'Confermato', pagato: 'Pagato' };
 const GSETT = ['Lun', 'Mar', 'Mer', 'Gio', 'Ven', 'Sab', 'Dom'];
@@ -12,7 +13,7 @@ const SIGLE = { L: '', F: 'Ferie', M: 'Malattia', P: 'Permesso', A: 'Assente', '
 
 export function mostraMesi(root, ctx) {
   const d = app.rapporto?.dati;
-  if (!d) { ctx.vai('rapporto'); return; }
+  if (!d) { ctx.vai('impostazioni'); return; }
   const catena = catenaCorrente();
   // aggiunge il mese successivo per poter preparare in anticipo
   const ultimo = catena[catena.length - 1];
@@ -30,6 +31,7 @@ export function mostraMesi(root, ctx) {
 
   root.innerHTML = `
     <h1 class="titolo-pagina">Presenze e cedolini</h1>
+    <section class="card richieste-box" hidden></section>
     <ul class="lista-mesi">
       ${[...catena].reverse().map((m) => `
         <li><button type="button" data-k="${chiaveMese(m.anno, m.mese)}" class="${chiaveMese(m.anno, m.mese) === oggiMese ? 'corrente' : ''}">
@@ -39,6 +41,7 @@ export function mostraMesi(root, ctx) {
           <span class="firma">${m.salvato?.ricevuta_at ? '✍︎ firmato' : ''}</span>
         </button></li>`).join('')}
     </ul>`;
+  cardRichieste(root.querySelector('.richieste-box'), () => mostraMesi(root, ctx));
   root.querySelectorAll('.lista-mesi button').forEach((b) =>
     b.addEventListener('click', () => {
       const [a, m] = b.dataset.k.split('-').map(Number);
@@ -205,7 +208,7 @@ function editorMese(root, ctx, anno, mese) {
         <p class="nota">Orario programmato: ${g.oreProgrammate} h${g.festivita ? ' · la festività è pagata comunque (1/6 dell\'orario settimanale)' : ''}</p>
         <div class="scelte">${Object.entries(TIPI).map(([k, v]) => `<label class="scelta"><input type="radio" name="tipo" value="${k}" ${g.tipo === k ? 'checked' : ''}/><span>${v}</span></label>`).join('')}</div>
         <div class="riga">
-          <label class="campo-ore">Ore lavorate<input type="number" name="ore" min="0" max="16" step="0.25" inputmode="decimal" value="${g.ore ?? g.oreProgrammate}" /></label>
+          <label class="campo-ore"><span class="et-ore">Ore lavorate</span><input type="number" name="ore" min="0" max="16" step="0.25" inputmode="decimal" value="${g.ore ?? g.oreProgrammate}" /></label>
           <label>Straordinario<input type="number" name="extra" min="0" max="12" step="0.25" inputmode="decimal" value="${g.extra || ''}" placeholder="0" /></label>
           <label>Tipo<select name="extraTipo"><option value="diurno">Diurno +25%</option><option value="notturno" ${g.extraTipo === 'notturno' ? 'selected' : ''}>Notturno +50%</option></select></label>
         </div>
@@ -218,7 +221,10 @@ function editorMese(root, ctx, anno, mese) {
       </form>`;
     const f = dlg.querySelector('form');
     const oreCampo = dlg.querySelector('.campo-ore');
-    const sync = () => { oreCampo.hidden = !['L', 'P'].includes(f.tipo.value); };
+    const sync = () => {
+      oreCampo.hidden = !['L', 'P'].includes(f.tipo.value);
+      dlg.querySelector('.et-ore').textContent = f.tipo.value === 'P' ? 'Ore di permesso' : 'Ore lavorate';
+    };
     f.addEventListener('change', sync);
     sync();
     dlg.onclose = () => {

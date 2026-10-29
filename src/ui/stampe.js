@@ -5,6 +5,7 @@ import { oreSettimanali } from '../engine/calcolo.js';
 import { riepilogoAnno, contributiDeducibili } from '../engine/annuale.js';
 import { MOTIVI } from '../engine/cessazione.js';
 import { REGOLE_CCNL } from '../engine/tabelle.js';
+import { voceT, meseT } from '../i18n.js';
 
 const GIORNI = ['lunedì', 'martedì', 'mercoledì', 'giovedì', 'venerdì', 'sabato', 'domenica'];
 const CCNL = 'CCNL sulla disciplina del rapporto di lavoro domestico (rinnovo del 28/10/2025) sottoscritto da Fidaldo e Domina con Filcams-CGIL, Fisascat-CISL, Uiltucs e Federcolf';
@@ -42,22 +43,24 @@ const firme = (sx = 'Il datore di lavoro', dx = 'La lavoratrice') => `
 const orarioTesto = (d) => Object.entries(d.orario).map(([g, h]) => `${GIORNI[g - 1]} ${num(h, h % 1 ? 1 : 0)} ore`).join(', ');
 
 // ---------- Cedolino ----------
-export function stampaCedolino(m, salvato) {
+export function stampaCedolino(m, salvato, { traduci = false } = {}) {
   const d = app.rapporto.dati;
   const r = m.risultato;
   const titolo = `Cedolino ${nomeMeseMaiusc(m.mese)} ${m.anno}`;
+  // traduzione affiancata per la lavoratrice: il testo italiano resta quello valido
+  const tr = (cod) => (traduci && voceT(cod) ? `<br><span class="trad">${esc(voceT(cod))}</span>` : '');
   apriStampa(titolo, `
-    <h1>Prospetto paga · ${nomeMeseMaiusc(m.mese)} ${m.anno}</h1>
+    <h1>Prospetto paga · ${nomeMeseMaiusc(m.mese)} ${m.anno}${traduci && voceT('titolo') ? `<br><span class="trad">${esc(voceT('titolo'))} · ${esc(meseT(m.mese))} ${m.anno}</span>` : ''}</h1>
     ${parti(d)}
     <p class="meta">Livello ${esc(d.livello)} · non convivente · ${oreSettimanali(d.orario)} ore settimanali · assunzione ${dataIt(d.dataAssunzione)}${d.codiceRapportoInps ? ` · cod. rapporto INPS ${esc(d.codiceRapportoInps)}` : ''}</p>
     <table class="dati">
       <thead><tr><th>Voce</th><th class="num">Ore</th><th class="num">Tariffa €</th><th class="num">Importo €</th></tr></thead>
       <tbody>
-        ${r.voci.map((v) => `<tr><td>${esc(v.descrizione)}</td><td class="num">${v.quantita != null ? num(v.quantita) : ''}</td><td class="num">${v.tariffa != null ? num(v.tariffa) : ''}</td><td class="num">${num(v.importo)}</td></tr>`).join('')}
-        <tr class="tot"><td colspan="3">Totale lordo</td><td class="num">${num(r.lordo)}</td></tr>
-        ${r.trattenute.map((t) => `<tr><td colspan="3">${esc(t.descrizione)}</td><td class="num">−${num(t.importo)}</td></tr>`).join('')}
-        ${r.anticipoTfr ? `<tr><td colspan="3">Anticipo TFR</td><td class="num">${num(r.anticipoTfr)}</td></tr>` : ''}
-        <tr class="tot grande"><td colspan="3">NETTO DA PAGARE</td><td class="num">${eur(r.netto)}</td></tr>
+        ${r.voci.map((v) => `<tr><td>${esc(v.descrizione)}${tr(v.codice)}</td><td class="num">${v.quantita != null ? num(v.quantita) : ''}</td><td class="num">${v.tariffa != null ? num(v.tariffa) : ''}</td><td class="num">${num(v.importo)}</td></tr>`).join('')}
+        <tr class="tot"><td colspan="3">Totale lordo${tr('lordo')}</td><td class="num">${num(r.lordo)}</td></tr>
+        ${r.trattenute.map((x) => `<tr><td colspan="3">${esc(x.descrizione)}${tr(x.codice)}</td><td class="num">−${num(x.importo)}</td></tr>`).join('')}
+        ${r.anticipoTfr ? `<tr><td colspan="3">Anticipo TFR${tr('anticipo')}</td><td class="num">${num(r.anticipoTfr)}</td></tr>` : ''}
+        <tr class="tot grande"><td colspan="3">NETTO DA PAGARE${tr('netto')}</td><td class="num">${eur(r.netto)}</td></tr>
       </tbody>
     </table>
     <h2>Contatori</h2>
@@ -79,7 +82,9 @@ export function stampaCedolino(m, salvato) {
     ${salvato?.pagato_at ? `<p>Pagato il ${dataIt(salvato.pagato_at)}.</p>` : ''}
     ${salvato?.ricevuta_at ? `<p class="firma-digitale">Ricevuta confermata nell'app da ${esc(salvato.ricevuta_da)} il ${new Date(salvato.ricevuta_at).toLocaleString('it-IT')}.</p>` : ''}
     <p>Per ricevuta della somma netta di ${eur(r.netto)}.</p>
-    ${firme('Il datore di lavoro', 'La lavoratrice (per ricevuta)')}`);
+    ${salvato?.ricevuta_firma
+      ? `<div class="firme"><div><span>Il datore di lavoro</span></div><div class="con-firma"><img src="${salvato.ricevuta_firma}" alt="Firma della lavoratrice" /><span>La lavoratrice (per ricevuta)</span></div></div>`
+      : firme('Il datore di lavoro', 'La lavoratrice (per ricevuta)')}`);
 }
 
 // ---------- Lettera di assunzione ----------
@@ -162,7 +167,7 @@ export function stampaDichiarazione(catena, anno) {
 export function stampaProspettoAnnuale(catena, anno) {
   const d = app.rapporto.dati;
   const a = riepilogoAnno(catena, anno);
-  const ded = contributiDeducibili(catena, anno);
+  const ded = contributiDeducibili(catena, anno, app.versamenti);
   apriStampa(`Prospetto costi ${anno}`, `
     <h1>Prospetto dei costi · anno ${anno}</h1>
     ${parti(d)}
@@ -175,7 +180,7 @@ export function stampaProspettoAnnuale(catena, anno) {
       <tr><td>Contributi INPS e Cas.Sa.Colf da versare (quota datore + lavoratrice)</td><td class="num">${eur(a.versamentiInps)}</td></tr>
       <tr><td>di cui a carico del datore</td><td class="num">${eur(a.contributiDatore)}</td></tr>
       <tr><td>TFR maturato nell'anno</td><td class="num">${eur(a.tfrMaturato)}</td></tr>
-      <tr class="tot"><td>Contributi a carico del datore pagati nell'anno (4° trim. ${anno - 1} + 1°–3° trim. ${anno})</td><td class="num">${eur(ded.pagati)}</td></tr>
+      <tr class="tot"><td>Contributi a carico del datore pagati nell'anno (4° trim. ${anno - 1} + 1°–3° trim. ${anno})${ded.trimestriRegistrati ? ` · ${ded.trimestriRegistrati} trimestri da pagamenti registrati` : ' · stima dai cedolini'}</td><td class="num">${eur(ded.pagati)}</td></tr>
       <tr><td>Importo deducibile dal reddito (massimo ${eur(ded.massimo)})</td><td class="num">${eur(ded.deducibili)}</td></tr>
     </table>
     <p class="piccolo">Il costo del datore comprende retribuzione, rateo di tredicesima, contributi a suo carico e TFR maturato. La deduzione vale per i contributi effettivamente pagati nell'anno solare: conservare le ricevute pagoPA. Le spese per l'assistenza di persone non autosufficienti possono dare diritto a un'ulteriore detrazione, a condizioni di reddito: verificare con il CAF.</p>`);

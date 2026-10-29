@@ -5,7 +5,7 @@ import { caricaAccessi, creaInvito, eliminaInvito, eliminaAccesso } from '../lib
 const RUOLI = {
   gestore: { nome: 'Gestore', descr: 'Familiare o consulente: inserisce presenze, conferma cedolini, modifica i dati. Non gestisce gli accessi.' },
   lettore: { nome: 'Sola lettura', descr: 'Vede tutto (cedolini, costi, scadenze, documenti) ma non modifica nulla.' },
-  lavoratrice: { nome: 'Lavoratrice', descr: 'Vede solo i propri cedolini confermati, ferie e TFR, e conferma la ricevuta dello stipendio.' },
+  lavoratrice: { nome: 'Lavoratrice', descr: 'Vede i propri cedolini confermati, ferie e TFR e i documenti condivisi; firma la ricevuta dello stipendio e chiede ferie e permessi. Può scegliere la lingua.' },
 };
 
 export async function mostraAccessi(root) {

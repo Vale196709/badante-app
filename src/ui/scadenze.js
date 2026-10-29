@@ -1,7 +1,7 @@
 // Scadenziario con spunta "fatto" ed esportazione nel calendario (.ics).
 import { app, catenaCorrente, puoModificare, eur, esc, dataIt, oggiIso, toast } from '../stato.js';
 import { generaScadenze } from '../engine/scadenze.js';
-import { segnaScadenza } from '../lib/dati.js';
+import { segnaScadenza, salvaVersamento, eliminaVersamento, caricaVersamenti } from '../lib/dati.js';
 
 function ics(scadenze) {
   const riga = (s) => {
@@ -25,7 +25,7 @@ function ics(scadenze) {
 
 export function mostraScadenze(root, { vai }) {
   const d = app.rapporto?.dati;
-  if (!d) { vai('rapporto'); return; }
+  if (!d) { vai('impostazioni'); return; }
   const oggi = oggiIso();
   const catena = catenaCorrente();
   const tutte = generaScadenze(d, catena, oggi, app.fatte);
@@ -44,7 +44,23 @@ export function mostraScadenze(root, { vai }) {
           <span class="data">${dataIt(s.data)}</span>
           <span class="corpo"><span class="cat">${esc(s.categoria)}</span><strong>${esc(s.titolo)}</strong>${s.importo != null ? ` · ${eur(s.importo)}` : ''}<br><small>${esc(s.descrizione || '')}</small></span>
         </label>
+        ${s.chiave.startsWith('inps-') ? bloccoVersamento(s) : ''}
       </li>`;
+    const bloccoVersamento = (s) => {
+      const [, a, tq] = s.chiave.match(/^inps-(\d{4})-T(\d)$/) || [];
+      const v = app.versamenti.find((x) => x.anno === Number(a) && x.trimestre === Number(tq));
+      if (v) {
+        const diff = Number(v.importo) - s.importo;
+        return `<div class="versamento">✓ Pagati ${eur(v.importo)} il ${dataIt(v.data_pagamento)}${Math.abs(diff) >= 0.01 ? ` <span class="${diff < 0 ? 'ko' : ''}">(${diff > 0 ? '+' : '−'}${eur(Math.abs(diff))} rispetto al calcolo)</span>` : ''}
+          ${mod ? `<button type="button" class="link ko" data-elimina-v="${a}-${tq}">Annulla</button>` : ''}</div>`;
+      }
+      if (!mod) return '';
+      return `<form class="versamento form-v" data-v="${a}-${tq}">
+        <label>Pagato il<input type="date" name="data" value="${oggi}" /></label>
+        <label>Importo €<input name="importo" inputmode="decimal" value="${String(s.importo.toFixed(2)).replace('.', ',')}" /></label>
+        <button type="submit" class="secondario">Registra pagamento</button>
+      </form>`;
+    };
     root.innerHTML = `
       <div class="card-testa"><h1 class="titolo-pagina">Scadenze</h1>
         <button type="button" class="secondario esporta">Aggiungi al calendario</button></div>
@@ -64,6 +80,30 @@ export function mostraScadenze(root, { vai }) {
       setTimeout(() => URL.revokeObjectURL(a.href), 1000);
       toast('File calendario scaricato: aprilo per aggiungere gli eventi');
     });
+    const aggiornaVersamenti = async () => { app.versamenti = await caricaVersamenti(app.rapporto.id); };
+    root.querySelectorAll('.form-v').forEach((f) => f.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const [a, tq] = f.dataset.v.split('-').map(Number);
+      const importo = Number(f.importo.value.replace(/\./g, '').replace(',', '.'));
+      if (!(importo >= 0) || !f.data.value) { toast('Inserisci data e importo', 'ko'); return; }
+      try {
+        await salvaVersamento(app.rapporto.id, { anno: a, trimestre: tq, data_pagamento: f.data.value, importo });
+        await segnaScadenza(app.rapporto.id, `inps-${a}-T${tq}`, true);
+        app.fatte.add(`inps-${a}-T${tq}`);
+        tutte.find((x) => x.chiave === `inps-${a}-T${tq}`).fatta = true;
+        await aggiornaVersamenti();
+        toast('Pagamento registrato');
+        disegna();
+      } catch (err) { toast(`Errore: ${err.message}`, 'ko'); }
+    }));
+    root.querySelectorAll('[data-elimina-v]').forEach((b) => b.addEventListener('click', async () => {
+      const [a, tq] = b.dataset.eliminaV.split('-').map(Number);
+      try {
+        await eliminaVersamento(app.rapporto.id, a, tq);
+        await aggiornaVersamenti();
+        disegna();
+      } catch (err) { toast(`Errore: ${err.message}`, 'ko'); }
+    }));
     root.querySelectorAll('input[data-k]').forEach((c) => c.addEventListener('change', async () => {
       const s = tutte.find((x) => x.chiave === c.dataset.k);
       try {

@@ -87,6 +87,7 @@ export function generaScadenze(rapporto, catena, oggi, fatte = new Set()) {
         data: isoDate(a, 2, 15),
         categoria: 'Aggiornamenti',
         titolo: `Aggiornare minimi e contributi ${a}`,
+        completataDa: !tabelleAnno(a).provvisorie,
         descrizione: 'A inizio anno escono i nuovi minimi CCNL e la circolare INPS sui contributi: vanno inseriti nell\'app prima di confermare i cedolini dell\'anno.',
       });
       add({

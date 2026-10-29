@@ -154,3 +154,38 @@ test('formato italiano e paga netta oraria', async () => {
   assert.equal(s.pagaNettaOraria, 8.5);   // 9 − 0,48 INPS − 0,02 Cassa Colf
   assert.equal(s.costoOrario, Math.round(776.89 / 65 * 100) / 100);
 });
+
+test('tabelle personalizzate hanno la precedenza e tolgono il "provvisorio"', async () => {
+  const { impostaTabellePersonalizzate, TABELLE } = await import('../src/engine/tabelle.js');
+  const t27 = JSON.parse(JSON.stringify(TABELLE[2026]));
+  t27.minimiOrariNonConviventi.B = 7.20;
+  t27.inps.indeterminato.fasce[0].lavoratore = 0.44;
+  impostaTabellePersonalizzate({ 2027: t27 });
+  const t = tabelleAnno(2027);
+  assert.equal(t.provvisorie, false);
+  assert.equal(t.minimiOrariNonConviventi.B, 7.2);
+  assert.equal(t.inps.indeterminato.fasce[2].fino, Infinity);
+  const c = calcolaCedolino({ ...r, pagaOraria: 8 }, { anno: 2027, mese: 2 });
+  assert.ok(!c.avvisi.some((a) => a.includes('provvisorio')));
+  assert.equal(c.trattenute[0].importo, Math.round(c.contributi.oreContributive * 0.44 * 100) / 100);
+  impostaTabellePersonalizzate({});
+});
+
+test('deducibili: usa il versamento registrato se pagato nell\'anno', () => {
+  const cat = calcolaCatena(r, [], { anno: 2027, mese: 12 });
+  const senza = contributiDeducibili(cat, 2027);
+  const q4 = cat.filter((m) => m.anno === 2026 && m.mese >= 10);
+  const dovuto = q4.reduce((s, m) => s + m.risultato.contributi.daVersareAInps, 0);
+  const con = contributiDeducibili(cat, 2027, [{ anno: 2026, trimestre: 4, data_pagamento: '2027-01-11', importo: dovuto }]);
+  assert.equal(con.trimestriRegistrati, 1);
+  assert.ok(Math.abs(con.pagati - senza.pagati) < 0.05);
+  // pagato in ritardo nel 2028: non conta nel 2027
+  const tardi = contributiDeducibili(cat, 2027, [{ anno: 2026, trimestre: 4, data_pagamento: '2028-02-01', importo: dovuto }]);
+  assert.ok(tardi.pagati < senza.pagati);
+});
+
+test('permesso di poche ore: il resto della giornata è lavorato', () => {
+  const p = presenzeDaGiorni(r, 2026, 11, { '2026-11-03': { tipo: 'P', ore: 1 } });
+  assert.equal(p.orePermessi, 1);
+  assert.equal(p.oreOrdinarie, 62);
+});

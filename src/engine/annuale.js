@@ -38,8 +38,24 @@ export function riepilogoAnno(catena, anno) {
  * Contributi a carico del datore effettivamente PAGATI nell'anno (deducibili fino a 1.549,37 €):
  * 4° trimestre dell'anno prima (pagato a gennaio) + 1°, 2°, 3° trimestre dell'anno.
  */
-export function contributiDeducibili(catena, anno) {
-  const dentro = catena.filter((m) => (m.anno === anno - 1 && m.mese >= 10) || (m.anno === anno && m.mese <= 9));
-  const pagati = somma(dentro, (m) => m.risultato.contributi.inpsDatore + m.risultato.contributi.cassaColfDatore);
-  return { pagati, deducibili: Math.min(pagati, REGOLE_CCNL.deduzioneContributiMax), massimo: REGOLE_CCNL.deduzioneContributiMax };
+export function contributiDeducibili(catena, anno, versamenti = []) {
+  // trimestri il cui pagamento cade nell'anno: 4° dell'anno prima e 1°–3° dell'anno
+  const trimestri = [{ anno: anno - 1, q: 4 }, { anno, q: 1 }, { anno, q: 2 }, { anno, q: 3 }];
+  let pagati = 0, daRegistrati = 0;
+  for (const t of trimestri) {
+    const mesi = catena.filter((m) => m.anno === t.anno && Math.ceil(m.mese / 3) === t.q);
+    if (!mesi.length) continue;
+    const datore = somma(mesi, (m) => m.risultato.contributi.inpsDatore + m.risultato.contributi.cassaColfDatore);
+    const totale = somma(mesi, (m) => m.risultato.contributi.daVersareAInps);
+    const v = versamenti.find((x) => x.anno === t.anno && x.trimestre === t.q);
+    if (v && v.data_pagamento?.startsWith(String(anno))) {
+      // quota datore del versamento effettivo, in proporzione al dovuto
+      pagati += totale > 0 ? Number(v.importo) * (datore / totale) : 0;
+      daRegistrati++;
+    } else if (!v) {
+      pagati += datore;
+    }
+  }
+  pagati = euro(pagati);
+  return { pagati, deducibili: Math.min(pagati, REGOLE_CCNL.deduzioneContributiMax), massimo: REGOLE_CCNL.deduzioneContributiMax, trimestriRegistrati: daRegistrati };
 }

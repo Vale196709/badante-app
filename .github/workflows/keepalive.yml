@@ -1,0 +1,44 @@
+name: Tieni attivo Supabase
+
+# Sul piano gratuito Supabase sospende i progetti senza attività per una settimana.
+# Due volte a settimana questo controllo interroga il database (senza leggere dati: le regole
+# di accesso restituiscono un elenco vuoto) e così il progetto resta attivo.
+# Una volta al mese aggiorna anche un piccolo file: GitHub disattiva le attività pianificate
+# dei repository senza modifiche da 60 giorni.
+
+on:
+  schedule:
+    - cron: '17 6 * * 1,4'   # lunedì e giovedì, 7:17 ora italiana d'inverno
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Interroga Supabase
+        run: |
+          set -a; . ./.env.production; set +a
+          for percorso in "rest/v1/rapporti?select=id&limit=1" "auth/v1/health"; do
+            codice=$(curl -s -o /dev/null -w "%{http_code}" "$VITE_SUPABASE_URL/$percorso" \
+              -H "apikey: $VITE_SUPABASE_PUBLISHABLE_KEY")
+            echo "$percorso → HTTP $codice"
+            if [ "$codice" -ge 500 ] || [ "$codice" = "000" ]; then
+              echo "::error::Supabase non risponde ($codice): il progetto potrebbe essere in pausa. Riattivalo dalla dashboard di Supabase."
+              exit 1
+            fi
+          done
+      - name: Aggiornamento mensile del repository
+        run: |
+          mese=$(date -u +%Y-%m)
+          if [ "$(cat .github/keepalive.txt 2>/dev/null)" != "$mese" ]; then
+            echo "$mese" > .github/keepalive.txt
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add .github/keepalive.txt
+            git commit -m "Controllo periodico $mese"
+            git push
+          fi

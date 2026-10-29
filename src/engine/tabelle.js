@@ -120,14 +120,36 @@ export function nomeFestivita(data) {
   return 'Lunedì dell\'Angelo';
 }
 
+// Tabelle inserite dall'utente nell'app (hanno la precedenza su quelle incluse nel codice).
+let personalizzate = {};
+export function impostaTabellePersonalizzate(mappa) {
+  personalizzate = {};
+  for (const [anno, dati] of Object.entries(mappa || {})) {
+    personalizzate[anno] = ripristinaInfinito({ ...dati, anno: Number(anno) });
+  }
+}
+export function tutteLeTabelle() {
+  return { ...TABELLE, ...personalizzate };
+}
+// In JSON Infinity diventa null: l'ultima fascia INPS non ha limite superiore.
+function ripristinaInfinito(t) {
+  for (const tipo of ['indeterminato', 'determinato']) {
+    const f = t.inps?.[tipo]?.fasce;
+    if (f?.length) f[f.length - 1].fino = Infinity;
+  }
+  return t;
+}
+
 /** Tabelle dell'anno; se mancano usa l'ultimo anno disponibile, segnalandolo. */
 export function tabelleAnno(anno) {
-  const anni = Object.keys(TABELLE).map(Number).sort((a, b) => a - b);
-  const scelto = TABELLE[anno] ? anno : anni.filter((a) => a <= anno).pop() ?? anni[0];
+  const tutte = tutteLeTabelle();
+  const anni = Object.keys(tutte).map(Number).sort((a, b) => a - b);
+  const scelto = tutte[anno] ? anno : anni.filter((a) => a <= anno).pop() ?? anni[0];
   return {
-    ...TABELLE[scelto],
+    ...tutte[scelto],
     festivita: festivitaAnno(anno),
     provvisorie: scelto !== anno,
     annoTabelle: scelto,
+    personalizzate: !!personalizzate[scelto],
   };
 }

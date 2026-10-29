@@ -28,7 +28,7 @@ function grafico(mensile) {
 
 export function mostraHome(root, { vai }) {
   const d = app.rapporto?.dati;
-  if (!d) { vai('rapporto'); return; }
+  if (!d) { vai('impostazioni'); return; }
   const oggi = oggiIso();
   const anno = Number(oggi.slice(0, 4));
   const mese = Number(oggi.slice(5, 7));
@@ -48,6 +48,7 @@ export function mostraHome(root, { vai }) {
   root.innerHTML = `
     <h1 class="titolo-pagina">${esc(d.lavoratrice?.nome || 'Rapporto di lavoro')}</h1>
     ${avvisi.map((a) => `<div class="avviso ${a.livello}">${esc(a.testo)}</div>`).join('')}
+    ${app.richieste.some((r) => r.stato === 'in attesa') ? `<button type="button" class="avviso info avviso-link" data-vai="mesi">${app.richieste.filter((r) => r.stato === 'in attesa').length} richieste di ferie o permessi in attesa di risposta ›</button>` : ''}
 
     <section class="card evidenza">
       <div class="card-testa">
