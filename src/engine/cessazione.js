@@ -1,3 +1,4 @@
+import { fmtNum } from './formato.js';
 // Conteggi di fine rapporto: preavviso, ferie non godute, ratei di 13ª, TFR.
 import { euro, oreSettimanali, mesiAnzianita, fasciaContributiva } from './calcolo.js';
 import { REGOLE_CCNL as R, tabelleAnno } from './tabelle.js';
@@ -34,7 +35,7 @@ export function calcolaCessazione(rapporto, stato, { dataCessazione, motivo, pre
   // Ferie maturate e non godute
   const oreFerie = Math.max(0, stato.ferieResidueOre ?? 0);
   const ferie = euro(oreFerie * paga);
-  if (ferie > 0) voci.push({ codice: 'IFE', descrizione: `Indennità ferie non godute (${oreFerie.toFixed(2)} h)`, importo: ferie, soggettaInps: true, ore: oreFerie });
+  if (ferie > 0) voci.push({ codice: 'IFE', descrizione: `Indennità ferie non godute (${fmtNum(oreFerie, 2)} h)`, importo: ferie, soggettaInps: true, ore: oreFerie });
 
   // Ratei di 13ª maturati e non pagati
   const tredicesima = rapporto.tredicesimaMensile ? 0 : euro(stato.anno === anno ? stato.tredicesimaMaturata ?? 0 : 0);

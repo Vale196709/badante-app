@@ -1,3 +1,4 @@
+import { fmtEur, fmtNum, fmtOre } from './formato.js';
 // Scadenze e avvisi di monitoraggio del rapporto.
 import { euro, isoDate, oreSettimanali } from './calcolo.js';
 import { festivitaAnno, tabelleAnno, REGOLE_CCNL as R } from './tabelle.js';
@@ -49,7 +50,7 @@ export function generaScadenze(rapporto, catena, oggi, fatte = new Set()) {
       data: primoLavorativo(isoDate(aAnno, aMese, 10)),
       categoria: 'Contributi',
       titolo: `Contributi INPS ${t.q}° trimestre ${t.anno}`,
-      descrizione: `${euro(t.ore).toLocaleString('it-IT')} ore${t.mesi < 3 ? ' (trimestre ancora in corso o parziale)' : ''}. Pagamento con avviso pagoPA dal Portale dei pagamenti INPS.`,
+      descrizione: `${fmtOre(euro(t.ore))} ore${t.mesi < 3 ? ' (trimestre ancora in corso o parziale)' : ''}. Pagamento con avviso pagoPA dal Portale dei pagamenti INPS.`,
       importo: euro(t.importo),
     });
   }
@@ -133,7 +134,7 @@ export function avvisiRapporto(rapporto, catena, oggi) {
   const s = ultimo.risultato.contatori;
   const oreAnnueFerie = R.giorniFerieAnnui * (oreSettimanali(rapporto.orario) / 6);
   if (s.ferieResidueOre > oreAnnueFerie) {
-    avvisi.push({ livello: 'attenzione', testo: `Ferie residue ${s.ferieResidueOre.toFixed(1)} ore, più di un anno di maturato: vanno pianificate.` });
+    avvisi.push({ livello: 'attenzione', testo: `Ferie residue ${fmtNum(s.ferieResidueOre, 1)} ore, più di un anno di maturato: vanno pianificate.` });
   }
   const meseOggi = oggi.slice(0, 7);
   const arretrati = catena.filter((m) => `${m.anno}-${String(m.mese).padStart(2, '0')}` < meseOggi && m.stato !== 'pagato');
@@ -143,7 +144,7 @@ export function avvisiRapporto(rapporto, catena, oggi) {
   const t = tabelleAnno(Number(oggi.slice(0, 4)));
   if (t.provvisorie) avvisi.push({ livello: 'attenzione', testo: `Mancano minimi e contributi ${oggi.slice(0, 4)}: i calcoli usano i valori ${t.annoTabelle}.` });
   const minimo = t.minimiOrariNonConviventi[rapporto.livello];
-  if (minimo && rapporto.pagaOraria < minimo) avvisi.push({ livello: 'grave', testo: `La paga oraria è sotto il minimo del livello ${rapporto.livello} (${minimo.toFixed(2)} €).` });
+  if (minimo && rapporto.pagaOraria < minimo) avvisi.push({ livello: 'grave', testo: `La paga oraria è sotto il minimo del livello ${rapporto.livello} (${fmtEur(minimo)}).` });
   for (const m of catena) for (const a of m.risultato.avvisi || []) {
     if (a.includes('conservazione del posto') || a.includes('non pagata')) avvisi.push({ livello: 'attenzione', testo: `${nomeMese(m.mese)} ${m.anno}: ${a}` });
   }

@@ -162,6 +162,7 @@ export async function mostraRapporto(root, { ricaricaDati, vai }) {
         <div><dt>Minimo livello ${v.livello}</dt><dd>${minimo ? `${eur(minimo)}/h ${v.pagaOraria >= minimo ? '✓' : '<strong class="ko">sotto il minimo</strong>'}` : 'da verificare'}</dd></div>
         <div><dt>Contributi INPS</dt><dd>${eur(fascia.totaleOrario)}/h, di cui ${eur(fascia.datoreOrario)} a tuo carico</dd></div>
         <div><dt>Costo medio mensile</dt><dd><strong>${eur(sim.costoMensile)}</strong></dd></div>
+        <div><dt>Paga oraria netta</dt><dd>${eur(sim.pagaNettaOraria)}</dd></div>
         <div><dt>Netto medio alla lavoratrice</dt><dd>${eur(sim.nettoMedioLavoratrice)}</dd></div>
         <div><dt>Versamento INPS trimestrale</dt><dd>${eur(sim.versamentoTrimestraleInps)}</dd></div>
       </dl>

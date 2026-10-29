@@ -1,3 +1,4 @@
+import { fmtEur, fmtOre } from './formato.js';
 // Motore di calcolo del cedolino per lavoro domestico non convivente pagato a ore.
 // Funzioni pure: ricevono dati, restituiscono risultati. Nessun accesso a rete o archivio.
 
@@ -81,7 +82,7 @@ export function fasciaContributiva(rapporto, anno) {
   } else {
     const idx = tab.fasce.findIndex((f) => effettiva <= f.fino);
     fascia = tab.fasce[idx];
-    nome = `fascia ${idx + 1} (retribuzione oraria effettiva ${effettiva.toFixed(2)} €)`;
+    nome = `fascia ${idx + 1} (retribuzione oraria effettiva ${fmtEur(effettiva)})`;
   }
   const totale = rapporto.cuaf === false ? fascia.senzaCuaf : fascia.conCuaf;
   return {
@@ -147,7 +148,7 @@ export function calcolaCedolino(rapporto, presenze, stato = {}) {
   // Controllo minimo contrattuale
   const minimo = t.minimiOrariNonConviventi[rapporto.livello];
   if (minimo && paga < minimo) {
-    avvisi.push(`Paga oraria ${paga.toFixed(2)} € sotto il minimo del livello ${rapporto.livello} (${minimo.toFixed(2)} €).`);
+    avvisi.push(`Paga oraria ${fmtEur(paga)} sotto il minimo del livello ${rapporto.livello} (${fmtEur(minimo)}).`);
   }
 
   const voci = [];
@@ -233,7 +234,7 @@ export function calcolaCedolino(rapporto, presenze, stato = {}) {
   const anticipoTfr = euro(presenze.anticipoTfr || 0);
   if (anticipoTfr > 0) {
     const max = euro(s.tfrAccantonato * R.anticipoTfrMassimo);
-    if (anticipoTfr > max) avvisi.push(`Anticipo TFR oltre il 70% del maturato (massimo ${max.toFixed(2)} €).`);
+    if (anticipoTfr > max) avvisi.push(`Anticipo TFR oltre il 70% del maturato (massimo ${fmtEur(max)}).`);
     if (s.anticipoTfrAnno > 0) avvisi.push('Il CCNL prevede un solo anticipo TFR l\'anno.');
     s.tfrAccantonato = euro(s.tfrAccantonato - anticipoTfr);
     s.anticipoTfrAnno = euro(s.anticipoTfrAnno + anticipoTfr);
@@ -252,10 +253,10 @@ export function calcolaCedolino(rapporto, presenze, stato = {}) {
   const cassaDatore = euro(oreContributive * cc.datore);
 
   const trattenute = [
-    { codice: 'INPS', descrizione: `Contributi INPS a carico lavoratrice (${oreContributive} h × ${fascia.lavoratoreOrario.toFixed(2)} €)`, importo: inpsLavoratore },
+    { codice: 'INPS', descrizione: `Contributi INPS a carico lavoratrice (${fmtOre(oreContributive)} h × ${fmtEur(fascia.lavoratoreOrario)})`, importo: inpsLavoratore },
   ];
   if (cassaLavoratore > 0) {
-    trattenute.push({ codice: 'CCOLF', descrizione: `Cassa Colf a carico lavoratrice (${oreContributive} h × ${cc.lavoratore.toFixed(2)} €)`, importo: cassaLavoratore });
+    trattenute.push({ codice: 'CCOLF', descrizione: `Cassa Colf a carico lavoratrice (${fmtOre(oreContributive)} h × ${fmtEur(cc.lavoratore)})`, importo: cassaLavoratore });
   }
   const totTrattenute = euro(trattenute.reduce((x, v) => x + v.importo, 0));
   const netto = euro(lordo - totTrattenute + anticipoTfr);
@@ -335,6 +336,11 @@ export function simulaCosto({ pagaOraria, oreSettimanaliTot, anno, tipoContratto
     costoMensile,
     costoAnnuo: euro(costoMensile * 12),
     nettoMedioLavoratrice: euro(retribuzione + rateo13 - inpsLavoratore - cassaLavoratore),
+    // paga oraria netta: lorda meno contributi a carico della lavoratrice (nessuna IRPEF trattenuta)
+    pagaNettaOraria: euro(pagaOraria - fascia.lavoratoreOrario - cc.lavoratore),
+    // netta oraria comprensiva della quota di tredicesima
+    nettaOrariaCon13: oreMese ? euro((retribuzione + rateo13 - inpsLavoratore - cassaLavoratore) / oreMese) : 0,
+    costoOrario: oreMese ? euro(costoMensile / oreMese) : 0,
     versamentoTrimestraleInps: euro((inpsDatore + inpsLavoratore + cassaDatore + cassaLavoratore) * 3),
   };
 }

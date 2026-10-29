@@ -144,3 +144,13 @@ test('avvisi: mesi passati non pagati', () => {
   const av = avvisiRapporto(r, cat, '2026-12-15');
   assert.ok(av.some((a) => a.testo.includes('non risultano pagati')));
 });
+
+test('formato italiano e paga netta oraria', async () => {
+  const { fmtEur } = await import('../src/engine/formato.js');
+  const { simulaCosto } = await import('../src/engine/calcolo.js');
+  assert.equal(fmtEur(1035.891), '1.035,89 €');
+  assert.equal(fmtEur(0.4), '0,40 €');
+  const s = simulaCosto({ pagaOraria: 9, oreSettimanaliTot: 15, anno: 2026 });
+  assert.equal(s.pagaNettaOraria, 8.5);   // 9 − 0,48 INPS − 0,02 Cassa Colf
+  assert.equal(s.costoOrario, Math.round(776.89 / 65 * 100) / 100);
+});

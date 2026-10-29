@@ -1,3 +1,4 @@
+import { fmtEur, fmtNum } from './engine/formato.js';
 // Stato condiviso dell'app e funzioni di supporto per le schermate.
 import { calcolaCatena } from './engine/catena.js';
 
@@ -31,8 +32,8 @@ export function catenaCorrente(fino) {
 }
 
 // ---------- formattazione ----------
-export const eur = (n) => (Number(n) || 0).toLocaleString('it-IT', { style: 'currency', currency: 'EUR' });
-export const num = (n, dec = 2) => (Number(n) || 0).toLocaleString('it-IT', { minimumFractionDigits: dec, maximumFractionDigits: dec });
+export const eur = fmtEur;
+export const num = (n, dec = 2) => fmtNum(n, dec);
 export const dataIt = (iso) => (iso ? iso.slice(0, 10).split('-').reverse().join('/') : '');
 export const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const MESI = ['Gennaio', 'Febbraio', 'Marzo', 'Aprile', 'Maggio', 'Giugno', 'Luglio', 'Agosto', 'Settembre', 'Ottobre', 'Novembre', 'Dicembre'];

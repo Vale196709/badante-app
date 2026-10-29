@@ -22,7 +22,7 @@ export function mostraSimulatore(root) {
     <h1 class="titolo-pagina">Simulatore</h1>
     <section class="card">
       <h2>Confronta scenari di costo</h2>
-      <p class="nota">Modifica paga, ore e livello: i valori sono medie mensili su base annua (52 settimane), con le tabelle ${anno}.</p>
+      <p class="nota">Modifica paga, ore e livello: i valori sono medie mensili su base annua (52 settimane), con le tabelle ${anno}. La paga netta è al netto dei soli contributi a carico della lavoratrice: il datore domestico non trattiene IRPEF, che la lavoratrice paga eventualmente con la sua dichiarazione dei redditi.</p>
       <div class="scenari"></div>
       <div class="tab-scorre"><table class="tab-confronto"></table></div>
     </section>
@@ -62,6 +62,10 @@ export function mostraSimulatore(root) {
     tab.innerHTML = `
       <thead><tr><th></th>${ris.map((x) => `<th class="num">${esc(x.s.nome)}</th>`).join('')}</tr></thead>
       <tbody>
+        ${riga('Paga oraria lorda', (x) => eur(x.s.pagaOraria))}
+        ${riga('Paga oraria netta', (x) => eur(x.r.pagaNettaOraria), true)}
+        ${riga('Netta oraria con 13ª', (x) => eur(x.r.nettaOrariaCon13))}
+        ${riga('Costo orario per te', (x) => eur(x.r.costoOrario))}
         ${riga('Ore al mese', (x) => num(x.r.oreMese, 1))}
         ${riga('Minimo CCNL', (x) => (x.min ? (x.s.pagaOraria >= x.min ? `✓ ${num(x.min)}` : `<span class="ko">sotto ${num(x.min)}</span>`) : 'n.d.'))}
         ${riga('Fascia INPS', (x) => esc(x.r.fascia.replace(/ \(.*\)/, '')))}
