@@ -1,8 +1,9 @@
 // Scheda del rapporto di lavoro: anagrafica e condizioni contrattuali, salvate sul cloud.
 import { salvaRapporto } from '../lib/dati.js';
 import { verificaCodiceFiscale } from '../lib/codiceFiscale.js';
-import { fasciaContributiva, oreSettimanali, simulaCosto } from '../engine/calcolo.js';
-import { tabelleAnno } from '../engine/tabelle.js';
+import { fasciaContributiva, oreSettimanali, simulaCosto, normalizzaRapporto } from '../engine/calcolo.js';
+import { tabelleAnno, TIPOLOGIE, tipologia, minimoContrattuale } from '../engine/tabelle.js';
+import { verificaIban, formattaIban } from '../lib/iban.js';
 import { app, puoModificare, eur, esc, oggiIso, toast } from '../stato.js';
 
 const GIORNI = ['Lun', 'Mar', 'Mer', 'Gio', 'Ven', 'Sab', 'Dom'];
@@ -15,7 +16,10 @@ export const RAPPORTO_VUOTO = {
   luogoLavoro: '',
   tipoContratto: 'indeterminato',
   dataFineTermine: '',
+  tipologia: 'ore',
   pagaOraria: 9,
+  pagaMensile: 0,
+  vittoAlloggio: false,
   orario: { 1: 3, 2: 3, 3: 3, 4: 3, 5: 3 },
   fasciaOraria: '09:00–12:00',
   dataAssunzione: '',
@@ -26,6 +30,9 @@ export const RAPPORTO_VUOTO = {
   cassaColf: true,
   scadenzaDocumento: '',
   codiceRapportoInps: '',
+  pagamento: { iban: '', intestatario: '', modalita: 'bonifico' },
+  budgetAnnuo: null,
+  detrazione: { assistito: '', nonAutosufficiente: false, redditoEntroLimite: false },
 };
 
 const campo = (etichetta, nome, valore, attr = '') =>
@@ -36,6 +43,8 @@ export async function mostraRapporto(root, { ricaricaDati, vai }) {
   const d = { ...structuredClone(RAPPORTO_VUOTO), ...structuredClone(app.rapporto?.dati ?? {}) };
   d.datore = { ...RAPPORTO_VUOTO.datore, ...d.datore };
   d.lavoratrice = { ...RAPPORTO_VUOTO.lavoratrice, ...d.lavoratrice };
+  d.pagamento = { ...RAPPORTO_VUOTO.pagamento, ...d.pagamento };
+  d.detrazione = { ...RAPPORTO_VUOTO.detrazione, ...d.detrazione };
   const nuovo = !app.rapporto?.dati;
 
   root.innerHTML = `
@@ -63,6 +72,9 @@ export async function mostraRapporto(root, { ricaricaDati, vai }) {
       <section>
         <h2>Contratto all'assunzione</h2>
         ${(d.variazioni || []).length ? '<p class="nota" style="margin:-4px 0 12px">Le condizioni sono variate nel tempo: quelle in vigore sono in Impostazioni → Variazioni.</p>' : ''}
+        <label>Tipo di rapporto
+          <select name="tipologia">${Object.entries(TIPOLOGIE).map(([k, v]) => `<option value="${k}" ${k === (d.tipologia || 'ore') ? 'selected' : ''}>${v.nome}</option>`).join('')}</select>
+        </label>
         <div class="riga">
           <label>Livello CCNL
             <select name="livello">${LIVELLI.map((l) => `<option ${l === d.livello ? 'selected' : ''}>${l}</option>`).join('')}</select>
@@ -78,7 +90,8 @@ export async function mostraRapporto(root, { ricaricaDati, vai }) {
         <label>Mansioni<input name="mansioni" value="${esc(d.mansioni)}" /></label>
         ${campo('Luogo di lavoro (indirizzo)', 'luogoLavoro', d.luogoLavoro, 'placeholder="se diverso dalla residenza del datore"')}
         <div class="riga">
-          <label>Paga oraria lorda (€)<input name="pagaOraria" type="number" step="0.01" min="0" inputmode="decimal" value="${d.pagaOraria}" /></label>
+          <label class="solo-ore">Paga oraria lorda (€)<input name="pagaOraria" type="number" step="0.01" min="0" inputmode="decimal" value="${d.pagaOraria}" /></label>
+          <label class="solo-mensile">Retribuzione mensile lorda (€)<input name="pagaMensile" type="number" step="0.01" min="0" inputmode="decimal" value="${d.pagaMensile || ''}" placeholder="minimo proposto" /></label>
           <label>Data di assunzione<input name="dataAssunzione" type="date" value="${esc(d.dataAssunzione)}" /></label>
         </div>
         <fieldset>
@@ -91,9 +104,35 @@ export async function mostraRapporto(root, { ricaricaDati, vai }) {
           ${campo('Fascia oraria abituale', 'fasciaOraria', d.fasciaOraria, 'placeholder="es. 09:00–12:00"')}
           <label>Periodo di prova (giorni di lavoro)<input name="giorniProva" type="number" min="0" max="60" value="${d.giorniProva}" /></label>
         </div>
+        <label class="spunta solo-mensile"><input type="checkbox" name="vittoAlloggio" ${d.vittoAlloggio ? 'checked' : ''} /> Vitto e alloggio forniti dal datore (entrano nel calcolo di 13ª, TFR e fascia INPS)</label>
         <label class="spunta"><input type="checkbox" name="tredicesimaMensile" ${d.tredicesimaMensile ? 'checked' : ''} /> Tredicesima pagata ogni mese (invece che a dicembre)</label>
         <label class="spunta"><input type="checkbox" name="cassaColf" ${d.cassaColf !== false ? 'checked' : ''} /> Iscrizione Cassa Colf</label>
         <label class="spunta"><input type="checkbox" name="parente" ${d.cuaf === false ? 'checked' : ''} /> Lavoratrice coniuge o parente convivente (niente quota CUAF)</label>
+      </section>
+
+      <section>
+        <h2>Pagamento dello stipendio</h2>
+        <label>Come paghi
+          <select name="modalita">
+            <option value="bonifico" ${d.pagamento.modalita === 'bonifico' ? 'selected' : ''}>Bonifico</option>
+            <option value="altro" ${d.pagamento.modalita === 'altro' ? 'selected' : ''}>Assegno o carta</option>
+            <option value="contanti" ${d.pagamento.modalita === 'contanti' ? 'selected' : ''}>Contanti</option>
+          </select>
+        </label>
+        <small class="nota avviso-contanti">Pagando in contanti si perde la detrazione del 19% per la badante.</small>
+        ${campo('IBAN della lavoratrice', 'iban', formattaIban(d.pagamento.iban), 'class="maiuscolo" autocapitalize="characters" autocomplete="off" placeholder="IT00 X000 0000 0000 0000 0000 000"')}
+        <small class="cf iban-esito"></small>
+        ${campo('Intestatario del conto', 'intestatario', d.pagamento.intestatario, 'placeholder="se diverso dalla lavoratrice"')}
+      </section>
+
+      <section>
+        <h2>Budget e agevolazioni fiscali</h2>
+        <label>Budget annuo per questo rapporto (€)<input name="budgetAnnuo" type="number" step="50" min="0" inputmode="decimal" value="${d.budgetAnnuo ?? ''}" placeholder="facoltativo" /></label>
+        <small class="nota">Se la spesa prevista dell'anno lo supera, l'app ti avvisa nel Riepilogo e nel Report.</small>
+        ${campo('Persona assistita', 'assistito', d.detrazione.assistito, 'placeholder="es. Maria Rossi"')}
+        <label class="spunta"><input type="checkbox" name="nonAutosufficiente" ${d.detrazione.nonAutosufficiente ? 'checked' : ''} /> La persona assistita non è autosufficiente (c'è un certificato medico)</label>
+        <label class="spunta"><input type="checkbox" name="redditoEntroLimite" ${d.detrazione.redditoEntroLimite ? 'checked' : ''} /> Il reddito di chi paga non supera 40.000 € l'anno</label>
+        <small class="nota">Servono per calcolare la detrazione del 19% sulle spese per l'assistenza personale (fino a 2.100 € di spesa, cioè 399 € di sconto). I contributi INPS sono invece deducibili sempre, fino a 1.549,37 €.</small>
       </section>
 
       <section>
@@ -127,7 +166,10 @@ export async function mostraRapporto(root, { ricaricaDati, vai }) {
     luogoLavoro: f.luogoLavoro.value.trim(),
     tipoContratto: f.tipoContratto.value,
     dataFineTermine: f.tipoContratto.value === 'determinato' ? f.dataFineTermine.value : '',
+    tipologia: f.tipologia.value,
     pagaOraria: Number(f.pagaOraria.value) || 0,
+    pagaMensile: Number(f.pagaMensile.value) || 0,
+    vittoAlloggio: f.vittoAlloggio.checked,
     orario: Object.fromEntries([1, 2, 3, 4, 5, 6, 7].map((g) => [g, Number(f[`g${g}`].value) || 0]).filter(([, h]) => h > 0)),
     fasciaOraria: f.fasciaOraria.value.trim(),
     dataAssunzione: f.dataAssunzione.value,
@@ -138,37 +180,66 @@ export async function mostraRapporto(root, { ricaricaDati, vai }) {
     scadenzaDocumento: f.scadenzaDocumento.value,
     codiceRapportoInps: f.codiceRapportoInps.value.trim(),
     dataCessazione: f.dataCessazione.value,
+    pagamento: { modalita: f.modalita.value, iban: f.iban.value.replace(/\s+/g, '').toUpperCase(), intestatario: f.intestatario.value.trim() },
+    budgetAnnuo: Number(f.budgetAnnuo.value) > 0 ? Number(f.budgetAnnuo.value) : null,
+    detrazione: { assistito: f.assistito.value.trim(), nonAutosufficiente: f.nonAutosufficiente.checked, redditoEntroLimite: f.redditoEntroLimite.checked },
   });
 
+  let tipologiaPrima = d.tipologia || 'ore';
   const aggiorna = () => {
     const v = leggi();
     termine.hidden = v.tipoContratto !== 'determinato';
-    for (const el of root.querySelectorAll('small.cf')) {
+    const tip = tipologia(v);
+    root.querySelectorAll('.solo-ore').forEach((el) => { el.hidden = tip.mensile; });
+    root.querySelectorAll('.solo-mensile').forEach((el) => { el.hidden = !tip.mensile; });
+    root.querySelector('.avviso-contanti').hidden = v.pagamento.modalita !== 'contanti';
+    const anno = Number(oggiIso().slice(0, 4));
+    const t = tabelleAnno(anno);
+    // al cambio di tipologia propone minimo, vitto e alloggio
+    if (v.tipologia !== tipologiaPrima) {
+      tipologiaPrima = v.tipologia;
+      if (tip.mensile) {
+        const min = minimoContrattuale(t, v);
+        if (min && !(Number(f.pagaMensile.value) >= min)) f.pagaMensile.value = min;
+        f.vittoAlloggio.checked = !!tip.vitto;
+        return aggiorna();
+      }
+    }
+    for (const el of root.querySelectorAll('small.cf[data-for]')) {
       const val = f[el.dataset.for].value.trim();
       if (!val) { el.textContent = ''; el.className = 'cf'; continue; }
       const r = verificaCodiceFiscale(val);
       el.textContent = r.ok ? '✓ Codice fiscale valido' : `✗ ${r.msg}`;
       el.className = `cf ${r.ok ? 'ok' : 'ko'}`;
     }
-    const anno = Number(oggiIso().slice(0, 4));
-    const t = tabelleAnno(anno);
+    const ie = root.querySelector('.iban-esito');
+    if (!v.pagamento.iban) { ie.textContent = ''; ie.className = 'cf iban-esito'; }
+    else { const r = verificaIban(v.pagamento.iban); ie.textContent = r.ok ? '✓ IBAN valido' : `✗ ${r.msg}`; ie.className = `cf iban-esito ${r.ok ? 'ok' : 'ko'}`; }
+
     const sett = oreSettimanali(v.orario);
-    if (!v.pagaOraria || !sett) { riep.innerHTML = ''; return; }
-    const minimo = t.minimiOrariNonConviventi[v.livello];
+    if ((tip.mensile ? !v.pagaMensile : !v.pagaOraria) || !sett) { riep.innerHTML = ''; return; }
+    const minimo = minimoContrattuale(t, v);
     const fascia = fasciaContributiva(v, anno);
-    const sim = simulaCosto({ pagaOraria: v.pagaOraria, oreSettimanaliTot: sett, anno, tipoContratto: v.tipoContratto, cuaf: v.cuaf, cassaColf: v.cassaColf });
+    const sim = simulaCosto({ pagaOraria: v.pagaOraria, oreSettimanaliTot: sett, anno, tipoContratto: v.tipoContratto, cuaf: v.cuaf, cassaColf: v.cassaColf, tipologia: v.tipologia, pagaMensile: v.pagaMensile, vittoAlloggio: v.vittoAlloggio, livello: v.livello });
+    const paga = tip.mensile ? v.pagaMensile : v.pagaOraria;
+    const minTesto = minimo == null
+      ? (tip.mensile ? `<strong class="ko">livello non previsto</strong>` : 'da verificare')
+      : `${eur(minimo)}${tip.mensile ? '/mese' : '/h'} ${paga >= minimo ? '✓' : '<strong class="ko">sotto il minimo</strong>'}`;
+    const oltre = tip.maxSettimanali && sett > tip.maxSettimanali;
     riep.innerHTML = `
       <h2>In sintesi (${anno}${t.provvisorie ? `, valori ${t.annoTabelle}` : ''})</h2>
       <dl>
-        <div><dt>Ore settimanali</dt><dd>${sett}</dd></div>
-        <div><dt>Minimo livello ${v.livello}</dt><dd>${minimo ? `${eur(minimo)}/h ${v.pagaOraria >= minimo ? '✓' : '<strong class="ko">sotto il minimo</strong>'}` : 'da verificare'}</dd></div>
+        <div><dt>Ore settimanali</dt><dd>${sett}${oltre ? ` <strong class="ko">oltre ${tip.maxSettimanali}</strong>` : ''}</dd></div>
+        <div><dt>Minimo livello ${v.livello}</dt><dd>${minTesto}</dd></div>
+        ${tip.mensile ? `<div><dt>Paga oraria equivalente</dt><dd>${eur(normalizzaRapporto(v).pagaOraria)}</dd></div>` : ''}
         <div><dt>Contributi INPS</dt><dd>${eur(fascia.totaleOrario)}/h, di cui ${eur(fascia.datoreOrario)} a tuo carico</dd></div>
         <div><dt>Costo medio mensile</dt><dd><strong>${eur(sim.costoMensile)}</strong></dd></div>
         <div><dt>Paga oraria netta</dt><dd>${eur(sim.pagaNettaOraria)}</dd></div>
         <div><dt>Netto medio alla lavoratrice</dt><dd>${eur(sim.nettoMedioLavoratrice)}</dd></div>
         <div><dt>Versamento INPS trimestrale</dt><dd>${eur(sim.versamentoTrimestraleInps)}</dd></div>
+        ${v.budgetAnnuo ? `<div><dt>Costo annuo / budget</dt><dd>${eur(sim.costoAnnuo)} su ${eur(v.budgetAnnuo)} ${sim.costoAnnuo > v.budgetAnnuo ? '<strong class="ko">oltre</strong>' : '✓'}</dd></div>` : ''}
       </dl>
-      <p class="nota">${fascia.nome}. Il costo comprende paga, 13ª, contributi a tuo carico e TFR.</p>`;
+      <p class="nota">${fascia.nome}. Il costo comprende paga, 13ª, contributi a tuo carico e TFR${sim.vittoAlloggioMese ? `; vitto e alloggio valgono ${eur(sim.vittoAlloggioMese)} al mese ai fini di 13ª e TFR` : ''}.</p>`;
   };
 
   f.addEventListener('input', () => { if (esito) esito.textContent = ''; aggiorna(); });
@@ -176,6 +247,7 @@ export async function mostraRapporto(root, { ricaricaDati, vai }) {
     e.preventDefault();
     const v = leggi();
     if (!v.dataAssunzione) { esito.textContent = 'Inserisci la data di assunzione.'; esito.className = 'esito ko'; return; }
+    if (v.pagamento.iban && !verificaIban(v.pagamento.iban).ok) { esito.textContent = 'Controlla l\'IBAN della lavoratrice.'; esito.className = 'esito ko'; return; }
     const btn = f.querySelector('button[type=submit]');
     btn.disabled = true;
     esito.textContent = 'Salvataggio…';

@@ -5,6 +5,13 @@ import { salvaTabelle, eliminaTabelle, caricaTabelle } from '../lib/dati.js';
 import { fmtNum } from '../engine/formato.js';
 
 const LIVELLI = ['A', 'AS', 'B', 'BS', 'C', 'CS', 'D', 'DS'];
+const MENSILI = ['minimiMensiliConviventi', 'indennitaFunzione', 'minimiMensiliConviventiPT', 'minimiAssistenzaNotturna', 'minimoPresenzaNotturna', 'vittoAlloggio'];
+const GRUPPI_MENSILI = [
+  ['minimiMensiliConviventi', 'Conviventi a tempo pieno, mensili (€)', LIVELLI],
+  ['indennitaFunzione', 'Indennità di funzione conviventi (€)', ['D', 'DS']],
+  ['minimiMensiliConviventiPT', 'Conviventi part-time fino a 30 h, mensili (€)', ['B', 'BS', 'C']],
+  ['minimiAssistenzaNotturna', 'Assistenza notturna, mensili (€)', ['BS', 'CS', 'DS']],
+];
 const n = (v, dec = 2) => (v == null || v === '' ? '' : fmtNum(v, dec).replace(/\./g, ''));
 const leggiNum = (s) => {
   const x = String(s ?? '').trim().replace(/\./g, '').replace(',', '.');
@@ -23,7 +30,9 @@ export function mostraTabelle(root, ctx) {
 
   const disegna = () => {
     const base = bozza?.anno === anno ? bozza : tutte[anno];
-    const t = structuredClone(base);
+    // le voci per conviventi e notturni mancanti si completano con i valori inclusi nell'app
+    const incluso = TABELLE[Math.max(...Object.keys(TABELLE).map(Number))];
+    const t = structuredClone({ ...Object.fromEntries(MENSILI.map((k) => [k, incluso[k]])), ...base });
     const personal = !TABELLE[anno] || JSON.stringify(TABELLE[anno]) !== JSON.stringify(base);
     const fasce = (tipo) => t.inps[tipo].fasce.map((f, i) => `
       <tr>
@@ -56,6 +65,22 @@ export function mostraTabelle(root, ctx) {
           <div class="griglia-livelli">
             ${LIVELLI.map((l) => `<label>${l}<input data-k="min.${l}" value="${n(t.minimiOrariNonConviventi[l])}" inputmode="decimal" placeholder="—" /></label>`).join('')}
           </div>
+
+          <details class="dettagli-tabelle">
+            <summary>Conviventi, notturni, vitto e alloggio</summary>
+            ${GRUPPI_MENSILI.map(([k, titolo, livelli]) => `
+              <h3 class="sottotitolo">${titolo}</h3>
+              <div class="griglia-livelli">${livelli.map((l) => `<label>${l}<input data-k="${k}.${l}" value="${n(t[k]?.[l])}" inputmode="decimal" placeholder="—" /></label>`).join('')}</div>`).join('')}
+            <div class="riga">
+              <label>Presenza notturna, mensile (€)<input data-k="presenza" value="${n(t.minimoPresenzaNotturna)}" inputmode="decimal" /></label>
+            </div>
+            <h3 class="sottotitolo">Indennità giornaliera di vitto e alloggio (€)</h3>
+            <div class="griglia-livelli">
+              <label>Pranzo/colazione<input data-k="va.pranzoColazione" value="${n(t.vittoAlloggio?.pranzoColazione)}" inputmode="decimal" /></label>
+              <label>Cena<input data-k="va.cena" value="${n(t.vittoAlloggio?.cena)}" inputmode="decimal" /></label>
+              <label>Alloggio<input data-k="va.alloggio" value="${n(t.vittoAlloggio?.alloggio)}" inputmode="decimal" /></label>
+            </div>
+          </details>
 
           <h3 class="sottotitolo">Contributi INPS orari – tempo indeterminato (€)</h3>
           <div class="tab-scorre"><table class="tab-tabelle">
@@ -122,6 +147,13 @@ export function mostraTabelle(root, ctx) {
         nuovo.inps[tipo].fasce[2].fino = null; // illimitata
         for (const c of ['conCuaf', 'senzaCuaf', 'lavoratore']) nuovo.inps[tipo].oltre24[c] = v(`${tipo}.oltre24.${c}`);
       }
+      for (const [k, , livelli] of GRUPPI_MENSILI) {
+        nuovo[k] = {};
+        for (const l of livelli) { const x = v(`${k}.${l}`); if (x != null) nuovo[k][l] = x; }
+      }
+      nuovo.minimoPresenzaNotturna = v('presenza');
+      const va = { pranzoColazione: v('va.pranzoColazione') ?? 0, cena: v('va.cena') ?? 0, alloggio: v('va.alloggio') ?? 0 };
+      nuovo.vittoAlloggio = { ...va, totale: Math.round((va.pranzoColazione + va.cena + va.alloggio) * 100) / 100 };
       nuovo.cassaColf = { datore: v('cc.datore') ?? 0, lavoratore: v('cc.lavoratore') ?? 0 };
       const infl = v('infl');
       nuovo.inflazioneTfr = infl == null ? null : infl / 100;

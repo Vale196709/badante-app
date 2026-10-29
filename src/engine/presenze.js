@@ -41,7 +41,7 @@ export function giorniMese(rapporto, anno, mese, salvati = {}) {
  */
 export function presenzeDaGiorni(rapporto, anno, mese, salvati = {}, extra = {}, malattiaInCorsoDal = null) {
   const giorni = giorniMese(rapporto, anno, mese, salvati);
-  let oreOrdinarie = 0, oreAggiuntive = 0, oreFerie = 0, orePermessi = 0, festivitaLavorate = 0;
+  let oreOrdinarie = 0, oreAggiuntive = 0, oreFerie = 0, orePermessi = 0, festivitaLavorate = 0, giorniAssenza = 0;
   const straordinari = { diurno: 0, notturno: 0, festivo: 0 };
   const malattia = [];
   let corrente = null;
@@ -65,6 +65,8 @@ export function presenzeDaGiorni(rapporto, anno, mese, salvati = {}, extra = {},
         oreOrdinarie += Math.min(ore, prog);
         oreAggiuntive += Math.max(0, ore - prog);
       }
+    } else if (g.tipo === 'A' && !g.festivita && g.oreProgrammate > 0) {
+      giorniAssenza += 1;
     } else if (g.tipo === 'F' && !g.festivita) {
       oreFerie += g.oreProgrammate;
     } else if (g.tipo === 'P' && !g.festivita) {
@@ -86,6 +88,7 @@ export function presenzeDaGiorni(rapporto, anno, mese, salvati = {}, extra = {},
     oreFerie,
     orePermessi,
     festivitaLavorate,
+    giorniAssenza,
     straordinari,
     malattia,
     anticipoTfr: Number(extra.anticipoTfr) || 0,

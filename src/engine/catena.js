@@ -24,7 +24,7 @@ function* mesiTra(daIso, aAnno, aMese) {
  * @returns array di { anno, mese, risultato, presenze, salvato, stato, statoPrima }
  */
 export function calcolaCatena(rapporto, cedolini, fino) {
-  if (!rapporto?.dataAssunzione || !rapporto.pagaOraria) return [];
+  if (!rapporto?.dataAssunzione || !(rapporto.pagaOraria || rapporto.pagaMensile)) return [];
   const perMese = new Map(cedolini.map((c) => [chiaveMese(c.anno, c.mese), c]));
   let ultimoMese = fino;
   if (rapporto.dataCessazione) {

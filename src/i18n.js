@@ -31,7 +31,7 @@ const T = {
     mesi: ['Ianuarie', 'Februarie', 'Martie', 'Aprilie', 'Mai', 'Iunie', 'Iulie', 'August', 'Septembrie', 'Octombrie', 'Noiembrie', 'Decembrie'],
     voci: {
       titolo: 'Fluturaș de salariu', ORD: 'Ore normale lucrate', AGG: 'Ore în plus (tarif normal)', FES: 'Sărbători plătite',
-      FER: 'Concediu de odihnă', PER: 'Învoiri plătite', MAL50: 'Boală, zilele 1–3 (50%)', MAL100: 'Boală din ziua a 4-a (100%)',
+      FER: 'Concediu de odihnă', PER: 'Învoiri plătite', MEN: 'Salariu lunar', ASS: 'Absențe neplătite', MALNP: 'Boală peste zilele plătite', MAL50: 'Boală, zilele 1–3 (50%)', MAL100: 'Boală din ziua a 4-a (100%)',
       STD: 'Ore suplimentare de zi (+25%)', STN: 'Ore suplimentare de noapte (+50%)', STF: 'Ore suplimentare duminică/sărbătoare (+60%)',
       FLV: 'Ore lucrate în zi de sărbătoare (+60%)', '13M': 'Al 13-lea salariu (rată lunară)', '13A': 'Al 13-lea salariu',
       INPS: 'Contribuții INPS reținute', CCOLF: 'Contribuție Cassa Colf reținută', lordo: 'Total brut', netto: 'NET DE PLATĂ', anticipo: 'Avans TFR',
@@ -51,7 +51,7 @@ const T = {
     mesi: ['Січень', 'Лютий', 'Березень', 'Квітень', 'Травень', 'Червень', 'Липень', 'Серпень', 'Вересень', 'Жовтень', 'Листопад', 'Грудень'],
     voci: {
       titolo: 'Розрахунковий лист', ORD: 'Відпрацьовані звичайні години', AGG: 'Додаткові години (звичайна ставка)', FES: 'Оплачувані свята',
-      FER: 'Відпустка', PER: 'Оплачувані відгули', MAL50: 'Лікарняний, дні 1–3 (50%)', MAL100: 'Лікарняний з 4-го дня (100%)',
+      FER: 'Відпустка', PER: 'Оплачувані відгули', MEN: 'Місячна зарплата', ASS: 'Неоплачувані відсутності', MALNP: 'Лікарняний понад оплачувані дні', MAL50: 'Лікарняний, дні 1–3 (50%)', MAL100: 'Лікарняний з 4-го дня (100%)',
       STD: 'Понаднормові денні (+25%)', STN: 'Понаднормові нічні (+50%)', STF: 'Понаднормові в неділю/свято (+60%)',
       FLV: 'Години, відпрацьовані у свято (+60%)', '13M': '13-та зарплата (щомісячна частина)', '13A': '13-та зарплата',
       INPS: 'Утримані внески INPS', CCOLF: 'Утриманий внесок Cassa Colf', lordo: 'Разом брутто', netto: 'ДО ВИПЛАТИ (НЕТТО)', anticipo: 'Аванс TFR',
@@ -71,7 +71,7 @@ const T = {
     mesi: ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'],
     voci: {
       titolo: 'Расчётный лист', ORD: 'Отработанные обычные часы', AGG: 'Дополнительные часы (обычная ставка)', FES: 'Оплачиваемые праздники',
-      FER: 'Отпуск', PER: 'Оплачиваемые отгулы', MAL50: 'Больничный, дни 1–3 (50%)', MAL100: 'Больничный с 4-го дня (100%)',
+      FER: 'Отпуск', PER: 'Оплачиваемые отгулы', MEN: 'Месячная зарплата', ASS: 'Неоплачиваемые отсутствия', MALNP: 'Больничный сверх оплачиваемых дней', MAL50: 'Больничный, дни 1–3 (50%)', MAL100: 'Больничный с 4-го дня (100%)',
       STD: 'Сверхурочные дневные (+25%)', STN: 'Сверхурочные ночные (+50%)', STF: 'Сверхурочные в воскресенье/праздник (+60%)',
       FLV: 'Часы, отработанные в праздник (+60%)', '13M': '13-я зарплата (ежемесячная часть)', '13A': '13-я зарплата',
       INPS: 'Удержанные взносы INPS', CCOLF: 'Удержанный взнос Cassa Colf', lordo: 'Итого брутто', netto: 'К ВЫПЛАТЕ (НЕТТО)', anticipo: 'Аванс TFR',
@@ -91,7 +91,7 @@ const T = {
     mesi: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
     voci: {
       titolo: 'Payslip', ORD: 'Regular hours worked', AGG: 'Extra hours (normal rate)', FES: 'Paid public holidays',
-      FER: 'Holiday taken', PER: 'Paid leave', MAL50: 'Sick leave, days 1–3 (50%)', MAL100: 'Sick leave from day 4 (100%)',
+      FER: 'Holiday taken', PER: 'Paid leave', MEN: 'Monthly salary', ASS: 'Unpaid absences', MALNP: 'Sick leave beyond paid days', MAL50: 'Sick leave, days 1–3 (50%)', MAL100: 'Sick leave from day 4 (100%)',
       STD: 'Overtime, daytime (+25%)', STN: 'Overtime, night (+50%)', STF: 'Overtime, Sunday/holiday (+60%)',
       FLV: 'Hours worked on a public holiday (+60%)', '13M': '13th-month pay (monthly share)', '13A': '13th-month pay',
       INPS: 'INPS contributions withheld', CCOLF: 'Cassa Colf contribution withheld', lordo: 'Gross total', netto: 'NET PAY', anticipo: 'TFR advance',

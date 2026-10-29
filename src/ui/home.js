@@ -1,5 +1,7 @@
 // Cruscotto: situazione del mese, contatori, prossime scadenze, avvisi e costi dell'anno.
 import { app, catenaCorrente, eur, num, esc, dataIt, oggiIso, nomeMeseMaiusc } from '../stato.js';
+import { reportAnno } from '../engine/report.js';
+import { apriBonifico } from './bonifico.js';
 import { generaScadenze, avvisiRapporto } from '../engine/scadenze.js';
 import { riepilogoAnno } from '../engine/annuale.js';
 import { condizioniAl } from '../engine/variazioni.js';
@@ -45,10 +47,12 @@ export function mostraHome(root, { vai }) {
   const prossime = scad.filter((x) => x.data >= oggi).slice(0, 4);
   const avvisi = avvisiRapporto(d, catena, oggi);
   const ra = riepilogoAnno(catena, anno);
+  const rep = d.budgetAnnuo ? reportAnno(d, app.cedolini, anno, oggi, app.fatte) : null;
 
   root.innerHTML = `
     <h1 class="titolo-pagina">Riepilogo</h1>
     ${avvisi.map((a) => `<div class="avviso ${a.livello}">${esc(a.testo)}</div>`).join('')}
+    ${rep?.scostamentoBudget > 0 ? `<button type="button" class="avviso attenzione avviso-link" data-vai="report">La spesa prevista per il ${anno} (${eur(rep.previsione.costo)}) supera il budget di ${eur(rep.scostamentoBudget)} ›</button>` : ''}
     ${app.richieste.some((r) => r.stato === 'in attesa') ? `<button type="button" class="avviso info avviso-link" data-vai="mesi">${((n) => `${n} ${n === 1 ? 'richiesta' : 'richieste'} di ferie o permessi in attesa di risposta`)(app.richieste.filter((r) => r.stato === 'in attesa').length)} ›</button>` : ''}
 
     <section class="card evidenza">
@@ -61,7 +65,10 @@ export function mostraHome(root, { vai }) {
         <div><span class="etichetta">Costo per te nel mese</span><span class="valore">${eur(corrente.risultato.costoDatore)}</span></div>
         <div><span class="etichetta">Ore lavorate</span><span class="valore">${num(corrente.risultato.oreLavorate, 1)}</span></div>
       </div>
-      <button type="button" class="secondario" data-vai="mesi">Apri presenze e cedolino</button>
+      <div class="azioni-mese">
+        <button type="button" class="secondario" data-vai="mesi">Apri presenze e cedolino</button>
+        ${corrente.stato === 'confermato' ? '<button type="button" class="primario paga">Dati per il bonifico</button>' : ''}
+      </div>
     </section>
 
     <section class="card">
@@ -87,6 +94,7 @@ export function mostraHome(root, { vai }) {
         <div><span class="etichetta">Netto pagato</span><span class="valore">${eur(ra.netto)}</span></div>
         <div><span class="etichetta">Contributi INPS</span><span class="valore">${eur(ra.versamentiInps)}</span></div>
         <div><span class="etichetta">Ore lavorate</span><span class="valore">${num(ra.oreLavorate, 0)}</span></div>
+        ${rep?.budget ? `<div><span class="etichetta">Budget annuo</span><span class="valore">${eur(rep.budget)}</span><span class="sotto">${rep.scostamentoBudget > 0 ? `previsto oltre di ${eur(rep.scostamentoBudget)}` : `margine previsto ${eur(-rep.scostamentoBudget)}`}</span></div>` : ''}
       </div>
       <h3 class="sottotitolo">Costo mensile per te</h3>
       ${grafico(ra.mensile)}
@@ -94,4 +102,5 @@ export function mostraHome(root, { vai }) {
     </section>`;
 
   root.querySelectorAll('[data-vai]').forEach((b) => b.addEventListener('click', () => vai(b.dataset.vai)));
+  root.querySelector('.paga')?.addEventListener('click', () => apriBonifico({ anno: corrente.anno, mese: corrente.mese, importo: corrente.risultato.netto }));
 }

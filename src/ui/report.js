@@ -26,6 +26,17 @@ function grafico(mesi) {
     </figure>`;
 }
 
+function budgetBox(rep) {
+  const oltre = rep.scostamentoBudget > 0;
+  const perc = Math.min(100, (rep.budgetConsumato || 0) * 100);
+  const prev = Math.min(100, (rep.previsione.costo / rep.budget) * 100);
+  return `<div class="budget ${oltre ? 'oltre' : ''}">
+    <div class="budget-testa"><span>Budget ${eur(rep.budget)}</span><strong>${oltre ? `oltre di ${eur(rep.scostamentoBudget)}` : `margine ${eur(-rep.scostamentoBudget)}`}</strong></div>
+    <div class="budget-barra" role="img" aria-label="Speso ${num(perc, 0)}% del budget, previsto ${num(prev, 0)}%"><span class="speso" style="width:${perc}%"></span><span class="previsto" style="width:${prev}%"></span></div>
+    <small>Speso ${num(perc, 0)}% · a fine anno ${num((rep.previsione.costo / rep.budget) * 100, 0)}%</small>
+  </div>`;
+}
+
 function composizione(t) {
   const voci = [['Retribuzione', t.retribuzione], ['Tredicesima', t.tredicesima], ['Contributi INPS e Cassa Colf', t.contributi], ['TFR', t.tfr]];
   const totale = voci.reduce((a, [, v]) => a + v, 0) || 1;
@@ -38,13 +49,13 @@ function composizione(t) {
 async function dati(anno) {
   const oggi = oggiIso();
   if (ambito === 'questo' || app.rapporti.length < 2) {
-    return { rep: reportAnno(app.rapporto.dati, app.cedolini, anno, oggi, app.fatte), nomi: [nomeRapporto(app.rapporto)] };
+    return { rep: reportAnno(app.rapporto.dati, app.cedolini, anno, oggi, app.fatte, { versamenti: app.versamenti }), nomi: [nomeRapporto(app.rapporto)] };
   }
   const lista = [];
   const nomi = [];
   for (const r of app.rapporti.filter((x) => x.ruolo !== 'lavoratrice' && x.dati)) {
     if (!cacheCedolini.has(r.id)) cacheCedolini.set(r.id, r.id === app.rapporto.id ? app.cedolini : await caricaCedolini(r.id));
-    const rep = reportAnno(r.dati, cacheCedolini.get(r.id), anno, oggi, r.id === app.rapporto.id ? app.fatte : new Set());
+    const rep = reportAnno(r.dati, cacheCedolini.get(r.id), anno, oggi, r.id === app.rapporto.id ? app.fatte : new Set(), { versamenti: r.id === app.rapporto.id ? app.versamenti : [] });
     if (rep && !rep.vuoto) {
       rep.uscite = rep.uscite.map((u) => ({ ...u, titolo: `${u.titolo} · ${nomeRapporto(r)}` }));
       lista.push(rep); nomi.push(nomeRapporto(r));
@@ -82,6 +93,7 @@ export async function mostraReport(root, { vai }) {
       <span class="valore grande">${eur(rep.previsione.costo)}</span>
       <p class="nota" style="margin-top:6px">${ult ? `Di cui ${eur(rep.consuntivo.costo)} già maturati fino a ${nomeMeseMaiusc(ult.mese).toLowerCase()}` : 'Nessun mese ancora maturato'}${rep.mesiPrevisti ? `; ${rep.mesiPrevisti} ${rep.mesiPrevisti === 1 ? 'mese stimato' : 'mesi stimati'} sull'orario programmato.` : '.'}
         ${var_ != null ? ` Rispetto al ${annoScelto - 1}: ${var_ >= 0 ? '+' : '−'}${num(Math.abs(var_) * 100, 1)}%.` : ''}</p>
+      ${rep.budget ? budgetBox(rep) : ''}
     </section>
 
     <section class="card">
@@ -118,6 +130,16 @@ export async function mostraReport(root, { vai }) {
     </section>
 
     <section class="card">
+      <h2>Agevolazioni fiscali ${annoScelto}</h2>
+      <p class="nota" style="margin:-4px 0 12px">Da indicare nella dichiarazione dei redditi dell'anno dopo. Il dettaglio è nel Pacchetto per commercialista o CAF, in Documenti.</p>
+      <dl class="tabella-dl">
+        <div><dt>Contributi deducibili dal reddito</dt><dd>${eur(rep.fiscale.deducibili)}</dd></div>
+        <div><dt>Detrazione 19% per l'assistenza</dt><dd>${rep.fiscale.detrazioneAmmessa ? eur(rep.fiscale.detrazione) : `<span class="nota">non spettante${rep.fiscale.detrazionePotenziale ? ` (potenziale ${eur(rep.fiscale.detrazionePotenziale)})` : ''}</span>`}</dd></div>
+      </dl>
+      ${!rep.fiscale.detrazioneAmmessa ? `<p class="nota">Per la detrazione servono: assistito non autosufficiente con certificato, reddito fino a 40.000 € e pagamento non in contanti. Si indicano in Impostazioni → Rapporto.</p>` : ''}
+    </section>
+
+    <section class="card">
       <h2>Uscite dei prossimi 90 giorni</h2>
       ${rep.uscite.length ? `<ul class="lista-scadenze">${rep.uscite.map((u) => `<li><span class="data">${dataIt(u.data)}</span><span style="flex:1">${esc(u.titolo)}</span><strong class="num">${eur(u.importo)}</strong></li>`).join('')}</ul>
         <p class="totale-uscite"><span>Totale</span><strong>${eur(rep.usciteTotale)}</strong></p>` : '<p class="nota">Nessuna uscita in arrivo.</p>'}
@@ -142,6 +164,9 @@ function stampaReport(rep, anno, nomi) {
       <tr><td>Costo per ora lavorata</td><td class="num">${rep.costoOrario != null ? eur(rep.costoOrario) : '—'}</td></tr>
       <tr><td>Netto pagato</td><td class="num">${eur(rep.consuntivo.netto)}</td></tr>
       <tr><td>Contributi da versare nell'anno</td><td class="num">${eur(rep.previsione.contributiDovuti)}</td></tr>
+      ${rep.budget ? `<tr><td>Budget annuo</td><td class="num">${eur(rep.budget)} (${rep.scostamentoBudget > 0 ? `oltre di ${eur(rep.scostamentoBudget)}` : `margine ${eur(-rep.scostamentoBudget)}`})</td></tr>` : ''}
+      <tr><td>Contributi deducibili dal reddito</td><td class="num">${eur(rep.fiscale.deducibili)}</td></tr>
+      <tr><td>Detrazione 19% per l'assistenza</td><td class="num">${rep.fiscale.detrazioneAmmessa ? eur(rep.fiscale.detrazione) : 'non spettante'}</td></tr>
     </table>
     <h2>Composizione del costo previsto</h2>
     <table class="dati compatta">

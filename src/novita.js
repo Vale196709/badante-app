@@ -3,6 +3,14 @@ export const VERSIONE = __VERSIONE__;
 export const DATA_BUILD = __DATA_BUILD__;
 
 export const NOVITA = [
+  { versione: '1.5.0', data: '2026-10-29', voci: [
+    'Accesso rapido: "Resta collegato" e sblocco con Face ID, Touch ID o impronta',
+    'Dati per il bonifico dello stipendio con causale e QR code per l\'app della banca',
+    'Budget annuo con avviso nel Riepilogo e nel Report',
+    'Pacchetto per commercialista o CAF: contributi deducibili, detrazione del 19% e documenti da portare',
+    'Rapporti con paga mensile: convivente, convivente part-time, assistenza e presenza notturna',
+    'Minimi 2026 completi per tutti i livelli',
+  ] },
   { versione: '1.4.0', data: '2026-10-29', voci: [
     'Nuovo nome: Badante di Maria',
     'Nuovi colori: blu notte e ambra',

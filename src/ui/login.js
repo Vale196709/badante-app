@@ -1,5 +1,6 @@
 import { supabase } from '../lib/supabase.js';
 import { VERSIONE, dataBuildIt } from '../novita.js';
+import { restaCollegato, impostaRestaCollegato } from '../lib/sblocco.js';
 
 export function mostraLogin(root) {
   root.innerHTML = `
@@ -17,6 +18,7 @@ export function mostraLogin(root) {
           <label>Password
             <input name="password" type="password" autocomplete="current-password" required />
           </label>
+          <label class="spunta"><input type="checkbox" name="resta" ${restaCollegato() ? 'checked' : ''} /> Resta collegato su questo dispositivo</label>
           <p class="errore" role="alert" hidden></p>
           <button type="submit" class="primario">Accedi</button>
         </form>
@@ -30,6 +32,7 @@ export function mostraLogin(root) {
     e.preventDefault();
     err.hidden = true;
     const btn = form.querySelector('button');
+    impostaRestaCollegato(form.resta.checked);
     btn.disabled = true;
     btn.textContent = 'Accesso in corso…';
     const { error } = await supabase.auth.signInWithPassword({

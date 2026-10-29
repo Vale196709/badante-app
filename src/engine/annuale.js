@@ -59,3 +59,39 @@ export function contributiDeducibili(catena, anno, versamenti = []) {
   pagati = euro(pagati);
   return { pagati, deducibili: Math.min(pagati, REGOLE_CCNL.deduzioneContributiMax), massimo: REGOLE_CCNL.deduzioneContributiMax, trimestriRegistrati: daRegistrati };
 }
+
+/**
+ * Detrazione IRPEF del 19% per gli addetti all'assistenza personale di persone non autosufficienti
+ * (art. 15, c. 1, lett. i-septies TUIR): spesa massima 2.100 € per assistito, reddito di chi paga
+ * fino a 40.000 €, pagamento tracciabile, certificazione medica della non autosufficienza.
+ * La spesa è per cassa: retribuzioni lorde dei cedolini pagati nell'anno (se nessun cedolino
+ * risulta pagato si usa la competenza, come stima).
+ */
+export function detrazioneAssistenza(catena, anno, dati = {}) {
+  const R = REGOLE_CCNL.detrazioneAssistenza;
+  const pagati = catena.filter((m) => m.salvato?.pagato_at?.startsWith(String(anno)));
+  const perCassa = pagati.length > 0;
+  const mesi = perCassa ? pagati : catena.filter((m) => m.anno === anno);
+  const spesa = somma(mesi, (m) => m.risultato.lordo);
+  const det = dati.detrazione || {};
+  const requisiti = {
+    nonAutosufficiente: !!det.nonAutosufficiente,
+    redditoEntroLimite: !!det.redditoEntroLimite,
+    pagamentoTracciabile: (dati.pagamento?.modalita || 'bonifico') !== 'contanti',
+  };
+  const ammessa = Object.values(requisiti).every(Boolean);
+  const base = Math.min(spesa, R.spesaMassima);
+  return {
+    spesa,
+    base: euro(base),
+    detrazione: ammessa ? euro(base * R.aliquota) : 0,
+    detrazionePotenziale: euro(base * R.aliquota),
+    massimo: euro(R.spesaMassima * R.aliquota),
+    spesaMassima: R.spesaMassima,
+    limiteReddito: R.limiteReddito,
+    requisiti,
+    ammessa,
+    perCassa,
+    mesi: mesi.length,
+  };
+}

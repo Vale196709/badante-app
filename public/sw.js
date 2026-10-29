@@ -1,5 +1,5 @@
 // Service worker: apre l'interfaccia anche senza rete e mostra le notifiche dei promemoria.
-const CACHE = 'badante-v3';
+const CACHE = 'badante-v4';
 self.addEventListener('install', () => self.skipWaiting());
 self.addEventListener('activate', (e) => {
   e.waitUntil(caches.keys().then((k) => Promise.all(k.filter((n) => n !== CACHE).map((n) => caches.delete(n)))).then(() => self.clients.claim()));

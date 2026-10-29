@@ -17,6 +17,8 @@ import { mostraAltro } from './ui/altro.js';
 import { mostraInfo } from './ui/info.js';
 import { mostraReport } from './ui/report.js';
 import { VERSIONE, dataBuildIt } from './novita.js';
+import { controllaBlocco } from './ui/blocco.js';
+import { sessioneScaduta } from './lib/sblocco.js';
 import { mostraLavoratrice, mostraRichiesteLavoratrice, mostraDocumentiLavoratrice } from './ui/lavoratrice.js';
 
 const root = document.getElementById('app');
@@ -145,6 +147,7 @@ function disegnaApp() {
 
 async function mostraApp(user) {
   root.innerHTML = '<p class="caricamento">Caricamento…</p>';
+  controllaBlocco(user);
   try {
     app.user = user;
     app.rapporti = (await caricaContesto(user)).map(normalizza);
@@ -163,6 +166,7 @@ export { mostraApp };
 
 supabase.auth.onAuthStateChange((_evento, session) => {
   const user = session?.user ?? null;
+  if (user && sessioneScaduta()) { supabase.auth.signOut(); return; }
   if (utenteCorrente !== undefined && (user?.id ?? null) === (utenteCorrente?.id ?? null)) return;
   utenteCorrente = user;
   setTimeout(() => (user ? mostraApp(user) : mostraLogin(root)), 0);

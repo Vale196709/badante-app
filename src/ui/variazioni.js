@@ -3,6 +3,7 @@ import { app, puoModificare, eur, esc, oggiIso, toast, nomeMeseMaiusc } from '..
 import { salvaRapporto } from '../lib/dati.js';
 import { variazioniOrdinate, condizioniAl } from '../engine/variazioni.js';
 import { oreSettimanali } from '../engine/calcolo.js';
+import { tipologia } from '../engine/tabelle.js';
 
 const GIORNI = ['Lun', 'Mar', 'Mer', 'Gio', 'Ven', 'Sab', 'Dom'];
 const LIVELLI = ['A', 'AS', 'B', 'BS', 'C', 'CS', 'D', 'DS'];
@@ -14,23 +15,26 @@ export function mostraVariazioni(root, ctx) {
   const mod = puoModificare();
   const lista = variazioniOrdinate(d);
   const attuali = condizioniAl(d, oggiIso());
+  const mens = tipologia(d).mensile;
+  const pagaTesto = (c) => (mens ? `${eur(c.pagaMensile)}/mese` : `${eur(c.pagaOraria)}/h`);
   const prossimoMese = (() => { const x = new Date(); x.setMonth(x.getMonth() + 1); return `${x.getFullYear()}-${String(x.getMonth() + 1).padStart(2, '0')}`; })();
 
   root.innerHTML = `
     <section class="card">
       <h2>Condizioni in vigore oggi</h2>
       <div class="cifre">
-        <div><span class="etichetta">Paga oraria</span><span class="valore">${eur(attuali.pagaOraria)}</span></div>
+        <div><span class="etichetta">${mens ? 'Paga mensile' : 'Paga oraria'}</span><span class="valore">${eur(mens ? attuali.pagaMensile : attuali.pagaOraria)}</span></div>
         <div><span class="etichetta">Orario</span><span class="valore">${oreSettimanali(attuali.orario)} h</span><span class="sotto">a settimana</span></div>
         <div><span class="etichetta">Livello</span><span class="valore">${esc(attuali.livello)}</span></div>
       </div>
-      <p class="nota">All'assunzione: ${eur(d.pagaOraria)}/h, ${descrOrario(d.orario)}, livello ${esc(d.livello)}. Le condizioni iniziali si correggono nella scheda Rapporto.</p>
+      <p class="nota">All'assunzione: ${pagaTesto(d)}, ${descrOrario(d.orario)}, livello ${esc(d.livello)}. Le condizioni iniziali si correggono nella scheda Rapporto.</p>
     </section>
     <section class="card">
       <h2>Variazioni</h2>
       ${lista.length ? `<ul class="lista-richieste">${lista.map((v, i) => `
         <li><span><strong>Da ${meseDi(v.dal)}</strong><br><small>${[
           v.pagaOraria != null ? `paga ${eur(v.pagaOraria)}/h` : '',
+          v.pagaMensile != null ? `paga ${eur(v.pagaMensile)}/mese` : '',
           v.orario ? descrOrario(v.orario) : '',
           v.livello ? `livello ${esc(v.livello)}` : '',
         ].filter(Boolean).join(' · ')}${v.nota ? ` · ${esc(v.nota)}` : ''}</small></span>
@@ -42,7 +46,7 @@ export function mostraVariazioni(root, ctx) {
       <form class="form-variazione">
         <label>Dal mese<input type="month" name="dal" value="${prossimoMese}" required /></label>
         <div class="riga">
-          <label>Nuova paga oraria (€)<input name="paga" inputmode="decimal" placeholder="${String(attuali.pagaOraria).replace('.', ',')}" /></label>
+          <label>${mens ? 'Nuova paga mensile (€)' : 'Nuova paga oraria (€)'}<input name="paga" inputmode="decimal" placeholder="${String(mens ? attuali.pagaMensile : attuali.pagaOraria).replace('.', ',')}" /></label>
           <label>Livello<select name="livello"><option value="">invariato</option>${LIVELLI.map((l) => `<option>${l}</option>`).join('')}</select></label>
         </div>
         <label class="spunta"><input type="checkbox" name="cambiaOrario" /> Cambia anche l'orario</label>
@@ -76,7 +80,7 @@ export function mostraVariazioni(root, ctx) {
     const dal = `${f.dal.value}-01`;
     const paga = f.paga.value.trim() ? Number(f.paga.value.replace(',', '.')) : null;
     const v = { dal };
-    if (paga != null && paga > 0) v.pagaOraria = paga;
+    if (paga != null && paga > 0) v[mens ? 'pagaMensile' : 'pagaOraria'] = paga;
     if (f.livello.value) v.livello = f.livello.value;
     if (f.cambiaOrario.checked) {
       v.orario = Object.fromEntries([1, 2, 3, 4, 5, 6, 7].map((g) => [g, Number(f[`g${g}`].value) || 0]).filter(([, h]) => h > 0));

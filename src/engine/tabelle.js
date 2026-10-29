@@ -17,8 +17,24 @@ export const TABELLE = {
       AS: 6.76,
       B: 7.01,
       BS: 7.45,
-      // C, CS, D, DS: da inserire dopo verifica sulla tabella ministeriale.
+      C: 7.86,
+      CS: 8.30,
+      D: 9.57,
+      DS: 9.97,
     },
+
+    // Minimi mensili per lavoratori conviventi a tempo pieno (Tabella A).
+    // Ai livelli D e DS si aggiunge l'indennità di funzione.
+    minimiMensiliConviventi: { A: 908.10, AS: 958.55, B: 983.16, BS: 1053.39, C: 1123.63, CS: 1193.84, D: 1404.51, DS: 1474.73 },
+    indennitaFunzione: { D: 207.69, DS: 207.69 },
+    // Conviventi a tempo parziale, massimo 30 ore settimanali (Tabella B).
+    minimiMensiliConviventiPT: { B: 702.25, BS: 737.39, C: 814.60 },
+    // Assistenza notturna a persone non autosufficienti, mensile (Tabella D).
+    minimiAssistenzaNotturna: { BS: 1211.38, CS: 1372.91, DS: 1695.99 },
+    // Presenza notturna, livello unico mensile (Tabella E).
+    minimoPresenzaNotturna: 811.09,
+    // Indennità giornaliera di vitto e alloggio (Tabella F).
+    vittoAlloggio: { pranzoColazione: 2.33, cena: 2.33, alloggio: 2.00, totale: 6.66 },
 
     // Contributi INPS orari. La fascia si sceglie sulla "retribuzione oraria effettiva" =
     // paga oraria + vitto/alloggio orario (conviventi) + quota oraria di 13ª (1/12).
@@ -50,6 +66,27 @@ export const TABELLE = {
     inflazioneTfr: null,
   },
 };
+
+// Tipologie di rapporto. Quelle "mensili" hanno una retribuzione fissa al mese.
+export const TIPOLOGIE = {
+  ore: { nome: 'Non convivente, pagata a ore', breve: 'A ore', mensile: false },
+  convivente: { nome: 'Convivente a tempo pieno (fino a 54 h/sett.)', breve: 'Convivente', mensile: true, maxSettimanali: 54, minimi: 'minimiMensiliConviventi', vitto: true },
+  conviventePT: { nome: 'Convivente part-time (fino a 30 h/sett.)', breve: 'Convivente part-time', mensile: true, maxSettimanali: 30, minimi: 'minimiMensiliConviventiPT', vitto: true },
+  notturna: { nome: 'Assistenza notturna a non autosufficienti', breve: 'Assistenza notturna', mensile: true, minimi: 'minimiAssistenzaNotturna', vitto: false },
+  presenza: { nome: 'Presenza notturna (dalle 21 alle 8)', breve: 'Presenza notturna', mensile: true, minimi: 'minimoPresenzaNotturna', vitto: false },
+};
+export const tipologia = (d) => TIPOLOGIE[d?.tipologia] || TIPOLOGIE.ore;
+
+/** Minimo contrattuale (orario o mensile) per tipologia e livello; null se non previsto. */
+export function minimoContrattuale(t, d) {
+  const tip = tipologia(d);
+  if (!tip.mensile) return t.minimiOrariNonConviventi?.[d.livello] ?? null;
+  const tab = t[tip.minimi];
+  if (typeof tab === 'number') return tab;
+  const base = tab?.[d.livello];
+  if (base == null) return null;
+  return tip.minimi === 'minimiMensiliConviventi' ? base + (t.indennitaFunzione?.[d.livello] || 0) : base;
+}
 
 // Regole del CCNL che non cambiano di anno in anno.
 export const REGOLE_CCNL = {
@@ -84,6 +121,8 @@ export const REGOLE_CCNL = {
   ],
   // Deduzione IRPEF dei contributi a carico del datore (art. 10 TUIR)
   deduzioneContributiMax: 1549.37,
+  // Detrazione 19% spese per addetti all'assistenza di non autosufficienti (art. 15 TUIR)
+  detrazioneAssistenza: { aliquota: 0.19, spesaMassima: 2100, limiteReddito: 40000 },
 };
 
 // ---------- Festività nazionali ----------
@@ -145,7 +184,11 @@ export function tabelleAnno(anno) {
   const tutte = tutteLeTabelle();
   const anni = Object.keys(tutte).map(Number).sort((a, b) => a - b);
   const scelto = tutte[anno] ? anno : anni.filter((a) => a <= anno).pop() ?? anni[0];
+  // le tabelle inserite a mano possono non avere le voci per conviventi e notturni:
+  // in quel caso si usano quelle dell'ultimo anno incluso nell'app
+  const incluso = TABELLE[Math.max(...Object.keys(TABELLE).map(Number).filter((a) => a <= Math.max(scelto, 2026)))];
   return {
+    ...incluso,
     ...tutte[scelto],
     festivita: festivitaAnno(anno),
     provvisorie: scelto !== anno,

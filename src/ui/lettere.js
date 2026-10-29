@@ -1,5 +1,6 @@
 // Lettere pronte: si compilano pochi campi e si stampano (o si salvano in PDF).
 import { app, catenaCorrente, eur, esc, dataIt, oggiIso } from '../stato.js';
+import { tipologia } from '../engine/tabelle.js';
 import { apriStampa } from './stampe.js';
 import { condizioniAl, variazioniOrdinate } from '../engine/variazioni.js';
 import { giorniPreavviso } from '../engine/cessazione.js';
@@ -121,7 +122,7 @@ export const LETTERE = {
       <p class="oggetto">Oggetto: variazione delle condizioni del rapporto di lavoro domestico</p>
       <p>Con riferimento al rapporto di lavoro in essere dal ${dataIt(d.dataAssunzione)}, Le comunico che dal <strong>${dataIt(v.dal)}</strong> le condizioni saranno le seguenti:</p>
       <ul>
-        <li>retribuzione oraria lorda: <strong>${eur(c.pagaOraria)}</strong>${v.pagaOraria != null ? ' (variata)' : ''};</li>
+        <li>${c.pagaMensile && tipologia(c).mensile ? `retribuzione mensile lorda: <strong>${eur(c.pagaMensile)}</strong>${v.pagaMensile != null ? ' (variata)' : ''}` : `retribuzione oraria lorda: <strong>${eur(c.pagaOraria)}</strong>${v.pagaOraria != null ? ' (variata)' : ''}`};</li>
         <li>livello di inquadramento: <strong>${esc(c.livello)}</strong>${v.livello ? ' (variato)' : ''};</li>
         <li>orario: <strong>${oreSettimanali(c.orario)} ore settimanali</strong>, ${orarioTesto(c.orario)}${v.orario ? ' (variato)' : ''}.</li>
       </ul>

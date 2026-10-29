@@ -358,14 +358,14 @@ small.cf { display: block; margin: -8px 0 12px; }
 .strumenti-presenze { align-items: flex-end; margin-top: 12px; }
 
 /* Fogli a scomparsa (dialog) */
-dialog.dlg-giorno, dialog.dlg-firma, dialog.dlg-lettera {
+dialog.dlg-giorno, dialog.dlg-firma, dialog.dlg-lettera, dialog.dlg-bonifico {
   border: 0; padding: 0; background: var(--superficie); color: var(--testo);
   width: min(480px, 100vw); max-height: 92dvh; border-radius: 14px;
 }
 dialog.dlg-firma, dialog.dlg-lettera { width: min(560px, 100vw); }
 @media (max-width: 600px) {
-  dialog.dlg-giorno, dialog.dlg-firma, dialog.dlg-lettera { margin: auto 0 0; width: 100vw; max-width: 100vw; border-radius: 14px 14px 0 0; padding-bottom: env(safe-area-inset-bottom); }
-  dialog[open].dlg-giorno, dialog[open].dlg-firma, dialog[open].dlg-lettera { animation: sale 0.28s ease-out; }
+  dialog.dlg-giorno, dialog.dlg-firma, dialog.dlg-lettera, dialog.dlg-bonifico { margin: auto 0 0; width: 100vw; max-width: 100vw; border-radius: 14px 14px 0 0; padding-bottom: env(safe-area-inset-bottom); }
+  dialog[open].dlg-giorno, dialog[open].dlg-firma, dialog[open].dlg-lettera, dialog[open].dlg-bonifico { animation: sale 0.28s ease-out; }
 }
 @keyframes sale { from { transform: translateY(40px); opacity: 0.4; } to { transform: none; opacity: 1; } }
 dialog::backdrop { background: rgba(0, 0, 0, 0.4); }
@@ -506,3 +506,47 @@ body.in-stampa { overflow: hidden; }
 .tabella-dl .tot dt, .tabella-dl .tot dd { color: var(--testo); font-weight: 700; }
 .totale-uscite { display: flex; justify-content: space-between; margin: 8px 0 0; padding-top: 10px; border-top: 1px solid var(--separatore); font-size: 16px; }
 .card-testa .secondario:disabled { opacity: 0.45; }
+
+/* Bonifico */
+.bonifico { padding: 14px 18px 18px; }
+.bonifico h2 { margin: 4px 0 12px; }
+.riga-copia { display: grid; grid-template-columns: 1fr auto; gap: 0 8px; padding: 9px 0; border-bottom: 0.5px solid var(--separatore); }
+.riga-copia .etichetta { grid-column: 1 / -1; font-size: 13px; color: var(--testo-2); }
+.riga-copia .valore { font-weight: 600; word-break: break-word; font-variant-numeric: tabular-nums; }
+.riga-copia .link { align-self: center; }
+.qr { display: grid; place-items: center; margin: 16px auto 6px; width: min(220px, 70vw); }
+.qr:empty { display: none; }
+.qr svg { width: 100%; height: auto; background: #fff; border-radius: 12px; padding: 6px; }
+
+/* Budget nel report */
+.budget { margin-top: 14px; }
+.budget-testa { display: flex; justify-content: space-between; gap: 8px; font-size: 14px; color: var(--testo-2); }
+.budget-testa strong { color: var(--verde); }
+.budget.oltre .budget-testa strong { color: var(--rosso); }
+.budget-barra { position: relative; height: 10px; border-radius: 999px; background: var(--riempimento); margin: 6px 0 4px; overflow: hidden; }
+.budget-barra span { position: absolute; inset: 0 auto 0 0; border-radius: 999px; }
+.budget-barra .previsto { background: repeating-linear-gradient(135deg, var(--ambra-fondo) 0 4px, transparent 4px 7px); box-shadow: inset 0 0 0 1px var(--ambra); }
+.budget-barra .speso { background: var(--tinta); z-index: 1; }
+.budget.oltre .budget-barra .speso { background: var(--rosso); }
+.budget small { color: var(--testo-3); font-size: 12px; }
+
+/* Simulatore: campi su tutta la larghezza dello scenario */
+.scenario .largo { clear: both; }
+.scenario .spunta { font-size: 13px; display: flex; gap: 6px; align-items: center; }
+
+/* Blocco con Face ID */
+body.bloccato { overflow: hidden; }
+.blocco {
+  position: fixed; inset: 0; z-index: 1000; display: grid; place-items: center; padding: 24px;
+  background: var(--sfondo);
+}
+.blocco-card { text-align: center; width: min(340px, 100%); }
+.blocco-card img { border-radius: 16px; box-shadow: 0 4px 18px rgba(15, 27, 45, 0.18); }
+.blocco-card h1 { margin: 14px 0 2px; font-size: 24px; }
+.blocco-card p { color: var(--testo-2); margin: 0 0 22px; }
+.blocco-card .primario { width: 100%; }
+.blocco-card .errore { margin: 12px 0 0; }
+.blocco-card .link { margin-top: 18px; }
+
+.dettagli-tabelle { margin: 14px 0 6px; border-top: 0.5px solid var(--separatore); padding-top: 10px; }
+.dettagli-tabelle summary { cursor: pointer; font-weight: 600; color: var(--tinta); padding: 4px 0; }

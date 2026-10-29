@@ -2,9 +2,10 @@
 // da cui si può anche scegliere "Salva come PDF" (PC e iPhone).
 import { app, eur, num, esc, dataIt, oggiIso, nomeMeseMaiusc } from '../stato.js';
 import { oreSettimanali } from '../engine/calcolo.js';
-import { riepilogoAnno, contributiDeducibili } from '../engine/annuale.js';
+import { riepilogoAnno, contributiDeducibili, detrazioneAssistenza } from '../engine/annuale.js';
+import { formattaIban } from '../lib/iban.js';
 import { MOTIVI } from '../engine/cessazione.js';
-import { REGOLE_CCNL } from '../engine/tabelle.js';
+import { REGOLE_CCNL, tipologia } from '../engine/tabelle.js';
 import { voceT, meseT } from '../i18n.js';
 import { condizioniMese, condizioniAl } from '../engine/variazioni.js';
 
@@ -53,11 +54,11 @@ export function stampaCedolino(m, salvato, { traduci = false } = {}) {
   apriStampa(titolo, `
     <h1>Prospetto paga · ${nomeMeseMaiusc(m.mese)} ${m.anno}${traduci && voceT('titolo') ? `<br><span class="trad">${esc(voceT('titolo'))} · ${esc(meseT(m.mese))} ${m.anno}</span>` : ''}</h1>
     ${parti(d)}
-    <p class="meta">Livello ${esc(condizioniMese(d, m.anno, m.mese).livello)} · non convivente · ${oreSettimanali(condizioniMese(d, m.anno, m.mese).orario)} ore settimanali · assunzione ${dataIt(d.dataAssunzione)}${d.codiceRapportoInps ? ` · cod. rapporto INPS ${esc(d.codiceRapportoInps)}` : ''}</p>
+    <p class="meta">Livello ${esc(condizioniMese(d, m.anno, m.mese).livello)} · ${esc(tipologia(d).breve.toLowerCase())} · ${oreSettimanali(condizioniMese(d, m.anno, m.mese).orario)} ore settimanali · assunzione ${dataIt(d.dataAssunzione)}${d.codiceRapportoInps ? ` · cod. rapporto INPS ${esc(d.codiceRapportoInps)}` : ''}</p>
     <table class="dati">
-      <thead><tr><th>Voce</th><th class="num">Ore</th><th class="num">Tariffa €</th><th class="num">Importo €</th></tr></thead>
+      <thead><tr><th>Voce</th><th class="num">Q.tà</th><th class="num">Tariffa €</th><th class="num">Importo €</th></tr></thead>
       <tbody>
-        ${r.voci.map((v) => `<tr><td>${esc(v.descrizione)}${tr(v.codice)}</td><td class="num">${v.quantita != null ? num(v.quantita) : ''}</td><td class="num">${v.tariffa != null ? num(v.tariffa) : ''}</td><td class="num">${num(v.importo)}</td></tr>`).join('')}
+        ${r.voci.map((v) => `<tr><td>${esc(v.descrizione)}${tr(v.codice)}</td><td class="num">${v.quantita != null ? `${num(v.quantita)}${v.unita === 'gg' ? ' gg' : v.unita === 'mese' ? ' mese' : ''}` : ''}</td><td class="num">${v.tariffa != null ? num(v.tariffa) : ''}</td><td class="num">${num(v.importo)}</td></tr>`).join('')}
         <tr class="tot"><td colspan="3">Totale lordo${tr('lordo')}</td><td class="num">${num(r.lordo)}</td></tr>
         ${r.trattenute.map((x) => `<tr><td colspan="3">${esc(x.descrizione)}${tr(x.codice)}</td><td class="num">−${num(x.importo)}</td></tr>`).join('')}
         ${r.anticipoTfr ? `<tr><td colspan="3">Anticipo TFR${tr('anticipo')}</td><td class="num">${num(r.anticipoTfr)}</td></tr>` : ''}
@@ -88,6 +89,14 @@ export function stampaCedolino(m, salvato, { traduci = false } = {}) {
       : firme('Il datore di lavoro', 'La lavoratrice (per ricevuta)')}`);
 }
 
+const DESCR_TIPO = {
+  ore: 'lavoratrice non convivente pagata a ore',
+  convivente: 'lavoratrice convivente a tempo pieno',
+  conviventePT: 'lavoratrice convivente a tempo parziale',
+  notturna: 'assistenza notturna a persona non autosufficiente',
+  presenza: 'presenza notturna',
+};
+
 // ---------- Lettera di assunzione ----------
 export function stampaLetteraAssunzione() {
   const d = app.rapporto.dati;
@@ -100,10 +109,12 @@ export function stampaLetteraAssunzione() {
     <ol class="clausole">
       <li><strong>Inizio e durata.</strong> Il rapporto inizia il ${dataIt(d.dataAssunzione)} ed è a ${d.tipoContratto === 'determinato' ? `tempo determinato fino al ${dataIt(d.dataFineTermine)}` : 'tempo indeterminato'}.</li>
       <li><strong>Periodo di prova.</strong> ${d.giorniProva ? `${d.giorniProva} giorni di lavoro effettivo, durante i quali ciascuna parte può recedere senza preavviso.` : 'Non previsto.'}</li>
-      <li><strong>Inquadramento e mansioni.</strong> Livello ${esc(d.livello)} del CCNL, lavoratrice non convivente. Mansioni: ${esc(d.mansioni)}.</li>
+      <li><strong>Inquadramento e mansioni.</strong> Livello ${esc(d.livello)} del CCNL, ${esc(DESCR_TIPO[d.tipologia || 'ore'])}. Mansioni: ${esc(d.mansioni)}.</li>
       <li><strong>Luogo di lavoro.</strong> ${esc(d.luogoLavoro || d.datore.indirizzo || 'abitazione del datore di lavoro')}.</li>
       <li><strong>Orario.</strong> ${num(sett, sett % 1 ? 1 : 0)} ore settimanali così distribuite: ${orarioTesto(d)}${d.fasciaOraria ? `, di norma nella fascia ${esc(d.fasciaOraria)}` : ''}. Riposo settimanale la domenica.</li>
-      <li><strong>Retribuzione.</strong> ${eur(d.pagaOraria)} lordi l'ora, pagati mensilmente entro la fine del mese sulla base delle ore effettivamente prestate, con prospetto paga. Straordinari, festività, ferie, malattia e permessi sono retribuiti secondo il CCNL.</li>
+      <li><strong>Retribuzione.</strong> ${tipologia(d).mensile
+        ? `${eur(d.pagaMensile)} lordi al mese, pagati entro la fine del mese con prospetto paga${d.vittoAlloggio ? ', oltre a vitto e alloggio forniti dal datore di lavoro' : ''}. Straordinari e lavoro festivo sono retribuiti secondo il CCNL; ferie, festività, malattia e permessi sono compresi secondo il CCNL.`
+        : `${eur(d.pagaOraria)} lordi l'ora, pagati mensilmente entro la fine del mese sulla base delle ore effettivamente prestate, con prospetto paga. Straordinari, festività, ferie, malattia e permessi sono retribuiti secondo il CCNL.`}${d.pagamento?.modalita === 'bonifico' && d.pagamento?.iban ? ` Pagamento con bonifico sul conto ${esc(formattaIban(d.pagamento.iban))}.` : ''}</li>
       <li><strong>Tredicesima.</strong> ${d.tredicesimaMensile ? 'Per accordo tra le parti è corrisposta in ratei mensili insieme alla retribuzione.' : 'È corrisposta a dicembre, in proporzione ai mesi lavorati.'}</li>
       <li><strong>Ferie.</strong> 26 giorni lavorativi l'anno (settimana di 6 giorni), da concordare tra le parti.</li>
       <li><strong>Trattamento di fine rapporto.</strong> Accantonato ogni anno nella misura della retribuzione annua divisa per 13,5 e rivalutato per legge; è possibile un anticipo annuo fino al 70% del maturato.</li>
@@ -173,7 +184,7 @@ export function stampaProspettoAnnuale(catena, anno) {
     <h1>Prospetto dei costi · anno ${anno}</h1>
     ${parti(d)}
     <table class="dati compatta">
-      <thead><tr><th>Mese</th><th class="num">Ore</th><th class="num">Lordo €</th><th class="num">Netto €</th><th class="num">Costo datore €</th><th>Stato</th></tr></thead>
+      <thead><tr><th>Mese</th><th class="num">Q.tà</th><th class="num">Lordo €</th><th class="num">Netto €</th><th class="num">Costo datore €</th><th>Stato</th></tr></thead>
       <tbody>${a.mensile.map((m) => `<tr><td>${nomeMeseMaiusc(m.mese)}</td><td class="num">${num(m.ore)}</td><td class="num">${num(m.lordo)}</td><td class="num">${num(m.netto)}</td><td class="num">${num(m.costo)}</td><td>${esc(m.stato)}</td></tr>`).join('')}
       <tr class="tot"><td>Totale</td><td class="num">${num(a.oreLavorate)}</td><td class="num">${num(a.lordo)}</td><td class="num">${num(a.netto)}</td><td class="num">${num(a.costoDatore)}</td><td></td></tr></tbody>
     </table>
@@ -223,4 +234,67 @@ export function stampaCessazione(c) {
     <ul class="piccolo">${c.note.map((n) => `<li>${esc(n)}</li>`).join('')}</ul>
     <p>Per ricevuta e a saldo di ogni spettanza relativa al rapporto di lavoro.</p>
     ${firme('Il datore di lavoro', 'La lavoratrice (per ricevuta)')}`);
+}
+
+// ---------- Pacchetto per commercialista o CAF ----------
+export function stampaPacchettoFiscale(catena, anno) {
+  const d = app.rapporto.dati;
+  const a = riepilogoAnno(catena, anno);
+  const ded = contributiDeducibili(catena, anno, app.versamenti);
+  const det = detrazioneAssistenza(catena, anno, d);
+  const si = (ok) => (ok ? '✓ sì' : '✗ no');
+  const trimestri = [{ anno: anno - 1, q: 4 }, { anno, q: 1 }, { anno, q: 2 }, { anno, q: 3 }].map((t) => {
+    const mesi = catena.filter((m) => m.anno === t.anno && Math.ceil(m.mese / 3) === t.q);
+    const dovuto = mesi.reduce((x, m) => x + m.risultato.contributi.daVersareAInps, 0);
+    const v = app.versamenti.find((x) => x.anno === t.anno && x.trimestre === t.q);
+    return { ...t, dovuto, v, mesi: mesi.length };
+  }).filter((t) => t.mesi);
+  const docs = (app.documenti || []).filter((x) => /pagoPA|Contratto/i.test(x.categoria || '') || (x.nome || '').includes(String(anno)));
+  apriStampa(`Dati per il 730 · ${anno}`, `
+    <h1>Dati per la dichiarazione dei redditi · spese ${anno}</h1>
+    <p class="meta">Lavoro domestico: deduzione dei contributi e detrazione delle spese di assistenza (modello 730/${anno + 1} o Redditi PF)</p>
+    ${parti(d)}
+    ${d.detrazione?.assistito ? `<p>Persona assistita: <strong>${esc(d.detrazione.assistito)}</strong></p>` : ''}
+
+    <h2>1. Contributi previdenziali deducibili · rigo E23</h2>
+    ${trimestri.length ? `<table class="dati compatta">
+      <thead><tr><th>Trimestre</th><th class="num">Dovuto €</th><th>Pagato il</th><th class="num">Importo pagato €</th></tr></thead>
+      <tbody>${trimestri.map((t) => `<tr><td>${t.q}° ${t.anno}</td><td class="num">${num(t.dovuto)}</td><td>${t.v?.data_pagamento ? dataIt(t.v.data_pagamento) : '<em>non registrato</em>'}</td><td class="num">${t.v ? num(Number(t.v.importo)) : ''}</td></tr>`).join('')}</tbody>
+    </table>` : `<p>Nessun trimestre di contributi da pagare nel ${anno}: il primo versamento cade nell'anno successivo.</p>`}
+    <table class="dati">
+      <tr><td>Contributi a carico del datore pagati nel ${anno}${ded.trimestriRegistrati < trimestri.length ? ' (in parte stimati dai cedolini)' : ''}</td><td class="num">${eur(ded.pagati)}</td></tr>
+      <tr class="tot"><td>Importo deducibile (massimo ${eur(ded.massimo)})</td><td class="num">${eur(ded.deducibili)}</td></tr>
+    </table>
+    <p class="piccolo">Si deduce solo la quota a carico del datore, per i versamenti fatti nell'anno solare: il 4° trimestre ${anno} si paga a gennaio ${anno + 1} e va nella dichiarazione successiva.</p>
+
+    <h2>2. Detrazione 19% per l'assistenza personale · righi E8–E10, codice 15</h2>
+    <table class="dati">
+      <tr><td>Persona assistita non autosufficiente, con certificato medico</td><td class="num">${si(det.requisiti.nonAutosufficiente)}</td></tr>
+      <tr><td>Reddito complessivo di chi detrae non superiore a ${eur(det.limiteReddito)}</td><td class="num">${si(det.requisiti.redditoEntroLimite)}</td></tr>
+      <tr><td>Pagamenti con bonifico, assegno o carta (non contanti)</td><td class="num">${si(det.requisiti.pagamentoTracciabile)}</td></tr>
+      <tr><td>Retribuzioni lorde ${det.perCassa ? `pagate nel ${anno} (${det.mesi} cedolini)` : `di competenza ${anno} (stima: nessun cedolino segnato come pagato)`}</td><td class="num">${eur(det.spesa)}</td></tr>
+      <tr><td>Spesa ammessa (massimo ${eur(det.spesaMassima)} per persona assistita)</td><td class="num">${eur(det.base)}</td></tr>
+      <tr class="tot"><td>Detrazione d'imposta (19%)</td><td class="num">${det.ammessa ? eur(det.detrazione) : `non spettante${det.detrazionePotenziale ? ` (sarebbe ${eur(det.detrazionePotenziale)})` : ''}`}</td></tr>
+    </table>
+    <p class="piccolo">Il tetto di ${eur(det.spesaMassima)} vale per ogni persona assistita, anche se la spesa è divisa tra più familiari o più badanti. La detrazione spetta anche se l'assistito non è fiscalmente a carico. Deduzione dei contributi e detrazione si possono sommare.</p>
+
+    <h2>3. Compensi corrisposti alla lavoratrice</h2>
+    <table class="dati">
+      <tr><td>Retribuzioni lorde di competenza ${anno}</td><td class="num">${eur(a.lordo)}</td></tr>
+      <tr><td>di cui tredicesima</td><td class="num">${eur(a.tredicesima)}</td></tr>
+      <tr><td>Contributi a carico della lavoratrice trattenuti</td><td class="num">${eur(a.contributiLavoratrice)}</td></tr>
+      <tr><td>TFR maturato nell'anno</td><td class="num">${eur(a.tfrMaturato)}</td></tr>
+      <tr class="tot"><td>Costo complessivo per il datore</td><td class="num">${eur(a.costoDatore)}</td></tr>
+    </table>
+
+    <h2>4. Documenti da portare</h2>
+    <ul class="piccolo elenco-doc">
+      <li>Ricevute pagoPA dei contributi INPS pagati nel ${anno}${trimestri.filter((t) => t.v).length ? ` (${trimestri.filter((t) => t.v).length} registrate nell'app)` : ''}</li>
+      <li>Certificato medico di non autosufficienza della persona assistita</li>
+      <li>Prove dei pagamenti degli stipendi (estratto conto o contabili dei bonifici)</li>
+      <li>Dichiarazione dei compensi ${anno} firmata dalla lavoratrice (da Documenti → Ogni anno)</li>
+      <li>Lettera di assunzione e ricevuta della comunicazione INPS (per il primo anno)</li>
+      ${docs.map((x) => `<li>In archivio: ${esc(x.nome || '')} <em>(${esc(x.categoria || '')})</em></li>`).join('')}
+    </ul>
+    <p class="piccolo">Prospetto preparato con l'app Badante di Maria il ${dataIt(oggiIso())}. Gli importi vanno verificati dal commercialista o dal CAF sulle ricevute originali.</p>`);
 }

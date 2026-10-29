@@ -7,6 +7,7 @@ import { condizioniMese } from '../engine/variazioni.js';
 import { salvaCedolino } from '../lib/dati.js';
 import { stampaCedolino } from './stampe.js';
 import { cardRichieste } from './richieste.js';
+import { apriBonifico } from './bonifico.js';
 
 const STATI = { 'da fare': 'Da preparare', bozza: 'Bozza', confermato: 'Confermato', pagato: 'Pagato' };
 const GSETT = ['Lun', 'Mar', 'Mer', 'Gio', 'Ven', 'Sab', 'Dom'];
@@ -132,9 +133,9 @@ function editorMese(root, ctx, anno, mese) {
       <div class="card-testa"><h2>Cedolino</h2>${r.lordo ? '' : ''}</div>
       ${(r.avvisi || []).map((a) => `<div class="avviso attenzione">${esc(a)}</div>`).join('')}
       <table class="tab-cedolino">
-        <thead><tr><th>Voce</th><th class="num">Ore</th><th class="num">Tariffa</th><th class="num">Importo</th></tr></thead>
+        <thead><tr><th>Voce</th><th class="num">Q.tà</th><th class="num">Tariffa</th><th class="num">Importo</th></tr></thead>
         <tbody>
-          ${r.voci.map((v) => `<tr><td>${esc(v.descrizione)}</td><td class="num">${v.quantita != null ? num(v.quantita) : ''}</td><td class="num">${v.tariffa != null ? num(v.tariffa) : ''}</td><td class="num">${num(v.importo)}</td></tr>`).join('')}
+          ${r.voci.map((v) => `<tr><td>${esc(v.descrizione)}</td><td class="num">${v.quantita != null ? `${num(v.quantita)}${v.unita === 'gg' ? ' gg' : v.unita === 'mese' ? ' mese' : ''}` : ''}</td><td class="num">${v.tariffa != null ? num(v.tariffa) : ''}</td><td class="num">${num(v.importo)}</td></tr>`).join('')}
           <tr class="totale"><td colspan="3">Totale lordo</td><td class="num">${num(r.lordo)}</td></tr>
           ${r.trattenute.map((t) => `<tr class="meno"><td colspan="3">${esc(t.descrizione)}</td><td class="num">−${num(t.importo)}</td></tr>`).join('')}
           ${r.anticipoTfr ? `<tr><td colspan="3">Anticipo TFR</td><td class="num">${num(r.anticipoTfr)}</td></tr>` : ''}
@@ -164,6 +165,7 @@ function editorMese(root, ctx, anno, mese) {
       b.push('<button type="button" class="primario" data-a="pagato">Segna come pagato</button>');
     }
     if (mod && (stato === 'confermato' || stato === 'pagato')) b.push('<button type="button" class="link" data-a="riapri">Riapri per modifiche</button>');
+    if (stato === 'confermato' || stato === 'pagato') b.push('<button type="button" class="secondario" data-a="bonifico">Dati per il bonifico</button>');
     b.push('<button type="button" class="secondario" data-a="stampa">Stampa / PDF</button>');
     az.innerHTML = b.join('');
     az.querySelectorAll('[data-a]').forEach((x) => x.addEventListener('click', () => azione(x.dataset.a)));
@@ -181,6 +183,7 @@ function editorMese(root, ctx, anno, mese) {
   async function azione(a) {
     try {
       if (a === 'stampa') { stampaCedolino(calcola(), salvato); return; }
+      if (a === 'bonifico') { apriBonifico({ anno, mese, importo: calcola().risultato.netto }); return; }
       if (a === 'bozza') { await salva('bozza'); toast('Bozza salvata'); }
       if (a === 'conferma') {
         if (!confirm('Confermando il cedolino i valori vengono fissati e la lavoratrice potrà vederlo. Procedere?')) return;

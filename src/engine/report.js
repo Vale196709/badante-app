@@ -4,6 +4,8 @@ import { euro } from './calcolo.js';
 import { calcolaCatena } from './catena.js';
 import { generaScadenze } from './scadenze.js';
 import { condizioniAl } from './variazioni.js';
+import { contributiDeducibili, detrazioneAssistenza } from './annuale.js';
+import { REGOLE_CCNL } from './tabelle.js';
 
 const somma = (arr, f) => euro(arr.reduce((s, x) => s + (Number(f(x)) || 0), 0));
 const addGiorni = (iso, n) => new Date(new Date(iso + 'T00:00:00Z').getTime() + n * 86400000).toISOString().slice(0, 10);
@@ -24,7 +26,7 @@ export function componentiCosto(r) {
  * @param oggi     'YYYY-MM-DD'
  * @param fatte    scadenze già fatte (per le uscite in arrivo)
  */
-export function reportAnno(rapporto, cedolini, anno, oggi, fatte = new Set()) {
+export function reportAnno(rapporto, cedolini, anno, oggi, fatte = new Set(), { versamenti = [] } = {}) {
   if (!rapporto?.dataAssunzione) return null;
   const meseOggi = oggi.slice(0, 7);
   const catenaAnno = calcolaCatena(rapporto, cedolini, { anno, mese: 12 });
@@ -79,9 +81,25 @@ export function reportAnno(rapporto, cedolini, anno, oggi, fatte = new Set()) {
     .map((s) => ({ data: s.data, titolo: s.titolo, importo: s.importo, tipo: s.chiave.startsWith('inps') ? 'Contributi' : 'Stipendio' }));
   const usciteTotale = somma(uscite, (u) => u.importo);
 
+  // budget e agevolazioni fiscali
+  const budget = Number(rapporto.budgetAnnuo) > 0 ? Number(rapporto.budgetAnnuo) : null;
+  const ded = contributiDeducibili(catenaAnno, anno, versamenti);
+  const det = detrazioneAssistenza(catenaAnno, anno, rapporto);
+
   return {
     anno,
     vuoto: false,
+    budget,
+    scostamentoBudget: budget ? euro(anno_.costo - budget) : null,
+    budgetConsumato: budget ? consuntivo.costo / budget : null,
+    fiscale: {
+      deducibili: ded.deducibili,
+      detrazione: det.detrazione,
+      detrazionePotenziale: det.detrazionePotenziale,
+      detrazioneAmmessa: det.ammessa,
+      requisiti: det.requisiti,
+      assistito: rapporto.detrazione?.assistito || '',
+    },
     ultimoConsuntivo: ultimo ? { anno: ultimo.anno, mese: ultimo.mese } : null,
     mesi: mesi.map((m) => ({ mese: m.mese, consuntivo: m.consuntivo, stato: m.stato, costo: m.risultato.costoDatore, netto: m.risultato.netto, ore: m.risultato.oreLavorate, ...m.componenti })),
     consuntivo,
@@ -128,5 +146,26 @@ export function sommaReport(lista) {
     uscite: validi.flatMap((r) => r.uscite).sort((a, b) => a.data.localeCompare(b.data)),
     usciteTotale: s((r) => r.usciteTotale),
     rapporti: validi.length,
+    budget: validi.every((r) => r.budget) ? s((r) => r.budget) : null,
+    scostamentoBudget: validi.every((r) => r.budget) ? euro(previsione.costo - s((r) => r.budget)) : null,
+    budgetConsumato: validi.every((r) => r.budget) ? consuntivo.costo / s((r) => r.budget) : null,
+    fiscale: {
+      // un solo tetto di deduzione per contribuente; il tetto di spesa della detrazione vale per persona assistita
+      deducibili: Math.min(s((r) => r.fiscale.deducibili), REGOLE_CCNL.deduzioneContributiMax),
+      detrazione: limitaPerAssistito(validi, 'detrazione'),
+      detrazionePotenziale: limitaPerAssistito(validi, 'detrazionePotenziale'),
+      detrazioneAmmessa: validi.some((r) => r.fiscale.detrazioneAmmessa),
+      requisiti: validi[0].fiscale.requisiti,
+    },
   };
+}
+
+function limitaPerAssistito(lista, campo) {
+  const max = REGOLE_CCNL.detrazioneAssistenza.spesaMassima * REGOLE_CCNL.detrazioneAssistenza.aliquota;
+  const per = new Map();
+  for (const r of lista) {
+    const k = (r.fiscale.assistito || '').trim().toLowerCase() || '—';
+    per.set(k, (per.get(k) || 0) + r.fiscale[campo]);
+  }
+  return euro([...per.values()].reduce((a, v) => a + Math.min(v, max), 0));
 }

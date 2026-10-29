@@ -3,6 +3,8 @@ import { app, isTitolare, esc, nomeRapporto } from '../stato.js';
 import { ICONE, tessera } from './icone.js';
 import { supabase } from '../lib/supabase.js';
 import { VERSIONE, dataBuildIt } from '../novita.js';
+import { apriSchedaImpostazioni } from './impostazioni.js';
+import { sbloccoAttivo } from '../lib/sblocco.js';
 
 const RUOLI = { titolare: 'Titolare', gestore: 'Gestore', lettore: 'Sola lettura', lavoratrice: 'Lavoratrice' };
 
@@ -15,7 +17,7 @@ export function mostraAltro(root, { vai, scegliRapporto }) {
     <ul class="gruppo">
       ${riga('data-vai="report"', 'grafico', '#e0a100', 'Report', 'Consuntivo, previsione e uscite in arrivo')}
       ${riga('data-vai="simulatore"', 'bilancia', '#1e4e8c', 'Simulatore', 'Scenari di costo e fine rapporto')}
-      ${riga('data-vai="impostazioni"', 'ingranaggio', '#8e8e93', 'Impostazioni', 'Rapporto, variazioni, tabelle, promemoria, accessi, backup')}
+      ${riga('data-vai="impostazioni"', 'ingranaggio', '#8e8e93', 'Impostazioni', 'Rapporto, variazioni, tabelle, promemoria, accessi, backup, sicurezza')}
     </ul>
     <h2 class="testa-gruppo">Rapporti di lavoro</h2>
     <ul class="gruppo">
@@ -26,6 +28,7 @@ export function mostraAltro(root, { vai, scegliRapporto }) {
     <h2 class="testa-gruppo">Account</h2>
     <ul class="gruppo">
       <li class="riga-info"><span>${esc(app.user.email)}</span><small>${RUOLI[app.rapporto.ruolo]}</small></li>
+      ${riga('data-sicurezza', 'scudo', '#1e4e8c', 'Sicurezza', sbloccoAttivo(app.user) ? 'Sblocco con Face ID attivo' : 'Resta collegato, sblocco con Face ID')}
       ${riga('data-esci', 'esci', '#ff3b30', 'Esci', '', false)}
     </ul>
     <ul class="gruppo">
@@ -34,5 +37,6 @@ export function mostraAltro(root, { vai, scegliRapporto }) {
   root.querySelectorAll('[data-vai]').forEach((b) => b.addEventListener('click', () => vai(b.dataset.vai)));
   root.querySelectorAll('[data-rapporto]').forEach((b) => b.addEventListener('click', () => { if (b.dataset.rapporto !== app.rapporto.id) scegliRapporto(b.dataset.rapporto); }));
   root.querySelector('[data-nuovo]')?.addEventListener('click', () => scegliRapporto(null));
+  root.querySelector('[data-sicurezza]').addEventListener('click', () => { apriSchedaImpostazioni('sicurezza'); vai('impostazioni'); });
   root.querySelector('[data-esci]').addEventListener('click', () => supabase.auth.signOut());
 }

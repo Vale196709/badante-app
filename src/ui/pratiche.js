@@ -1,5 +1,7 @@
 // Pratiche INPS guidate: quando farle, dove, e i dati da inserire, presi dall'app.
 import { app, catenaCorrente, eur, esc, dataIt, oggiIso } from '../stato.js';
+import { tipologia } from '../engine/tabelle.js';
+const CONVIVENZA = { ore: 'non convivente', convivente: 'convivente', conviventePT: 'convivente a tempo parziale', notturna: 'non convivente (assistenza notturna)', presenza: 'non convivente (presenza notturna)' };
 import { apriStampa } from './stampe.js';
 import { condizioniAl, variazioniOrdinate } from '../engine/variazioni.js';
 import { oreSettimanali, retribuzioneOrariaEffettiva, fasciaContributiva, euro } from '../engine/calcolo.js';
@@ -34,10 +36,10 @@ export const PRATICHE = {
         ['Residenza della lavoratrice', esc(d.lavoratrice.indirizzo || '—')],
         ['Data di inizio', dataIt(d.dataAssunzione)],
         ['Tipo di contratto', d.tipoContratto === 'determinato' ? `tempo determinato fino al ${dataIt(d.dataFineTermine)}` : 'tempo indeterminato'],
-        ['Convivenza', 'non convivente'],
+        ['Convivenza', CONVIVENZA[d.tipologia || 'ore']],
         ['Livello CCNL', esc(d.livello)],
         ['Ore settimanali', `${oreSettimanali(d.orario)} (${orarioTesto(d.orario)})`],
-        ['Retribuzione oraria', eur(d.pagaOraria)],
+        tipologia(d).mensile ? ['Retribuzione mensile', `${eur(d.pagaMensile)}${d.vittoAlloggio ? ' + vitto e alloggio' : ''}`] : ['Retribuzione oraria', eur(d.pagaOraria)],
         ['Luogo di lavoro', esc(d.luogoLavoro || d.datore.indirizzo || '—')],
         ['CCNL', 'Lavoro domestico (Fidaldo-Domina) · adesione Cas.Sa.Colf'],
       ])}
@@ -60,7 +62,7 @@ export const PRATICHE = {
           ...anag(d),
           ['Data della variazione', dataIt(v.dal)],
           ['Nuove ore settimanali', `${oreSettimanali(c.orario)} (${orarioTesto(c.orario)})`],
-          ['Nuova retribuzione oraria', eur(c.pagaOraria)],
+          tipologia(c).mensile ? ['Nuova retribuzione mensile', eur(c.pagaMensile)] : ['Nuova retribuzione oraria', eur(c.pagaOraria)],
           ['Livello', esc(c.livello)],
         ])}`;
       }).join('');
@@ -104,7 +106,7 @@ export const PRATICHE = {
         return `<h2>${t.q}° trimestre ${t.anno}${t.mesi.length < 3 ? ' (parziale)' : ''}</h2>${tab([
           d.codiceRapportoInps ? ['Codice rapporto INPS', esc(d.codiceRapportoInps)] : null,
           ['Ore retribuite nel trimestre', fmtNum(t.ore, 2)],
-          ['Retribuzione oraria effettiva (paga + quota di 13ª)', eur(retribuzioneOrariaEffettiva(c.pagaOraria))],
+          ['Retribuzione oraria effettiva (paga + quota di 13ª)', eur(retribuzioneOrariaEffettiva(c.pagaOraria, c, Number(oggiIso().slice(0, 4))))],
           ['Contributo orario', `${eur(fasciaContributiva(c, t.anno).totaleOrario)} INPS + Cassa Colf`],
           ['Totale stimato', eur(euro(t.importo))],
         ])}`;

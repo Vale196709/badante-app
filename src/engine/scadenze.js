@@ -1,8 +1,8 @@
 import { fmtEur, fmtNum, fmtOre } from './formato.js';
 // Scadenze e avvisi di monitoraggio del rapporto.
 import { euro, isoDate, oreSettimanali } from './calcolo.js';
-import { festivitaAnno, tabelleAnno, REGOLE_CCNL as R } from './tabelle.js';
-import { variazioniOrdinate } from './variazioni.js';
+import { festivitaAnno, tabelleAnno, REGOLE_CCNL as R, minimoContrattuale, tipologia } from './tabelle.js';
+import { variazioniOrdinate, condizioniAl } from './variazioni.js';
 
 const addGiorni = (iso, n) => new Date(new Date(iso + 'T00:00:00Z').getTime() + n * 86400000).toISOString().slice(0, 10);
 const ultimoGiorno = (a, m) => isoDate(a, m, new Date(Date.UTC(a, m, 0)).getUTCDate());
@@ -165,8 +165,11 @@ export function avvisiRapporto(rapporto, catena, oggi) {
   }
   const t = tabelleAnno(Number(oggi.slice(0, 4)));
   if (t.provvisorie) avvisi.push({ livello: 'attenzione', testo: `Mancano minimi e contributi ${oggi.slice(0, 4)}: i calcoli usano i valori ${t.annoTabelle}.` });
-  const minimo = t.minimiOrariNonConviventi[rapporto.livello];
-  if (minimo && rapporto.pagaOraria < minimo) avvisi.push({ livello: 'grave', testo: `La paga oraria è sotto il minimo del livello ${rapporto.livello} (${fmtEur(minimo)}).` });
+  const c = condizioniAl(rapporto, oggi);
+  const minimo = minimoContrattuale(t, c);
+  if (tipologia(c).mensile) {
+    if (minimo && (Number(c.pagaMensile) || 0) < minimo) avvisi.push({ livello: 'grave', testo: `La retribuzione mensile è sotto il minimo del livello ${c.livello} (${fmtEur(minimo)}).` });
+  } else if (minimo && c.pagaOraria < minimo) avvisi.push({ livello: 'grave', testo: `La paga oraria è sotto il minimo del livello ${c.livello} (${fmtEur(minimo)}).` });
   for (const m of catena) for (const a of m.risultato.avvisi || []) {
     if (a.includes('conservazione del posto') || a.includes('non pagata')) avvisi.push({ livello: 'attenzione', testo: `${nomeMese(m.mese)} ${m.anno}: ${a}` });
   }
