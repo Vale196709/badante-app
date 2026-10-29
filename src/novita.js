@@ -3,6 +3,14 @@ export const VERSIONE = __VERSIONE__;
 export const DATA_BUILD = __DATA_BUILD__;
 
 export const NOVITA = [
+  { versione: '1.6.0', data: '2026-10-29', voci: [
+    'La lavoratrice segna le ore dal suo telefono, il datore le approva e vanno nelle presenze',
+    'Lettura delle ricevute dei contributi da PDF o foto, con registrazione del pagamento',
+    'Calendario annuale delle ferie con saldo previsto e "Prepara sostituta"',
+    'Contratti di sostituzione senza contributo aggiuntivo dei contratti a termine',
+    'Verifica delle agevolazioni: Prestazione universale, esonero over 80, detrazione e deduzione',
+    'Rendiconto trimestrale della Prestazione universale e link "+ Google Calendar" per ogni scadenza',
+  ] },
   { versione: '1.5.1', data: '2026-10-29', voci: [
     'Nuovo ordine del menu: Documenti, Report, Simulatore, Presenze, Riepilogo, Scadenze, Impostazioni',
   ] },

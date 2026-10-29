@@ -1,5 +1,6 @@
 import './style.css';
 import { supabase } from './lib/supabase.js';
+import { caricaOreSegnate } from './lib/dati.js';
 import { caricaContesto, caricaCedolini, caricaScadenzeFatte, caricaTabelle, caricaVersamenti, caricaRichieste, caricaDocumenti } from './lib/dati.js';
 import { impostaTabellePersonalizzate } from './engine/tabelle.js';
 import { LINGUE, linguaCorrente, impostaLingua, t } from './i18n.js';
@@ -20,6 +21,8 @@ import { VERSIONE, dataBuildIt } from './novita.js';
 import { controllaBlocco } from './ui/blocco.js';
 import { sessioneScaduta } from './lib/sblocco.js';
 import { mostraLavoratrice, mostraRichiesteLavoratrice, mostraDocumentiLavoratrice } from './ui/lavoratrice.js';
+import { mostraOreLavoratrice } from './ui/oreLavoratrice.js';
+import { mostraFerie } from './ui/ferie.js';
 
 const root = document.getElementById('app');
 let utenteCorrente;
@@ -38,8 +41,10 @@ const SEZIONI = {
   scadenze: { titolo: 'Scadenze', icona: 'campana', mostra: mostraScadenze, ruoli: GESTIONE, barra: ['lato'] },
   impostazioni: { titolo: 'Impostazioni', icona: 'ingranaggio', mostra: mostraImpostazioni, ruoli: GESTIONE, barra: ['lato'] },
   altro: { titolo: 'Altro', icona: 'altro', mostra: mostraAltro, ruoli: GESTIONE, barra: ['basso'] },
+  ferie: { titolo: 'Ferie', icona: 'calendario', mostra: mostraFerie, ruoli: GESTIONE, barra: [] },
   info: { titolo: 'Informazioni', icona: 'documento', mostra: mostraInfo, ruoli: [...GESTIONE, 'lavoratrice'], barra: [] },
   lavoratrice: { titolo: () => t('tabCedolini'), icona: 'euro', mostra: mostraLavoratrice, ruoli: ['lavoratrice'], barra: ['basso', 'lato'] },
+  lavOre: { titolo: () => t('tabOre'), icona: 'orologio', mostra: mostraOreLavoratrice, ruoli: ['lavoratrice'], barra: ['basso', 'lato'] },
   lavRichieste: { titolo: () => t('tabRichieste'), icona: 'valigia', mostra: mostraRichiesteLavoratrice, ruoli: ['lavoratrice'], barra: ['basso', 'lato'] },
   lavDocumenti: { titolo: () => t('tabDocumenti'), icona: 'documento', mostra: mostraDocumentiLavoratrice, ruoli: ['lavoratrice'], barra: ['basso', 'lato'] },
 };
@@ -48,18 +53,19 @@ const titolo = (s, lungo = false) => (typeof s.titolo === 'function' ? s.titolo(
 const CHIAVE_RAPPORTO = 'badante-rapporto';
 
 export async function ricaricaDati() {
-  if (!app.rapporto?.id) { Object.assign(app, { cedolini: [], fatte: new Set(), versamenti: [], richieste: [], documenti: [] }); impostaTabellePersonalizzate({}); return; }
+  if (!app.rapporto?.id) { Object.assign(app, { cedolini: [], fatte: new Set(), versamenti: [], richieste: [], documenti: [], ore: [] }); impostaTabellePersonalizzate({}); return; }
   const id = app.rapporto.id;
   const lav = app.rapporto.ruolo === 'lavoratrice';
-  const [cedolini, fatte, tabelle, versamenti, richieste, documenti] = await Promise.all([
+  const [cedolini, fatte, tabelle, versamenti, richieste, documenti, ore] = await Promise.all([
     caricaCedolini(id),
     lav ? new Set() : caricaScadenzeFatte(id),
     caricaTabelle(id),
     lav ? [] : caricaVersamenti(id),
     caricaRichieste(id),
     caricaDocumenti(id),
+    caricaOreSegnate(id),
   ]);
-  Object.assign(app, { cedolini, fatte, versamenti, richieste, documenti });
+  Object.assign(app, { cedolini, fatte, versamenti, richieste, documenti, ore });
   impostaTabellePersonalizzate(tabelle);
 }
 
@@ -70,7 +76,8 @@ const normalizza = (r) => {
 };
 
 /** Cambia il rapporto attivo (id null = nuovo rapporto da creare). */
-export async function scegliRapporto(id) {
+export async function scegliRapporto(id, bozza = null) {
+  app.bozzaRapporto = id === null ? bozza : null; // dati proposti per il nuovo rapporto (es. sostituta)
   try { localStorage.setItem(CHIAVE_RAPPORTO, id ?? ''); } catch { /* memoria non disponibile */ }
   if (id === null) {
     app.rapporto = { id: null, dati: null, ruolo: 'titolare' };

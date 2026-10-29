@@ -19,6 +19,7 @@ export const ICONE = {
   piu: svg('<path d="M12 5v14M5 12h14"/>'),
   scambia: svg('<path d="M5 8.5h13l-3.5-3.5M19 15.5H6l3.5 3.5"/>'),
   nuvola: svg('<path d="M7 18.5a4 4 0 0 1-.6-8 5.5 5.5 0 0 1 10.6-1.3A4.5 4.5 0 0 1 17.5 18.5z"/><path d="M12 11v5M9.8 13.2 12 11l2.2 2.2"/>'),
+  orologio: svg('<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>'),
   scudo: svg('<path d="M12 3.5 5 6v5.5c0 4.5 3 7.7 7 9 4-1.3 7-4.5 7-9V6z"/><path d="m9 12 2.2 2.2L15.5 10"/>'),
   matita: svg('<path d="M15.5 4.5l4 4L8.5 19.5H4.5v-4z"/><path d="m13.5 6.5 4 4"/>'),
   tabella: svg('<rect x="3.5" y="4.5" width="17" height="15" rx="2"/><path d="M3.5 9.5h17M3.5 14.5h17M9.5 9.5v10"/>'),

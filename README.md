@@ -29,6 +29,14 @@ Online: https://vale196709.github.io/badante-app/
 - **Lettere pronte**: licenziamento, dimissioni, anticipo TFR, accordo ferie, variazione, proroga, trasformazione.
 - **Pratiche INPS guidate**: assunzione, variazione, contributi trimestrali, cessazione, con i dati da inserire.
 - **Promemoria**: email (Gmail) e notifiche sul telefono ogni mattina, da GitHub Actions (`scripts/promemoria.mjs`).
+- **Tipi di rapporto**: a ore, convivente (tempo pieno e part-time), assistenza e presenza notturna, con paga mensile.
+- **Bonifico**: dati pronti e QR code EPC per pagare lo stipendio; budget annuo con avviso.
+- **Ore segnate dalla lavoratrice**: le inserisce dal suo telefono, titolare o gestore le approvano e vanno nelle presenze.
+- **Lettura ricevute**: PDF (pdf.js) o foto (Tesseract, eseguito sul dispositivo con i file in `public/ocr`, copiati da `scripts/copia-ocr.mjs`).
+- **Calendario ferie** dell'anno con saldo previsto e preparazione del rapporto della sostituta.
+- **Agevolazioni**: deduzione dei contributi, detrazione 19%, Prestazione universale (con rendiconto trimestrale), esonero over 80.
+- **Pacchetto per commercialista o CAF** con i dati per il 730.
+- **Sicurezza**: "resta collegato" e sblocco locale con Face ID / impronta (WebAuthn).
 - **Keep-alive**: un'attività GitHub due volte a settimana tiene attivo il progetto Supabase gratuito.
 
 ## Versioni
@@ -38,7 +46,7 @@ La versione è in `package.json` e le novità in `src/novita.js`; versione e dat
 - `src/engine/` motore di calcolo (tabelle annuali, cedolino, presenze, catena mensile, scadenze,
   riepilogo annuo, cessazione) – coperto da test (`npm test`).
 - `src/ui/` schermate; `src/lib/` accesso a Supabase.
-- `supabase/` script SQL da eseguire nel SQL Editor, in ordine: 01, 02, 03, 04.
+- `supabase/` script SQL da eseguire nel SQL Editor, in ordine: 01, 02, 03, 04, 05 (05 = ore segnate dalla lavoratrice).
 
 ## Aggiornamento annuale
 A inizio anno, in Impostazioni → Tabelle annuali: "+ Nuovo anno", aggiornare minimi CCNL e contributi INPS

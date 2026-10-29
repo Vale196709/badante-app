@@ -150,6 +150,21 @@ export async function ritiraRichiesta(id) {
   ok(await supabase.from('richieste').delete().eq('id', id));
 }
 
+// ---------- Ore segnate dalla lavoratrice ----------
+export async function caricaOreSegnate(rapportoId) {
+  return facoltativo(supabase.from('ore_segnate').select('*').eq('rapporto_id', rapportoId).order('data', { ascending: false }), []);
+}
+/** righe: [{ data, ore, extra, extra_tipo, nota }] */
+export async function segnaOre(rapportoId, righe) {
+  ok(await supabase.from('ore_segnate').upsert(righe.map((r) => ({ rapporto_id: rapportoId, stato: 'in attesa', deciso_da: null, deciso_at: null, updated_at: new Date().toISOString(), ...r }))));
+}
+export async function togliOre(rapportoId, data) {
+  ok(await supabase.from('ore_segnate').delete().eq('rapporto_id', rapportoId).eq('data', data));
+}
+export async function decidiOre(rapportoId, date, stato, email) {
+  ok(await supabase.from('ore_segnate').update({ stato, deciso_da: email, deciso_at: new Date().toISOString() }).eq('rapporto_id', rapportoId).in('data', date));
+}
+
 // ---------- Firma grafica ----------
 export async function firmaRicevutaConFirma(cedolinoId, firmaPng) {
   return ok(await supabase.rpc('firma_ricevuta', { cid: cedolinoId, firma: firmaPng || null }));

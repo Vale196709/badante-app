@@ -4,6 +4,7 @@ import { verificaCodiceFiscale } from '../lib/codiceFiscale.js';
 import { fasciaContributiva, oreSettimanali, simulaCosto, normalizzaRapporto } from '../engine/calcolo.js';
 import { tabelleAnno, TIPOLOGIE, tipologia, minimoContrattuale } from '../engine/tabelle.js';
 import { verificaIban, formattaIban } from '../lib/iban.js';
+import { verificaAgevolazioni } from '../engine/annuale.js';
 import { app, puoModificare, eur, esc, oggiIso, toast } from '../stato.js';
 
 const GIORNI = ['Lun', 'Mar', 'Mer', 'Gio', 'Ven', 'Sab', 'Dom'];
@@ -33,6 +34,7 @@ export const RAPPORTO_VUOTO = {
   pagamento: { iban: '', intestatario: '', modalita: 'bonifico' },
   budgetAnnuo: null,
   detrazione: { assistito: '', nonAutosufficiente: false, redditoEntroLimite: false },
+  agevolazioni: { over80: false, accompagnamento: false, iseeEntroLimite: false, prestazioneUniversale: false },
 };
 
 const campo = (etichetta, nome, valore, attr = '') =>
@@ -40,15 +42,18 @@ const campo = (etichetta, nome, valore, attr = '') =>
 
 export async function mostraRapporto(root, { ricaricaDati, vai }) {
   const mod = puoModificare();
-  const d = { ...structuredClone(RAPPORTO_VUOTO), ...structuredClone(app.rapporto?.dati ?? {}) };
+  const prefill = !app.rapporto?.dati ? app.bozzaRapporto : null; // es. sostituta preparata dal calendario ferie
+  const d = { ...structuredClone(RAPPORTO_VUOTO), ...structuredClone(app.rapporto?.dati ?? prefill ?? {}) };
   d.datore = { ...RAPPORTO_VUOTO.datore, ...d.datore };
   d.lavoratrice = { ...RAPPORTO_VUOTO.lavoratrice, ...d.lavoratrice };
   d.pagamento = { ...RAPPORTO_VUOTO.pagamento, ...d.pagamento };
   d.detrazione = { ...RAPPORTO_VUOTO.detrazione, ...d.detrazione };
+  d.agevolazioni = { ...RAPPORTO_VUOTO.agevolazioni, ...d.agevolazioni };
   const nuovo = !app.rapporto?.dati;
 
   root.innerHTML = `
-    ${nuovo ? '<div class="avviso info"><strong>Nuovo rapporto.</strong> Inserisci i dati e premi Salva: da qui partono cedolini, scadenze e documenti. Hai già un backup? Lo ripristini dalla scheda <button type="button" class="link vai-backup" style="padding:0">Backup</button>.</div>' : ''}
+    ${prefill ? `<div class="avviso info"><strong>Sostituta${prefill.sostituisce ? ` di ${esc(prefill.sostituisce)}` : ''}.</strong> Ho già inserito date, orario, paga e datore: completa i dati della lavoratrice e premi Salva. Ricordati la comunicazione di assunzione all'INPS entro il giorno prima dell'inizio.</div>` : ''}
+    ${nuovo && !prefill ? '<div class="avviso info"><strong>Nuovo rapporto.</strong> Inserisci i dati e premi Salva: da qui partono cedolini, scadenze e documenti. Hai già un backup? Lo ripristini dalla scheda <button type="button" class="link vai-backup" style="padding:0">Backup</button>.</div>' : ''}
     <form id="f-rapporto" class="scheda" novalidate>
       <fieldset ${mod ? '' : 'disabled'} class="tutto">
       <section>
@@ -87,6 +92,7 @@ export async function mostraRapporto(root, { ricaricaDati, vai }) {
           </label>
         </div>
         <label class="solo-termine">Fine del contratto a termine<input name="dataFineTermine" type="date" value="${esc(d.dataFineTermine)}" /></label>
+        <label class="spunta solo-termine-s"><input type="checkbox" name="sostituzione" ${d.sostituzione ? 'checked' : ''} /> Per sostituire una lavoratrice assente (niente contributo INPS aggiuntivo dei contratti a termine)</label>
         <label>Mansioni<input name="mansioni" value="${esc(d.mansioni)}" /></label>
         ${campo('Luogo di lavoro (indirizzo)', 'luogoLavoro', d.luogoLavoro, 'placeholder="se diverso dalla residenza del datore"')}
         <div class="riga">
@@ -133,6 +139,11 @@ export async function mostraRapporto(root, { ricaricaDati, vai }) {
         <label class="spunta"><input type="checkbox" name="nonAutosufficiente" ${d.detrazione.nonAutosufficiente ? 'checked' : ''} /> La persona assistita non è autosufficiente (c'è un certificato medico)</label>
         <label class="spunta"><input type="checkbox" name="redditoEntroLimite" ${d.detrazione.redditoEntroLimite ? 'checked' : ''} /> Il reddito di chi paga non supera 40.000 € l'anno</label>
         <small class="nota">Servono per calcolare la detrazione del 19% sulle spese per l'assistenza personale (fino a 2.100 € di spesa, cioè 399 € di sconto). I contributi INPS sono invece deducibili sempre, fino a 1.549,37 €.</small>
+        <label class="spunta"><input type="checkbox" name="over80" ${d.agevolazioni.over80 ? 'checked' : ''} /> La persona assistita ha almeno 80 anni</label>
+        <label class="spunta"><input type="checkbox" name="accompagnamento" ${d.agevolazioni.accompagnamento ? 'checked' : ''} /> Riceve l'indennità di accompagnamento</label>
+        <label class="spunta"><input type="checkbox" name="iseeEntroLimite" ${d.agevolazioni.iseeEntroLimite ? 'checked' : ''} /> ISEE sociosanitario fino a 6.000 €</label>
+        <label class="spunta"><input type="checkbox" name="prestazioneUniversale" ${d.agevolazioni.prestazioneUniversale ? 'checked' : ''} /> Riceve già la Prestazione universale (assegno di 850 € al mese)</label>
+        <div class="verifica-agevolazioni"></div>
       </section>
 
       <section>
@@ -166,6 +177,7 @@ export async function mostraRapporto(root, { ricaricaDati, vai }) {
     luogoLavoro: f.luogoLavoro.value.trim(),
     tipoContratto: f.tipoContratto.value,
     dataFineTermine: f.tipoContratto.value === 'determinato' ? f.dataFineTermine.value : '',
+    sostituzione: f.tipoContratto.value === 'determinato' && f.sostituzione.checked,
     tipologia: f.tipologia.value,
     pagaOraria: Number(f.pagaOraria.value) || 0,
     pagaMensile: Number(f.pagaMensile.value) || 0,
@@ -183,12 +195,14 @@ export async function mostraRapporto(root, { ricaricaDati, vai }) {
     pagamento: { modalita: f.modalita.value, iban: f.iban.value.replace(/\s+/g, '').toUpperCase(), intestatario: f.intestatario.value.trim() },
     budgetAnnuo: Number(f.budgetAnnuo.value) > 0 ? Number(f.budgetAnnuo.value) : null,
     detrazione: { assistito: f.assistito.value.trim(), nonAutosufficiente: f.nonAutosufficiente.checked, redditoEntroLimite: f.redditoEntroLimite.checked },
+    agevolazioni: { over80: f.over80.checked, accompagnamento: f.accompagnamento.checked, iseeEntroLimite: f.iseeEntroLimite.checked, prestazioneUniversale: f.prestazioneUniversale.checked },
   });
 
   let tipologiaPrima = d.tipologia || 'ore';
   const aggiorna = () => {
     const v = leggi();
     termine.hidden = v.tipoContratto !== 'determinato';
+    root.querySelector('.solo-termine-s').hidden = v.tipoContratto !== 'determinato';
     const tip = tipologia(v);
     root.querySelectorAll('.solo-ore').forEach((el) => { el.hidden = tip.mensile; });
     root.querySelectorAll('.solo-mensile').forEach((el) => { el.hidden = !tip.mensile; });
@@ -216,6 +230,10 @@ export async function mostraRapporto(root, { ricaricaDati, vai }) {
     if (!v.pagamento.iban) { ie.textContent = ''; ie.className = 'cf iban-esito'; }
     else { const r = verificaIban(v.pagamento.iban); ie.textContent = r.ok ? '✓ IBAN valido' : `✗ ${r.msg}`; ie.className = `cf iban-esito ${r.ok ? 'ok' : 'ko'}`; }
 
+    const ESITI = { si: ['✓', 'es-si'], no: ['✗', 'es-no'], forse: ['?', 'es-forse'] };
+    root.querySelector('.verifica-agevolazioni').innerHTML = `<h3 class="sottotitolo">Verifica delle agevolazioni</h3>
+      <ul class="lista-agevolazioni">${verificaAgevolazioni(v, oggiIso()).map((x) => `<li class="${ESITI[x.esito][1]}"><span class="segno">${ESITI[x.esito][0]}</span><span><strong>${esc(x.nome)}</strong><br><small>${esc(x.testo)}</small></span></li>`).join('')}</ul>
+      <p class="nota">Verifica orientativa: per Prestazione universale e detrazione conferma con il patronato o il CAF.</p>`;
     const sett = oreSettimanali(v.orario);
     if ((tip.mensile ? !v.pagaMensile : !v.pagaOraria) || !sett) { riep.innerHTML = ''; return; }
     const minimo = minimoContrattuale(t, v);
@@ -256,6 +274,7 @@ export async function mostraRapporto(root, { ricaricaDati, vai }) {
       const salvato = await salvaRapporto(app.rapporto?.id, v);
       app.rapporto = { ...app.rapporto, ...salvato, ruolo: app.rapporto?.ruolo ?? 'titolare' };
       await ricaricaDati();
+      app.bozzaRapporto = null;
       toast('Dati del rapporto salvati');
       if (nuovo) {
         try { localStorage.setItem('badante-rapporto', salvato.id); } catch { /* */ }

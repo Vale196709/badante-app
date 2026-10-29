@@ -56,6 +56,24 @@ export function generaScadenze(rapporto, catena, oggi, fatte = new Set()) {
     });
   }
 
+  // Rendiconto trimestrale della Prestazione universale (buste paga quietanzate)
+  const pu = rapporto.agevolazioni?.prestazioneUniversale ? R.prestazioneUniversale : null;
+  if (pu) {
+    for (const t of trimestri.values()) {
+      const inizioQ = isoDate(t.anno, (t.q - 1) * 3 + 1, 1);
+      if (inizioQ > pu.fine) continue;
+      const aAnno = t.q === 4 ? t.anno + 1 : t.anno;
+      const aMese = t.q === 4 ? 1 : t.q * 3 + 1;
+      add({
+        chiave: `pu-${t.anno}-T${t.q}`,
+        data: isoDate(aAnno, aMese, 10),
+        categoria: 'Agevolazioni',
+        titolo: `Rendiconto Prestazione universale ${t.q}° trimestre ${t.anno}`,
+        descrizione: 'Caricare sul sito INPS i cedolini del trimestre pagati e firmati (Documenti → Ogni anno → Rendiconto Prestazione universale).',
+      });
+    }
+  }
+
   // Stipendio e cedolino mensile
   for (const m of catena) {
     add({

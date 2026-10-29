@@ -4,7 +4,7 @@ import { caricaFile, linkFile, aggiornaDocumento, eliminaDocumento, caricaDocume
 
 export const CATEGORIE_DOC = ['Contratto e assunzione', 'Ricevute pagoPA INPS', 'Cedolini firmati', 'Certificati di malattia', 'Documenti della lavoratrice', 'Altro'];
 const dimensione = (b) => (b > 1048576 ? `${(b / 1048576).toFixed(1).replace('.', ',')} MB` : `${Math.max(1, Math.round(b / 1024))} KB`);
-import { stampaLetteraAssunzione, stampaPrivacy, stampaDichiarazione, stampaProspettoAnnuale, stampaTfr, stampaPacchettoFiscale } from './stampe.js';
+import { stampaLetteraAssunzione, stampaPrivacy, stampaDichiarazione, stampaProspettoAnnuale, stampaTfr, stampaPacchettoFiscale, stampaRendicontoPU } from './stampe.js';
 import { ICONE, tessera } from './icone.js';
 import { LETTERE, apriLettera } from './lettere.js';
 import { apriPratica } from './pratiche.js';
@@ -55,6 +55,7 @@ export function mostraDocumenti(root, { vai }) {
       ${voce('data-doc="dichiarazione"', 'documento', '#2e9f5a', 'Dichiarazione dei compensi', 'Per la lavoratrice: dichiarazione dei redditi, ISEE, permesso di soggiorno', !anni.length)}
       ${voce('data-doc="annuale"', 'grafico', '#2e9f5a', 'Prospetto costi', 'Per te: costi mese per mese e contributi da dedurre nel 730', !anni.length)}
       ${voce('data-doc="fiscale"', 'euro', '#2e9f5a', 'Pacchetto per commercialista o CAF', 'Deduzione dei contributi, detrazione del 19% e documenti da allegare al 730', !anni.length)}
+      ${d.agevolazioni?.prestazioneUniversale ? voce('data-doc="pu"', 'euro', '#2e9f5a', 'Rendiconto Prestazione universale', 'Cedolini pagati e firmati di ogni trimestre, da caricare sul sito INPS', !anni.length) : ''}
       ${voce('data-doc="tfr"', 'tabella', '#2e9f5a', 'Prospetto TFR', 'Quote, rivalutazioni e anticipi dall\'assunzione', !catena.length)}
     </ul>
     <p class="nota" style="margin:-6px 16px 18px">Ogni documento si apre in anteprima. "Stampa / PDF" lo stampa o lo salva in PDF; su iPhone: Condividi → Salva su File. I cedolini si stampano dal singolo mese, i conteggi di fine rapporto dal Simulatore.</p>
@@ -73,6 +74,7 @@ export function mostraDocumenti(root, { vai }) {
       case 'dichiarazione': return stampaDichiarazione(catena, anno());
       case 'annuale': return stampaProspettoAnnuale(catena, anno());
       case 'fiscale': return stampaPacchettoFiscale(catena, anno());
+      case 'pu': return stampaRendicontoPU(catena, anno());
       case 'tfr': return stampaTfr(catena);
     }
   }));

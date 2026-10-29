@@ -104,7 +104,8 @@ export function retribuzioneOrariaEffettiva(pagaOraria, rapporto = null, anno = 
 export function fasciaContributiva(rapporto0, anno) {
   const rapporto = normalizzaRapporto(rapporto0);
   const t = tabelleAnno(anno).inps;
-  const tab = rapporto.tipoContratto === 'determinato' ? t.determinato : t.indeterminato;
+  // a termine: contributo aggiuntivo, salvo i contratti per sostituire lavoratori assenti
+  const tab = rapporto.tipoContratto === 'determinato' && !rapporto.sostituzione ? t.determinato : t.indeterminato;
   const settimanali = oreSettimanali(rapporto.orario);
   const effettiva = retribuzioneOrariaEffettiva(rapporto.pagaOraria, rapporto, anno);
   let fascia, nome;

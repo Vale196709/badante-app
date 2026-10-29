@@ -4,7 +4,7 @@ export const LINGUE = { it: 'Italiano', ro: 'Română', uk: 'Українськ�
 
 const T = {
   it: {
-    tabCedolini: 'I miei cedolini', tabRichieste: 'Ferie e permessi', tabDocumenti: 'Documenti',
+    tabOre: 'Le mie ore', oreTitolo: 'Segna le ore lavorate', oreSpiega: 'Scrivi le ore lavorate ogni giorno e premi Invia: il datore le approva e il cedolino si prepara da solo.', previste: 'previste', comeOrario: 'Come da orario', inviaOre: 'Invia le ore', oreInviate: 'Ore inviate', nienteDaInviare: 'Nessuna ora nuova da inviare.', meseChiuso: 'Mese già chiuso: le ore non si possono più cambiare.', riposo: 'riposo', festivo: 'festivo', tabCedolini: 'I miei cedolini', tabRichieste: 'Ferie e permessi', tabDocumenti: 'Documenti',
     ferieResidue: 'Ferie residue', ore: 'ore', tfr: 'TFR accantonato', aggiornati: 'Valori aggiornati all\'ultimo cedolino confermato.',
     vedi: 'Vedi', ricevutoIl: 'ricevuto il', confermoRicevuto: 'Confermo di aver ricevuto', firmaQui: 'Firma qui con il dito',
     cancella: 'Cancella', conferma: 'Conferma', annulla: 'Annulla', ricevutaOk: 'Ricevuta confermata', nessunCedolino: 'Non ci sono ancora cedolini da visualizzare.',
@@ -18,7 +18,7 @@ const T = {
     voci: {},
   },
   ro: {
-    tabCedolini: 'Fluturașii mei', tabRichieste: 'Concedii și învoiri', tabDocumenti: 'Documente',
+    tabOre: 'Orele mele', oreTitolo: 'Notează orele lucrate', oreSpiega: 'Scrie orele lucrate în fiecare zi și apasă Trimite: angajatorul le aprobă și fluturașul se pregătește singur.', previste: 'prevăzute', comeOrario: 'Ca în program', inviaOre: 'Trimite orele', oreInviate: 'Ore trimise', nienteDaInviare: 'Nicio oră nouă de trimis.', meseChiuso: 'Luna este închisă: orele nu mai pot fi modificate.', riposo: 'liber', festivo: 'sărbătoare', tabCedolini: 'Fluturașii mei', tabRichieste: 'Concedii și învoiri', tabDocumenti: 'Documente',
     ferieResidue: 'Concediu rămas', ore: 'ore', tfr: 'TFR acumulat (indemnizație de sfârșit de contract)', aggiornati: 'Valori actualizate la ultimul fluturaș confirmat.',
     vedi: 'Vezi', ricevutoIl: 'primit la', confermoRicevuto: 'Confirm că am primit', firmaQui: 'Semnați aici cu degetul',
     cancella: 'Șterge', conferma: 'Confirmă', annulla: 'Anulează', ricevutaOk: 'Primire confirmată', nessunCedolino: 'Nu există încă fluturași de salariu.',
@@ -38,7 +38,7 @@ const T = {
     },
   },
   uk: {
-    tabCedolini: 'Мої розрахункові листи', tabRichieste: 'Відпустки та відгули', tabDocumenti: 'Документи',
+    tabOre: 'Мої години', oreTitolo: 'Відмітьте відпрацьовані години', oreSpiega: 'Записуйте відпрацьовані години щодня й натисніть «Надіслати»: роботодавець їх підтвердить, і розрахунковий лист підготується сам.', previste: 'за графіком', comeOrario: 'За графіком', inviaOre: 'Надіслати години', oreInviate: 'Години надіслано', nienteDaInviare: 'Немає нових годин для надсилання.', meseChiuso: 'Місяць закрито: години вже не можна змінити.', riposo: 'вихідний', festivo: 'свято', tabCedolini: 'Мої розрахункові листи', tabRichieste: 'Відпустки та відгули', tabDocumenti: 'Документи',
     ferieResidue: 'Залишок відпустки', ore: 'год', tfr: 'Накопичений TFR (вихідна допомога)', aggiornati: 'Дані станом на останній підтверджений розрахунковий лист.',
     vedi: 'Переглянути', ricevutoIl: 'отримано', confermoRicevuto: 'Підтверджую, що отримала', firmaQui: 'Підпишіть тут пальцем',
     cancella: 'Очистити', conferma: 'Підтвердити', annulla: 'Скасувати', ricevutaOk: 'Отримання підтверджено', nessunCedolino: 'Розрахункових листів ще немає.',
@@ -58,7 +58,7 @@ const T = {
     },
   },
   ru: {
-    tabCedolini: 'Мои расчётные листы', tabRichieste: 'Отпуска и отгулы', tabDocumenti: 'Документы',
+    tabOre: 'Мои часы', oreTitolo: 'Отметьте отработанные часы', oreSpiega: 'Записывайте отработанные часы каждый день и нажмите «Отправить»: работодатель их подтвердит, и расчётный лист подготовится сам.', previste: 'по графику', comeOrario: 'По графику', inviaOre: 'Отправить часы', oreInviate: 'Часы отправлены', nienteDaInviare: 'Нет новых часов для отправки.', meseChiuso: 'Месяц закрыт: часы больше нельзя изменить.', riposo: 'выходной', festivo: 'праздник', tabCedolini: 'Мои расчётные листы', tabRichieste: 'Отпуска и отгулы', tabDocumenti: 'Документы',
     ferieResidue: 'Остаток отпуска', ore: 'ч', tfr: 'Накопленный TFR (выходное пособие)', aggiornati: 'Данные на момент последнего подтверждённого расчётного листа.',
     vedi: 'Посмотреть', ricevutoIl: 'получено', confermoRicevuto: 'Подтверждаю получение', firmaQui: 'Распишитесь здесь пальцем',
     cancella: 'Очистить', conferma: 'Подтвердить', annulla: 'Отмена', ricevutaOk: 'Получение подтверждено', nessunCedolino: 'Расчётных листов пока нет.',
@@ -78,7 +78,7 @@ const T = {
     },
   },
   en: {
-    tabCedolini: 'My payslips', tabRichieste: 'Holidays and leave', tabDocumenti: 'Documents',
+    tabOre: 'My hours', oreTitolo: 'Record the hours you worked', oreSpiega: 'Write the hours you worked each day and press Send: your employer approves them and the payslip is prepared automatically.', previste: 'scheduled', comeOrario: 'As scheduled', inviaOre: 'Send hours', oreInviate: 'Hours sent', nienteDaInviare: 'No new hours to send.', meseChiuso: 'Month closed: hours can no longer be changed.', riposo: 'day off', festivo: 'holiday', tabCedolini: 'My payslips', tabRichieste: 'Holidays and leave', tabDocumenti: 'Documents',
     ferieResidue: 'Holiday left', ore: 'hours', tfr: 'Severance pay (TFR) accrued', aggiornati: 'Figures as of the last confirmed payslip.',
     vedi: 'View', ricevutoIl: 'received on', confermoRicevuto: 'I confirm I received', firmaQui: 'Sign here with your finger',
     cancella: 'Clear', conferma: 'Confirm', annulla: 'Cancel', ricevutaOk: 'Receipt confirmed', nessunCedolino: 'No payslips yet.',

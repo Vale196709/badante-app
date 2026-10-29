@@ -123,6 +123,13 @@ export const REGOLE_CCNL = {
   deduzioneContributiMax: 1549.37,
   // Detrazione 19% spese per addetti all'assistenza di non autosufficienti (art. 15 TUIR)
   detrazioneAssistenza: { aliquota: 0.19, spesaMassima: 2100, limiteReddito: 40000 },
+  // Prestazione universale (D.Lgs. 29/2024): assegno di assistenza per over 80 con accompagnamento,
+  // ISEE sociosanitario fino a 6.000 €, da usare per lavoro domestico regolare (almeno 15 h/sett.)
+  // e da rendicontare ogni trimestre. In vigore fino al 31/12/2026 salvo proroga.
+  prestazioneUniversale: { importoMensile: 850, etaMinima: 80, iseeMassimo: 6000, oreMinime: 15, fine: '2026-12-31' },
+  // Esonero contributivo per assunzioni a tempo indeterminato da parte di over 80 con accompagnamento
+  // (DL 19/2024): finestra 1/4/2024–31/12/2025, mai resa operativa dall'INPS, non rinnovata per il 2026.
+  esoneroOver80: { dal: '2024-04-01', al: '2025-12-31', massimoAnnuo: 3000, operativo: false },
 };
 
 // ---------- Festività nazionali ----------

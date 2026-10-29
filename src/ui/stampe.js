@@ -298,3 +298,28 @@ export function stampaPacchettoFiscale(catena, anno) {
     </ul>
     <p class="piccolo">Prospetto preparato con l'app Badante di Maria il ${dataIt(oggiIso())}. Gli importi vanno verificati dal commercialista o dal CAF sulle ricevute originali.</p>`);
 }
+
+// ---------- Rendiconto Prestazione universale ----------
+export function stampaRendicontoPU(catena, anno) {
+  const d = app.rapporto.dati;
+  const trimestri = [1, 2, 3, 4].map((q) => ({
+    q,
+    mesi: catena.filter((m) => m.anno === anno && Math.ceil(m.mese / 3) === q),
+    v: app.versamenti.find((x) => x.anno === anno && x.trimestre === q),
+  })).filter((t) => t.mesi.length);
+  apriStampa(`Rendiconto Prestazione universale ${anno}`, `
+    <h1>Rendiconto della Prestazione universale · ${anno}</h1>
+    <p class="meta">Spese per il lavoro domestico regolare dell'assistente familiare, da caricare sul sito INPS entro il 10 del mese successivo a ogni trimestre</p>
+    ${parti(d)}
+    ${d.detrazione?.assistito ? `<p>Persona assistita: <strong>${esc(d.detrazione.assistito)}</strong></p>` : ''}
+    ${trimestri.map((t) => `
+      <h2>${t.q}° trimestre ${anno}</h2>
+      <table class="dati compatta">
+        <thead><tr><th>Mese</th><th class="num">Ore</th><th class="num">Netto pagato €</th><th>Pagato il</th><th>Ricevuta firmata</th></tr></thead>
+        <tbody>${t.mesi.map((m) => `<tr><td>${nomeMeseMaiusc(m.mese)}</td><td class="num">${num(m.risultato.oreLavorate)}</td><td class="num">${num(m.risultato.netto)}</td>
+          <td>${m.salvato?.pagato_at ? dataIt(m.salvato.pagato_at) : '<em>non pagato</em>'}</td><td>${m.salvato?.ricevuta_at ? `✓ ${dataIt(m.salvato.ricevuta_at)}` : '—'}</td></tr>`).join('')}
+        <tr class="tot"><td>Totale</td><td class="num">${num(t.mesi.reduce((s, m) => s + m.risultato.oreLavorate, 0))}</td><td class="num">${num(t.mesi.reduce((s, m) => s + m.risultato.netto, 0))}</td><td colspan="2"></td></tr></tbody>
+      </table>
+      <p class="piccolo">Contributi INPS del trimestre: ${eur(t.mesi.reduce((s, m) => s + m.risultato.contributi.daVersareAInps, 0))}${t.v ? ` · pagati il ${dataIt(t.v.data_pagamento)} (${eur(Number(t.v.importo))})` : ' · pagamento non ancora registrato'}.</p>`).join('')}
+    <p class="piccolo">Allegare i cedolini del trimestre firmati per ricevuta (Presenze → mese → Stampa / PDF) e le ricevute pagoPA dei contributi. Prospetto preparato con l'app Badante di Maria il ${dataIt(oggiIso())}.</p>`);
+}

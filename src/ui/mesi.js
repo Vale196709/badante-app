@@ -8,6 +8,7 @@ import { salvaCedolino } from '../lib/dati.js';
 import { stampaCedolino } from './stampe.js';
 import { cardRichieste } from './richieste.js';
 import { apriBonifico } from './bonifico.js';
+import { cardOre } from './oreApprova.js';
 
 const STATI = { 'da fare': 'Da preparare', bozza: 'Bozza', confermato: 'Confermato', pagato: 'Pagato' };
 const GSETT = ['Lun', 'Mar', 'Mer', 'Gio', 'Ven', 'Sab', 'Dom'];
@@ -32,7 +33,9 @@ export function mostraMesi(root, ctx) {
   const oggiMese = oggiIso().slice(0, 7);
 
   root.innerHTML = `
-    <h1 class="titolo-pagina">Presenze e cedolini</h1>
+    <div class="card-testa"><h1 class="titolo-pagina">Presenze e cedolini</h1>
+      <button type="button" class="secondario vai-ferie">Ferie dell'anno</button></div>
+    <section class="card ore-box" hidden></section>
     <section class="card richieste-box" hidden></section>
     <ul class="lista-mesi">
       ${[...catena].reverse().map((m) => `
@@ -44,6 +47,8 @@ export function mostraMesi(root, ctx) {
         </button></li>`).join('')}
     </ul>`;
   cardRichieste(root.querySelector('.richieste-box'), () => mostraMesi(root, ctx));
+  cardOre(root.querySelector('.ore-box'), () => mostraMesi(root, ctx));
+  root.querySelector('.vai-ferie').addEventListener('click', () => ctx.vai('ferie'));
   root.querySelectorAll('.lista-mesi button').forEach((b) =>
     b.addEventListener('click', () => {
       const [a, m] = b.dataset.k.split('-').map(Number);

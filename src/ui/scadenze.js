@@ -1,5 +1,6 @@
 // Scadenziario con spunta "fatto" ed esportazione nel calendario (.ics).
 import { app, catenaCorrente, puoModificare, eur, esc, dataIt, oggiIso, toast } from '../stato.js';
+import { apriLetturaRicevuta } from './ricevuta.js';
 import { generaScadenze } from '../engine/scadenze.js';
 import { segnaScadenza, salvaVersamento, eliminaVersamento, caricaVersamenti } from '../lib/dati.js';
 
@@ -23,6 +24,15 @@ function ics(scadenze) {
   return ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Badante//IT', 'CALSCALE:GREGORIAN', ...scadenze.map(riga), 'END:VCALENDAR'].join('\r\n');
 }
 
+/** Link "aggiungi evento" di Google Calendar (giornata intera), senza collegare account. */
+function linkGoogle(s) {
+  const giorno = s.data.replace(/-/g, '');
+  const dopo = new Date(new Date(s.data + 'T00:00:00Z').getTime() + 86400000).toISOString().slice(0, 10).replace(/-/g, '');
+  const dettagli = [s.descrizione, s.importo != null ? `Importo: ${eur(s.importo)}` : '', 'Da Badante di Maria'].filter(Boolean).join('\n');
+  const q = new URLSearchParams({ action: 'TEMPLATE', text: s.titolo, dates: `${giorno}/${dopo}`, details: dettagli });
+  return `https://calendar.google.com/calendar/render?${q}`;
+}
+
 export function mostraScadenze(root, { vai }) {
   const d = app.rapporto?.dati;
   if (!d) { vai('impostazioni'); return; }
@@ -44,6 +54,7 @@ export function mostraScadenze(root, { vai }) {
           <span class="data">${dataIt(s.data)}</span>
           <span class="corpo"><span class="cat">${esc(s.categoria)}</span><strong>${esc(s.titolo)}</strong>${s.importo != null ? ` · ${eur(s.importo)}` : ''}<br><small>${esc(s.descrizione || '')}</small></span>
         </label>
+        ${!s.fatta && s.data >= oggi ? `<a class="link-gcal" href="${linkGoogle(s)}" target="_blank" rel="noopener">+ Google Calendar</a>` : ''}
         ${s.chiave.startsWith('inps-') ? bloccoVersamento(s) : ''}
       </li>`;
     const bloccoVersamento = (s) => {
@@ -63,13 +74,24 @@ export function mostraScadenze(root, { vai }) {
     };
     root.innerHTML = `
       <div class="card-testa"><h1 class="titolo-pagina">Scadenze</h1>
-        <button type="button" class="secondario esporta">Aggiungi al calendario</button></div>
+        <div class="azioni-testa">${mod ? '<button type="button" class="secondario leggi-ricevuta">Leggi una ricevuta</button>' : ''}
+        <button type="button" class="secondario esporta">Aggiungi al calendario</button></div></div>
       ${scadute.length ? `<section class="card"><h2>Da recuperare</h2><ul class="lista-scad">${scadute.map(item).join('')}</ul></section>` : ''}
       <section class="card"><h2>Prossime</h2><ul class="lista-scad">${prossime.map(item).join('') || '<li>Nessuna.</li>'}</ul></section>
       <section class="card"><button type="button" class="link toggle-fatte">${mostraFatte ? 'Nascondi' : 'Mostra'} completate (${fatte.length})</button>
         ${mostraFatte ? `<ul class="lista-scad">${fatte.map(item).join('')}</ul>` : ''}</section>
       <p class="nota">Lo stipendio risulta completato quando il cedolino del mese è segnato come pagato.</p>`;
 
+    root.querySelector('.leggi-ricevuta')?.addEventListener('click', () => {
+      const trimestri = tutte.filter((x) => /^inps-\d{4}-T\d$/.test(x.chiave)).map((x) => {
+        const [, a, q] = x.chiave.match(/^inps-(\d{4})-T(\d)$/);
+        return { anno: Number(a), trimestre: Number(q), importo: x.importo, data: x.data, fatta: x.fatta };
+      }).sort((a, b) => (a.fatta - b.fatta) || a.data.localeCompare(b.data));
+      apriLetturaRicevuta(trimestri, () => {
+        for (const v of app.versamenti) { const t = tutte.find((x) => x.chiave === `inps-${v.anno}-T${v.trimestre}`); if (t) t.fatta = true; }
+        disegna();
+      });
+    });
     root.querySelector('.toggle-fatte').addEventListener('click', () => { mostraFatte = !mostraFatte; disegna(); });
     root.querySelector('.esporta').addEventListener('click', () => {
       const blob = new Blob([ics(tutte.filter((s) => !s.fatta && s.data >= oggi))], { type: 'text/calendar' });

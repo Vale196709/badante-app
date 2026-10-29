@@ -53,6 +53,7 @@ export function mostraHome(root, { vai }) {
     <h1 class="titolo-pagina">Riepilogo</h1>
     ${avvisi.map((a) => `<div class="avviso ${a.livello}">${esc(a.testo)}</div>`).join('')}
     ${rep?.scostamentoBudget > 0 ? `<button type="button" class="avviso attenzione avviso-link" data-vai="report">La spesa prevista per il ${anno} (${eur(rep.previsione.costo)}) supera il budget di ${eur(rep.scostamentoBudget)} ›</button>` : ''}
+    ${((n) => (n ? `<button type="button" class="avviso info avviso-link" data-vai="mesi">${n} ${n === 1 ? 'giorno' : 'giorni'} di ore segnate dalla lavoratrice da approvare ›</button>` : ''))(app.ore.filter((o) => o.stato === 'in attesa').length)}
     ${app.richieste.some((r) => r.stato === 'in attesa') ? `<button type="button" class="avviso info avviso-link" data-vai="mesi">${((n) => `${n} ${n === 1 ? 'richiesta' : 'richieste'} di ferie o permessi in attesa di risposta`)(app.richieste.filter((r) => r.stato === 'in attesa').length)} ›</button>` : ''}
 
     <section class="card evidenza">
@@ -72,7 +73,7 @@ export function mostraHome(root, { vai }) {
     </section>
 
     <section class="card">
-      <h2>Contatori</h2>
+      <div class="card-testa"><h2>Contatori</h2><button type="button" class="link" data-vai="ferie">Ferie dell'anno</button></div>
       <div class="cifre">
         <div><span class="etichetta">Ferie residue</span><span class="valore">${num(s.ferieResidueOre, 1)} h</span><span class="sotto">≈ ${num(s.ferieResidueOre / (Object.values(condizioniAl(d, oggi).orario).reduce((a, b) => a + b, 0) / Object.keys(condizioniAl(d, oggi).orario).length || 1), 1)} giorni</span></div>
         <div><span class="etichetta">TFR accantonato</span><span class="valore">${eur(s.tfrAccantonato)}</span></div>

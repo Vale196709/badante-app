@@ -11,6 +11,7 @@ export const app = {
   versamenti: [],
   richieste: [],
   documenti: [],
+  ore: [], // ore segnate dalla lavoratrice
 };
 
 export const nomeRapporto = (r) => r?.dati?.lavoratrice?.nome || (r?.dati ? 'Rapporto senza nome' : 'Nuovo rapporto');

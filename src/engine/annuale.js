@@ -95,3 +95,47 @@ export function detrazioneAssistenza(catena, anno, dati = {}) {
     mesi: mesi.length,
   };
 }
+
+/**
+ * Verifica orientativa delle agevolazioni per la persona assistita.
+ * @returns [{ chiave, nome, esito: 'si'|'no'|'forse', testo }]
+ */
+export function verificaAgevolazioni(dati = {}, oggi = new Date().toISOString().slice(0, 10)) {
+  const a = dati.agevolazioni || {};
+  const det = dati.detrazione || {};
+  const R = REGOLE_CCNL;
+  const out = [];
+  const ore = Object.values(dati.orario || {}).reduce((s, h) => s + h, 0);
+
+  // Prestazione universale
+  const pu = R.prestazioneUniversale;
+  let esitoPu;
+  if (a.prestazioneUniversale) esitoPu = 'si';
+  else if (!a.over80 || !a.accompagnamento || !a.iseeEntroLimite || oggi > pu.fine) esitoPu = 'no';
+  else esitoPu = 'forse'; // requisiti principali presenti: serve la domanda e l'accertamento INPS
+  out.push({
+    chiave: 'pu', nome: 'Prestazione universale (850 € al mese)', esito: esitoPu,
+    testo: a.prestazioneUniversale
+      ? `Ricevuta: va spesa per il lavoro domestico regolare${ore < pu.oreMinime ? ` (attenzione: servono almeno ${pu.oreMinime} ore settimanali, il rapporto ne ha ${ore})` : ''} e rendicontata ogni trimestre con i cedolini pagati.`
+      : `Per chi ha almeno ${pu.etaMinima} anni, l'indennità di accompagnamento, ISEE sociosanitario fino a ${pu.iseeMassimo.toLocaleString('it-IT')} € e bisogno assistenziale gravissimo accertato dall'INPS. In vigore fino al ${pu.fine.split('-').reverse().join('/')}, salvo proroga.`,
+  });
+
+  // Esonero contributivo over 80
+  const es = R.esoneroOver80;
+  const nellaFinestra = dati.dataAssunzione >= es.dal && dati.dataAssunzione <= es.al && dati.tipoContratto !== 'determinato';
+  out.push({
+    chiave: 'esonero', nome: 'Esonero contributi per datori over 80', esito: 'no',
+    testo: nellaFinestra
+      ? 'Assunzione nella finestra prevista (1/4/2024–31/12/2025), ma l\'INPS non ha mai pubblicato le istruzioni: oggi non si può applicare.'
+      : 'Previsto per le assunzioni a tempo indeterminato dal 1/4/2024 al 31/12/2025 e mai reso operativo dall\'INPS: non vale per questo rapporto.',
+  });
+
+  // Detrazione 19% e deduzione contributi
+  const detOk = det.nonAutosufficiente && det.redditoEntroLimite && (dati.pagamento?.modalita || 'bonifico') !== 'contanti';
+  out.push({
+    chiave: 'detrazione', nome: 'Detrazione 19% per l\'assistenza', esito: detOk ? 'si' : (det.nonAutosufficiente === false ? 'no' : 'forse'),
+    testo: detOk ? 'Fino a 399 € l\'anno, nel 730 (righi E8–E10, codice 15).' : 'Serve: persona non autosufficiente con certificato medico, reddito di chi paga fino a 40.000 €, pagamenti non in contanti.',
+  });
+  out.push({ chiave: 'deduzione', nome: 'Deduzione dei contributi INPS', esito: 'si', testo: 'Sempre, fino a 1.549,37 € l\'anno di contributi a tuo carico pagati (rigo E23).' });
+  return out;
+}
