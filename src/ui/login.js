@@ -5,7 +5,7 @@ export function mostraLogin(root) {
     <main class="login">
       <div class="login-card">
         <div class="brand">
-          <img src="/icons/icon-192.png" alt="" width="56" height="56" />
+          <img src="${import.meta.env.BASE_URL}icons/icon-192.png" alt="" width="56" height="56" />
           <h1>Badante</h1>
           <p>Cedolini, costi e scadenze del lavoro domestico</p>
         </div>

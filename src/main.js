@@ -16,7 +16,7 @@ const SEZIONI = {
 function mostraApp(user) {
   root.innerHTML = `
     <header class="barra">
-      <span class="logo"><img src="/icons/icon-192.png" alt="" width="28" height="28" /> Badante</span>
+      <span class="logo"><img src="${import.meta.env.BASE_URL}icons/icon-192.png" alt="" width="28" height="28" /> Badante</span>
       <button class="esci" type="button">Esci</button>
     </header>
     <nav class="schede">
@@ -45,5 +45,5 @@ supabase.auth.onAuthStateChange((_evento, session) => {
 });
 
 if ('serviceWorker' in navigator && import.meta.env.PROD) {
-  navigator.serviceWorker.register('/sw.js');
+  navigator.serviceWorker.register(`${import.meta.env.BASE_URL}sw.js`);
 }
