@@ -19,6 +19,8 @@ export function mostraDocumenti(root, { vai }) {
   if (!d.datore.cf) mancanti.push('codice fiscale del datore');
   if (!d.lavoratrice.cf) mancanti.push('codice fiscale della lavoratrice');
   if (!d.lavoratrice.indirizzo) mancanti.push('indirizzo della lavoratrice');
+  if (!d.lavoratrice.citta || !d.lavoratrice.cap) mancanti.push('CAP e città della lavoratrice');
+  if (!d.datore.citta || !d.datore.cap) mancanti.push('CAP e città del datore');
 
   const voce = (attr, icona, colore, titolo, descr, disabilitato = false) => `
     <li><button type="button" class="riga-lista" ${attr} ${disabilitato ? 'disabled' : ''}>${tessera(icona, colore)}

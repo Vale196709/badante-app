@@ -53,3 +53,9 @@ export function toast(testo, tipo = 'ok') {
   setTimeout(() => el.classList.add('via'), 2600);
   setTimeout(() => el.remove(), 3200);
 }
+
+/** Indirizzo completo: via, CAP città (provincia). */
+export function indirizzoCompleto(p = {}) {
+  const localita = [p.cap, p.citta].filter(Boolean).join(' ') + (p.provincia ? ` (${p.provincia})` : '');
+  return [p.indirizzo, localita.trim()].filter(Boolean).join(', ');
+}

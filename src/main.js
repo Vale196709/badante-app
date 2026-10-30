@@ -132,6 +132,7 @@ function disegnaApp() {
         <div class="lato-piede">
           ${lav ? `<select class="lingua" aria-label="${t('lingua')}">${Object.entries(LINGUE).map(([k, v]) => `<option value="${k}" ${k === linguaCorrente() ? 'selected' : ''}>${v}</option>`).join('')}</select>` : ''}
           <small>${esc(user.email)}</small>
+          <small class="autore">Sviluppata da Valentino</small>
           <button type="button" class="link versione" data-s="info">Versione ${esc(VERSIONE)} · ${esc(dataBuildIt().split(' alle')[0])}</button>
           <button type="button" class="esci">${ICONE.esci}<span>${lav ? t('esci') : 'Esci'}</span></button>
         </div>

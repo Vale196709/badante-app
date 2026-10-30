@@ -22,7 +22,8 @@ export function mostraLogin(root) {
           <p class="errore" role="alert" hidden></p>
           <button type="submit" class="primario">Accedi</button>
         </form>
-        <p class="nota centro" style="margin-top:18px">Versione ${VERSIONE} · aggiornata il ${dataBuildIt()}</p>
+        <p class="nota centro autore" style="margin-top:18px">Sviluppata da Valentino</p>
+        <p class="nota centro" style="margin-top:2px">Versione ${VERSIONE} · aggiornata il ${dataBuildIt()}</p>
       </div>
     </main>`;
 

@@ -587,3 +587,12 @@ body.bloccato { overflow: hidden; }
 .lista-agevolazioni .es-forse .segno { background: var(--ambra-fondo); color: var(--ambra-testo); }
 .lista-agevolazioni small { color: var(--testo-2); }
 .link-gcal { display: inline-block; margin: 2px 0 6px 34px; font-size: 13px; color: var(--tinta); text-decoration: none; }
+
+/* CAP, città e provincia sulla stessa riga */
+.riga.localita { flex-wrap: nowrap; gap: 8px; }
+.riga.localita > label { min-width: 0; }
+.riga.localita .cap { flex: 0 0 84px; }
+.riga.localita .citta { flex: 1 1 auto; }
+.riga.localita .prov { flex: 0 0 82px; }
+.lato-piede .autore { margin-bottom: -6px; }
+.autore { font-weight: 500; }

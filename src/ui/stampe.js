@@ -1,6 +1,6 @@
 // Documenti stampabili. Si aprono in anteprima; "Stampa" usa la stampa del browser,
 // da cui si può anche scegliere "Salva come PDF" (PC e iPhone).
-import { app, eur, num, esc, dataIt, oggiIso, nomeMeseMaiusc } from '../stato.js';
+import { app, eur, num, esc, dataIt, oggiIso, nomeMeseMaiusc, indirizzoCompleto } from '../stato.js';
 import { oreSettimanali } from '../engine/calcolo.js';
 import { riepilogoAnno, contributiDeducibili, detrazioneAssistenza } from '../engine/annuale.js';
 import { formattaIban } from '../lib/iban.js';
@@ -35,8 +35,8 @@ export function apriStampa(titolo, corpo) {
 
 const parti = (d) => `
   <table class="parti"><tr>
-    <td><span class="et">Datore di lavoro</span><strong>${esc(d.datore.nome)}</strong><br>C.F. ${esc(d.datore.cf)}${d.datore.indirizzo ? `<br>${esc(d.datore.indirizzo)}` : ''}</td>
-    <td><span class="et">Lavoratrice</span><strong>${esc(d.lavoratrice.nome)}</strong><br>C.F. ${esc(d.lavoratrice.cf || '—')}${d.lavoratrice.indirizzo ? `<br>${esc(d.lavoratrice.indirizzo)}` : ''}</td>
+    <td><span class="et">Datore di lavoro</span><strong>${esc(d.datore.nome)}</strong><br>C.F. ${esc(d.datore.cf)}${indirizzoCompleto(d.datore) ? `<br>${esc(indirizzoCompleto(d.datore))}` : ''}</td>
+    <td><span class="et">Lavoratrice</span><strong>${esc(d.lavoratrice.nome)}</strong><br>C.F. ${esc(d.lavoratrice.cf || '—')}${indirizzoCompleto(d.lavoratrice) ? `<br>${esc(indirizzoCompleto(d.lavoratrice))}` : ''}</td>
   </tr></table>`;
 
 const firme = (sx = 'Il datore di lavoro', dx = 'La lavoratrice') => `
@@ -110,7 +110,7 @@ export function stampaLetteraAssunzione() {
       <li><strong>Inizio e durata.</strong> Il rapporto inizia il ${dataIt(d.dataAssunzione)} ed è a ${d.tipoContratto === 'determinato' ? `tempo determinato fino al ${dataIt(d.dataFineTermine)}` : 'tempo indeterminato'}.</li>
       <li><strong>Periodo di prova.</strong> ${d.giorniProva ? `${d.giorniProva} giorni di lavoro effettivo, durante i quali ciascuna parte può recedere senza preavviso.` : 'Non previsto.'}</li>
       <li><strong>Inquadramento e mansioni.</strong> Livello ${esc(d.livello)} del CCNL, ${esc(DESCR_TIPO[d.tipologia || 'ore'])}. Mansioni: ${esc(d.mansioni)}.</li>
-      <li><strong>Luogo di lavoro.</strong> ${esc(d.luogoLavoro || d.datore.indirizzo || 'abitazione del datore di lavoro')}.</li>
+      <li><strong>Luogo di lavoro.</strong> ${esc(d.luogoLavoro || indirizzoCompleto(d.datore) || 'abitazione del datore di lavoro')}.</li>
       <li><strong>Orario.</strong> ${num(sett, sett % 1 ? 1 : 0)} ore settimanali così distribuite: ${orarioTesto(d)}${d.fasciaOraria ? `, di norma nella fascia ${esc(d.fasciaOraria)}` : ''}. Riposo settimanale la domenica.</li>
       <li><strong>Retribuzione.</strong> ${tipologia(d).mensile
         ? `${eur(d.pagaMensile)} lordi al mese, pagati entro la fine del mese con prospetto paga${d.vittoAlloggio ? ', oltre a vitto e alloggio forniti dal datore di lavoro' : ''}. Straordinari e lavoro festivo sono retribuiti secondo il CCNL; ferie, festività, malattia e permessi sono compresi secondo il CCNL.`
@@ -132,7 +132,7 @@ export function stampaPrivacy() {
   apriStampa('Informativa privacy', `
     <h1>Informativa sul trattamento dei dati personali</h1>
     <p class="meta">Art. 13 del Regolamento (UE) 2016/679 (GDPR)</p>
-    <p><strong>Titolare del trattamento:</strong> ${esc(d.datore.nome)}, C.F. ${esc(d.datore.cf)}${d.datore.indirizzo ? `, ${esc(d.datore.indirizzo)}` : ''}.</p>
+    <p><strong>Titolare del trattamento:</strong> ${esc(d.datore.nome)}, C.F. ${esc(d.datore.cf)}${indirizzoCompleto(d.datore) ? `, ${esc(indirizzoCompleto(d.datore))}` : ''}.</p>
     <p><strong>Interessata:</strong> ${esc(d.lavoratrice.nome)}.</p>
     <ol class="clausole">
       <li><strong>Finalità.</strong> I dati sono trattati per gestire il rapporto di lavoro domestico: retribuzione e prospetti paga, adempimenti verso INPS e Cas.Sa.Colf, certificazioni dei compensi, gestione di assenze, malattia e ferie.</li>

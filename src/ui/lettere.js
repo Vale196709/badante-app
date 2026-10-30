@@ -1,5 +1,5 @@
 // Lettere pronte: si compilano pochi campi e si stampano (o si salvano in PDF).
-import { app, catenaCorrente, eur, esc, dataIt, oggiIso } from '../stato.js';
+import { app, catenaCorrente, eur, esc, dataIt, oggiIso, indirizzoCompleto } from '../stato.js';
 import { tipologia } from '../engine/tabelle.js';
 import { apriStampa } from './stampe.js';
 import { condizioniAl, variazioniOrdinate } from '../engine/variazioni.js';
@@ -10,14 +10,14 @@ import { REGOLE_CCNL } from '../engine/tabelle.js';
 const GIORNI = ['lunedì', 'martedì', 'mercoledì', 'giovedì', 'venerdì', 'sabato', 'domenica'];
 const orarioTesto = (o) => Object.entries(o).map(([g, h]) => `${GIORNI[g - 1]} ${String(h).replace('.', ',')} ore`).join(', ');
 const addGiorni = (iso, n) => new Date(new Date(iso + 'T00:00:00Z').getTime() + n * 86400000).toISOString().slice(0, 10);
-const luogo = (d) => (d.datore.indirizzo || '').split(',').pop()?.trim() || '______________';
+const luogo = (d) => d.datore.citta || (d.datore.indirizzo || '').split(',').pop()?.trim() || '______________';
 
 const intestazione = (mitt, dest) => `
   <p>${mitt}</p>
   <div class="destinatario">${dest}</div>`;
 const firma = (chi, sotto = '') => `<div class="firme"><div><span>${chi}</span></div>${sotto ? `<div><span>${sotto}</span></div>` : '<div style="border:0"></div>'}</div>`;
-const datore = (d) => `${esc(d.datore.nome)}<br>${esc(d.datore.indirizzo || '')}<br>C.F. ${esc(d.datore.cf)}`;
-const lavoratrice = (d) => `Gentile Sig.ra<br><strong>${esc(d.lavoratrice.nome)}</strong><br>${esc(d.lavoratrice.indirizzo || '')}`;
+const datore = (d) => `${esc(d.datore.nome)}<br>${esc(indirizzoCompleto(d.datore))}<br>C.F. ${esc(d.datore.cf)}`;
+const lavoratrice = (d) => `Gentile Sig.ra<br><strong>${esc(d.lavoratrice.nome)}</strong><br>${esc(indirizzoCompleto(d.lavoratrice))}`;
 
 export const LETTERE = {
   licenziamento: {
@@ -56,7 +56,7 @@ export const LETTERE = {
       ];
     },
     testo: (d, f) => `
-      ${intestazione(`${esc(d.lavoratrice.nome)}<br>${esc(d.lavoratrice.indirizzo || '')}<br>C.F. ${esc(d.lavoratrice.cf || '')}`, `Spett.le<br><strong>${esc(d.datore.nome)}</strong><br>${esc(d.datore.indirizzo || '')}`)}
+      ${intestazione(`${esc(d.lavoratrice.nome)}<br>${esc(indirizzoCompleto(d.lavoratrice))}<br>C.F. ${esc(d.lavoratrice.cf || '')}`, `Spett.le<br><strong>${esc(d.datore.nome)}</strong><br>${esc(indirizzoCompleto(d.datore))}`)}
       <p>${esc(luogo(d))}, ${dataIt(f.data)}</p>
       <p class="oggetto">Oggetto: dimissioni dal rapporto di lavoro domestico</p>
       <p>Con la presente comunico le mie dimissioni dal rapporto di lavoro domestico in essere dal ${dataIt(d.dataAssunzione)}. Nel rispetto del preavviso previsto dal CCNL, il mio ultimo giorno di lavoro sarà il ${dataIt(f.ultimo)}.</p>

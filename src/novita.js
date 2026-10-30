@@ -3,6 +3,10 @@ export const VERSIONE = __VERSIONE__;
 export const DATA_BUILD = __DATA_BUILD__;
 
 export const NOVITA = [
+  { versione: '1.6.1', data: '2026-10-30', voci: [
+    'CAP, città e provincia nella residenza di datore e lavoratrice, usati in tutti i documenti',
+    'Indicazione "Sviluppata da Valentino"',
+  ] },
   { versione: '1.6.0', data: '2026-10-29', voci: [
     'La lavoratrice segna le ore dal suo telefono, il datore le approva e vanno nelle presenze',
     'Lettura delle ricevute dei contributi da PDF o foto, con registrazione del pagamento',

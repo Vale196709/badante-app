@@ -6,6 +6,7 @@ export function mostraInfo(root) {
   root.innerHTML = `
     <h1 class="titolo-pagina">Informazioni</h1>
     <ul class="gruppo">
+      <li class="riga-info"><span>Sviluppata da</span><strong>Valentino</strong></li>
       <li class="riga-info"><span>Versione</span><strong>${esc(VERSIONE)}</strong></li>
       <li class="riga-info"><span>Aggiornata il</span><strong>${esc(dataBuildIt())}</strong></li>
     </ul>

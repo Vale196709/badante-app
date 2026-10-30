@@ -32,7 +32,7 @@ export function mostraAltro(root, { vai, scegliRapporto }) {
       ${riga('data-esci', 'esci', '#ff3b30', 'Esci', '', false)}
     </ul>
     <ul class="gruppo">
-      ${riga('data-vai="info"', 'documento', '#8691a8', 'Informazioni', `Versione ${VERSIONE} · aggiornata il ${dataBuildIt()}`)}
+      ${riga('data-vai="info"', 'documento', '#8691a8', 'Informazioni', `Sviluppata da Valentino<br>Versione ${VERSIONE} · aggiornata il ${dataBuildIt()}`)}
     </ul>`;
   root.querySelectorAll('[data-vai]').forEach((b) => b.addEventListener('click', () => vai(b.dataset.vai)));
   root.querySelectorAll('[data-rapporto]').forEach((b) => b.addEventListener('click', () => { if (b.dataset.rapporto !== app.rapporto.id) scegliRapporto(b.dataset.rapporto); }));

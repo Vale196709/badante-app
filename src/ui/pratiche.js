@@ -1,5 +1,5 @@
 // Pratiche INPS guidate: quando farle, dove, e i dati da inserire, presi dall'app.
-import { app, catenaCorrente, eur, esc, dataIt, oggiIso } from '../stato.js';
+import { app, catenaCorrente, eur, esc, dataIt, oggiIso, indirizzoCompleto } from '../stato.js';
 import { tipologia } from '../engine/tabelle.js';
 const CONVIVENZA = { ore: 'non convivente', convivente: 'convivente', conviventePT: 'convivente a tempo parziale', notturna: 'non convivente (assistenza notturna)', presenza: 'non convivente (presenza notturna)' };
 import { apriStampa } from './stampe.js';
@@ -19,7 +19,7 @@ const canali = `
   </ul>`;
 const anag = (d) => [
   ['Datore di lavoro', `${esc(d.datore.nome)} · C.F. ${esc(d.datore.cf)}`],
-  ['Residenza del datore', esc(d.datore.indirizzo || '—')],
+  ['Residenza del datore', esc(indirizzoCompleto(d.datore) || '—')],
   ['Lavoratrice', `${esc(d.lavoratrice.nome)} · C.F. ${esc(d.lavoratrice.cf || 'da inserire')}`],
   d.codiceRapportoInps ? ['Codice rapporto INPS', esc(d.codiceRapportoInps)] : null,
 ];
@@ -33,14 +33,14 @@ export const PRATICHE = {
       ${tab([
         ...anag(d),
         ['Nascita della lavoratrice', esc(d.lavoratrice.nascita || '—')],
-        ['Residenza della lavoratrice', esc(d.lavoratrice.indirizzo || '—')],
+        ['Residenza della lavoratrice', esc(indirizzoCompleto(d.lavoratrice) || '—')],
         ['Data di inizio', dataIt(d.dataAssunzione)],
         ['Tipo di contratto', d.tipoContratto === 'determinato' ? `tempo determinato fino al ${dataIt(d.dataFineTermine)}` : 'tempo indeterminato'],
         ['Convivenza', CONVIVENZA[d.tipologia || 'ore']],
         ['Livello CCNL', esc(d.livello)],
         ['Ore settimanali', `${oreSettimanali(d.orario)} (${orarioTesto(d.orario)})`],
         tipologia(d).mensile ? ['Retribuzione mensile', `${eur(d.pagaMensile)}${d.vittoAlloggio ? ' + vitto e alloggio' : ''}`] : ['Retribuzione oraria', eur(d.pagaOraria)],
-        ['Luogo di lavoro', esc(d.luogoLavoro || d.datore.indirizzo || '—')],
+        ['Luogo di lavoro', esc(d.luogoLavoro || indirizzoCompleto(d.datore) || '—')],
         ['CCNL', 'Lavoro domestico (Fidaldo-Domina) · adesione Cas.Sa.Colf'],
       ])}
       <h2>Dopo l'invio</h2>

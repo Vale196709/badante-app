@@ -10,8 +10,8 @@ import { app, puoModificare, eur, esc, oggiIso, toast } from '../stato.js';
 const GIORNI = ['Lun', 'Mar', 'Mer', 'Gio', 'Ven', 'Sab', 'Dom'];
 const LIVELLI = ['A', 'AS', 'B', 'BS', 'C', 'CS', 'D', 'DS'];
 export const RAPPORTO_VUOTO = {
-  datore: { nome: '', cf: '', indirizzo: '' },
-  lavoratrice: { nome: '', cf: '', nascita: '', indirizzo: '' },
+  datore: { nome: '', cf: '', indirizzo: '', cap: '', citta: '', provincia: '' },
+  lavoratrice: { nome: '', cf: '', nascita: '', indirizzo: '', cap: '', citta: '', provincia: '' },
   livello: 'B',
   mansioni: 'Collaboratrice familiare: pulizia e riordino della casa, lavanderia e stiro, preparazione dei pasti',
   luogoLavoro: '',
@@ -37,6 +37,13 @@ export const RAPPORTO_VUOTO = {
   agevolazioni: { over80: false, accompagnamento: false, iseeEntroLimite: false, prestazioneUniversale: false },
 };
 
+const campiLocalita = (pre, p) => `
+        <div class="riga localita">
+          <label class="cap">CAP<input name="${pre}Cap" value="${esc(p.cap || '')}" inputmode="numeric" maxlength="5" pattern="[0-9]{5}" autocomplete="postal-code" /></label>
+          <label class="citta">Città<input name="${pre}Citta" value="${esc(p.citta || '')}" autocomplete="address-level2" /></label>
+          <label class="prov">Provincia<input name="${pre}Provincia" value="${esc(p.provincia || '')}" maxlength="2" class="maiuscolo" autocapitalize="characters" placeholder="RM" /></label>
+        </div>`;
+
 const campo = (etichetta, nome, valore, attr = '') =>
   `<label>${etichetta}<input name="${nome}" value="${esc(valore)}" ${attr} /></label>`;
 
@@ -61,7 +68,8 @@ export async function mostraRapporto(root, { ricaricaDati, vai }) {
         ${campo('Nome e cognome', 'datoreNome', d.datore.nome, 'autocomplete="name"')}
         ${campo('Codice fiscale', 'datoreCf', d.datore.cf, 'maxlength="16" class="maiuscolo" autocapitalize="characters"')}
         <small class="cf" data-for="datoreCf"></small>
-        ${campo('Indirizzo di residenza', 'datoreIndirizzo', d.datore.indirizzo)}
+        ${campo('Indirizzo di residenza (via e numero civico)', 'datoreIndirizzo', d.datore.indirizzo, 'autocomplete="street-address"')}
+        ${campiLocalita('datore', d.datore)}
       </section>
 
       <section>
@@ -70,7 +78,8 @@ export async function mostraRapporto(root, { ricaricaDati, vai }) {
         ${campo('Codice fiscale', 'lavCf', d.lavoratrice.cf, 'maxlength="16" class="maiuscolo" autocapitalize="characters" placeholder="Da inserire"')}
         <small class="cf" data-for="lavCf"></small>
         ${campo('Luogo e data di nascita', 'lavNascita', d.lavoratrice.nascita, 'placeholder="es. Chișinău, 12/03/1975"')}
-        ${campo('Indirizzo di residenza', 'lavIndirizzo', d.lavoratrice.indirizzo)}
+        ${campo('Indirizzo di residenza (via e numero civico)', 'lavIndirizzo', d.lavoratrice.indirizzo)}
+        ${campiLocalita('lav', d.lavoratrice)}
         <label>Scadenza documento di soggiorno (se previsto)<input name="scadenzaDocumento" type="date" value="${esc(d.scadenzaDocumento)}" /></label>
       </section>
 
@@ -168,10 +177,15 @@ export async function mostraRapporto(root, { ricaricaDati, vai }) {
   const esito = root.querySelector('.esito');
   const termine = root.querySelector('.solo-termine');
 
+  const leggiLocalita = (pre) => ({
+    cap: f[`${pre}Cap`].value.replace(/\D/g, '').slice(0, 5),
+    citta: f[`${pre}Citta`].value.trim(),
+    provincia: f[`${pre}Provincia`].value.trim().toUpperCase().slice(0, 2),
+  });
   const leggi = () => ({
     ...d,
-    datore: { nome: f.datoreNome.value.trim(), cf: f.datoreCf.value.trim().toUpperCase(), indirizzo: f.datoreIndirizzo.value.trim() },
-    lavoratrice: { nome: f.lavNome.value.trim(), cf: f.lavCf.value.trim().toUpperCase(), nascita: f.lavNascita.value.trim(), indirizzo: f.lavIndirizzo.value.trim() },
+    datore: { nome: f.datoreNome.value.trim(), cf: f.datoreCf.value.trim().toUpperCase(), indirizzo: f.datoreIndirizzo.value.trim(), ...leggiLocalita('datore') },
+    lavoratrice: { nome: f.lavNome.value.trim(), cf: f.lavCf.value.trim().toUpperCase(), nascita: f.lavNascita.value.trim(), indirizzo: f.lavIndirizzo.value.trim(), ...leggiLocalita('lav') },
     livello: f.livello.value,
     mansioni: f.mansioni.value.trim(),
     luogoLavoro: f.luogoLavoro.value.trim(),
@@ -265,6 +279,10 @@ export async function mostraRapporto(root, { ricaricaDati, vai }) {
     e.preventDefault();
     const v = leggi();
     if (!v.dataAssunzione) { esito.textContent = 'Inserisci la data di assunzione.'; esito.className = 'esito ko'; return; }
+    for (const [chi, p] of [['del datore', v.datore], ['della lavoratrice', v.lavoratrice]]) {
+      if (p.cap && !/^\d{5}$/.test(p.cap)) { esito.textContent = `Il CAP ${chi} deve avere 5 cifre.`; esito.className = 'esito ko'; return; }
+      if (p.provincia && !/^[A-Z]{2}$/.test(p.provincia)) { esito.textContent = `La provincia ${chi} va indicata con la sigla di 2 lettere (es. RM).`; esito.className = 'esito ko'; return; }
+    }
     if (v.pagamento.iban && !verificaIban(v.pagamento.iban).ok) { esito.textContent = 'Controlla l\'IBAN della lavoratrice.'; esito.className = 'esito ko'; return; }
     const btn = f.querySelector('button[type=submit]');
     btn.disabled = true;
