@@ -596,3 +596,77 @@ body.bloccato { overflow: hidden; }
 .riga.localita .prov { flex: 0 0 82px; }
 .lato-piede .autore { margin-bottom: -6px; }
 .autore { font-weight: 500; }
+
+/* ---------- Cose da fare ---------- */
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+.secondario.piccolo { min-height: 36px; font-size: 15px; padding: 0 14px; border-radius: 18px; }
+.link.piccolo { font-size: 15px; padding: 8px 4px; }
+.nota-breve { font-size: 13px; color: var(--testo-2); font-variant-numeric: tabular-nums; }
+.griglia-cose { display: grid; gap: 0 16px; grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 980px) { .griglia-cose { grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); align-items: start; } }
+.avanzamento { height: 6px; border-radius: 3px; background: var(--riempimento); overflow: hidden; margin: 2px 0 18px; }
+.avanzamento span { display: block; height: 100%; background: var(--tinta); border-radius: 3px; transition: width .4s ease; }
+
+.percorso { list-style: none; margin: 0; padding: 0; position: relative; }
+.tappa { position: relative; display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 12px; padding-bottom: 18px; }
+.tappa:last-child { padding-bottom: 0; }
+.tappa:not(:last-child)::before { content: ""; position: absolute; left: 13px; top: 30px; bottom: 2px; width: 2px; border-radius: 1px; background: var(--separatore); }
+.tappa.fatto:not(:last-child)::before { background: var(--verde); }
+.tappa-punto {
+  width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center;
+  font-size: 13px; font-weight: 700; font-family: var(--cifre); font-variant-numeric: tabular-nums;
+  background: var(--superficie); color: var(--testo-3); box-shadow: inset 0 0 0 1.5px var(--separatore);
+}
+.tappa-punto .ico-segno { width: 17px; height: 17px; stroke-width: 2.6; }
+.tappa.fatto .tappa-punto { background: var(--verde); color: #fff; box-shadow: none; }
+.tappa.ora .tappa-punto { background: var(--ambra); color: #1f1500; box-shadow: none; }
+.tappa.ritardo .tappa-punto { background: var(--rosso); color: #fff; box-shadow: none; }
+.tappa.corso .tappa-punto { background: var(--tinta); color: var(--sulla-tinta); box-shadow: none; }
+.tappa-corpo { min-width: 0; padding-top: 3px; }
+.tappa.attuale .tappa-corpo { background: var(--ambra-fondo); border-radius: 12px; padding: 8px 12px 10px; margin: -5px 0 0 -4px; }
+.tappa.attuale.ritardo .tappa-corpo { background: var(--rosso-fondo); }
+.tappa.attuale.corso .tappa-corpo { background: var(--tinta-fondo); }
+.tappa-titolo { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 16px; }
+.tappa.attesa .tappa-titolo strong { font-weight: 500; color: var(--testo-2); }
+.tappa.fatto .tappa-titolo strong { font-weight: 500; }
+.tappa-dettaglio { margin: 2px 0 0; font-size: 14px; color: var(--testo-2); line-height: 1.4; }
+.tappa.attuale.ora .tappa-dettaglio { color: var(--ambra-testo); }
+.tappa.attuale.ritardo .tappa-dettaglio { color: var(--rosso); }
+.tappa-azioni { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 8px; }
+.senza-firma { margin-top: 16px; padding-top: 10px; border-top: 0.5px solid var(--separatore); display: flex; flex-direction: column; align-items: flex-start; }
+
+.lista-cose { list-style: none; margin: 0; padding: 0; }
+.lista-cose li { display: grid; grid-template-columns: 10px minmax(0, 1fr) auto; align-items: baseline; gap: 10px; padding: 10px 0; border-top: 0.5px solid var(--separatore); font-size: 15px; }
+.lista-cose li:first-child { border-top: 0; }
+.lista-cose .pallino { width: 8px; height: 8px; border-radius: 50%; background: var(--separatore); align-self: center; }
+.lista-cose li.ora .pallino { background: var(--ambra); }
+.lista-cose li.ritardo .pallino { background: var(--rosso); }
+.lista-cose .data { font-variant-numeric: tabular-nums; color: var(--testo-2); font-size: 14px; white-space: nowrap; }
+.lista-cose li.ritardo .data { color: var(--rosso); font-weight: 600; }
+
+.tessere-percorsi { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.tessera-percorso {
+  position: relative; display: flex; flex-direction: column; align-items: center; gap: 6px;
+  padding: 14px 6px 12px; border: 0; border-radius: 12px; background: var(--riempimento); color: var(--tinta);
+  font-size: 14px; font-weight: 600; text-align: center;
+}
+.tessera-percorso span { color: var(--testo); }
+.tessera-percorso[aria-pressed="true"] { background: var(--tinta); color: var(--sulla-tinta); }
+.tessera-percorso[aria-pressed="true"] span { color: var(--sulla-tinta); }
+.tessera-percorso .punto-attivo { position: absolute; top: 8px; right: 8px; width: 8px; height: 8px; border-radius: 50%; background: var(--ambra); }
+.percorso-guidato { box-shadow: inset 0 3px 0 var(--tinta); }
+
+/* Riepilogo: prossima cosa da fare */
+.card.prossima { display: flex; flex-direction: column; gap: 3px; width: 100%; text-align: left; border: 0; font: inherit; color: var(--testo); position: relative; padding-left: 20px; }
+.card.prossima::before { content: ""; position: absolute; left: 0; top: 12px; bottom: 12px; width: 4px; border-radius: 0 3px 3px 0; background: var(--tinta); }
+.card.prossima.stato-ora::before { background: var(--ambra); }
+.card.prossima.stato-ritardo::before { background: var(--rosso); }
+.card.prossima.stato-fatto::before { background: var(--verde); }
+.prossima-testa { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+.card.prossima strong { font-size: 18px; }
+.prossima-link { display: inline-flex; align-items: center; gap: 2px; color: var(--tinta); font-size: 15px; margin-top: 6px; }
+.prossima-link .ico { width: 16px; height: 16px; }
+
+/* Vista lavoratrice: da fare */
+.lav-dafare { display: flex; flex-direction: column; gap: 8px; }
+.lav-dafare .riga-dafare { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; font-size: 15px; }

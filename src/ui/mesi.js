@@ -14,6 +14,10 @@ const STATI = { 'da fare': 'Da preparare', bozza: 'Bozza', confermato: 'Conferma
 const GSETT = ['Lun', 'Mar', 'Mer', 'Gio', 'Ven', 'Sab', 'Dom'];
 const SIGLE = { L: '', F: 'Ferie', M: 'Malattia', P: 'Permesso', A: 'Assente', '': '' };
 
+let meseDaAprire = null;
+/** Alla prossima apertura di Presenze si apre direttamente questo mese. */
+export const apriMese = (anno, mese) => { meseDaAprire = { anno, mese }; };
+
 export function mostraMesi(root, ctx) {
   const d = app.rapporto?.dati;
   if (!d) { ctx.vai('impostazioni'); return; }
@@ -55,6 +59,11 @@ export function mostraMesi(root, ctx) {
       editorMese(root, ctx, a, m);
     })
   );
+  if (meseDaAprire) {
+    const { anno, mese } = meseDaAprire;
+    meseDaAprire = null;
+    if (catena.some((m) => m.anno === anno && m.mese === mese)) editorMese(root, ctx, anno, mese);
+  }
 }
 
 function editorMese(root, ctx, anno, mese) {

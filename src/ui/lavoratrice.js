@@ -5,17 +5,40 @@ import { firmaRicevutaConFirma, creaRichiesta, ritiraRichiesta, caricaRichieste 
 import { stampaCedolino } from './stampe.js';
 import { apriFile } from './documenti.js';
 import { t, meseT } from '../i18n.js';
+import { calendarioMese } from '../engine/calcolo.js';
+import { condizioniMese } from '../engine/variazioni.js';
+
+/** Riquadro "Da fare": ricevute da firmare e giorni senza ore segnate. */
+function cardDaFare(visibili) {
+  const righe = [];
+  const daFirmare = visibili.filter((c) => !c.ricevuta_at);
+  for (const c of daFirmare.slice(0, 2)) righe.push(`<div class="riga-dafare"><span>${t('firmaDi', { mese: `${meseT(c.mese)} ${c.anno}` })}</span><button type="button" class="primario piccolo" data-firma="${c.id}">${t('firmaBreve')}</button></div>`);
+  const d = app.rapporto.dati;
+  const oggi = oggiIso();
+  const [anno, mese] = oggi.split('-').map(Number);
+  const chiuso = app.cedolini.some((c) => c.anno === anno && c.mese === mese && c.stato !== 'bozza');
+  if (d?.dataAssunzione && !chiuso) {
+    const segnate = new Set(app.ore.map((o) => o.data));
+    const mancanti = calendarioMese(condizioniMese(d, anno, mese), anno, mese)
+      .filter((g) => g.attivo && g.data <= oggi && !g.festivita && g.oreProgrammate > 0 && !segnate.has(g.data)).length;
+    if (mancanti) righe.push(`<div class="riga-dafare"><span>${t('giorniDaSegnare', { n: mancanti })}</span><button type="button" class="secondario piccolo" data-vai-ore>${t('segnaOre')}</button></div>`);
+  }
+  return righe.length ? `<section class="card lav-dafare"><h2>${t('daFare')}</h2>${righe.join('')}</section>` : '';
+}
 
 // ---------- Cedolini ----------
-export function mostraLavoratrice(root, { ricaricaDati }) {
+export function mostraLavoratrice(root, ctx) {
+  const { ricaricaDati } = ctx;
   const visibili = app.cedolini.filter((c) => c.stato !== 'bozza').sort((a, b) => b.anno - a.anno || b.mese - a.mese);
   if (!visibili.length) {
-    root.innerHTML = `<p class="vuoto">${t('nessunCedolino')}</p>`;
+    root.innerHTML = `${cardDaFare(visibili)}<p class="vuoto">${t('nessunCedolino')}</p>`;
+    root.querySelector('[data-vai-ore]')?.addEventListener('click', () => ctx.vai('lavOre'));
     return;
   }
   const ultimo = visibili[0].risultato.contatori;
   root.innerHTML = `
     <h1 class="titolo-pagina">${t('tabCedolini')}</h1>
+    ${cardDaFare(visibili)}
     <section class="card">
       <div class="cifre">
         <div><span class="etichetta">${t('ferieResidue')}</span><span class="valore">${num(ultimo.ferieResidueOre, 1)} ${t('ore')}</span></div>
@@ -42,13 +65,14 @@ export function mostraLavoratrice(root, { ricaricaDati }) {
     const c = visibili.find((x) => x.id === b.dataset.vedi);
     stampaCedolino({ anno: c.anno, mese: c.mese, risultato: c.risultato }, c, { traduci: true });
   }));
+  root.querySelector('[data-vai-ore]')?.addEventListener('click', () => ctx.vai('lavOre'));
   root.querySelectorAll('[data-firma]').forEach((b) => b.addEventListener('click', () => {
     const c = visibili.find((x) => x.id === b.dataset.firma);
     chiediFirma(root.querySelector('.dlg-firma'), t('domandaRicevuta', { importo: eur(c.risultato.netto), mese: `${meseT(c.mese)} ${c.anno}` }), async (png) => {
       await firmaRicevutaConFirma(c.id, png);
       await ricaricaDati();
       toast(t('ricevutaOk'));
-      mostraLavoratrice(root, { ricaricaDati });
+      mostraLavoratrice(root, ctx);
     });
   }));
 }

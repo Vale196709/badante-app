@@ -4,6 +4,7 @@ export const LINGUE = { it: 'Italiano', ro: 'Română', uk: 'Українськ�
 
 const T = {
   it: {
+    daFare: 'Da fare', firmaDi: 'Firma la ricevuta di {mese}', giorniDaSegnare: 'Giorni senza ore segnate: {n}', segnaOre: 'Segna le ore', firmaBreve: 'Firma',
     tabOre: 'Le mie ore', oreTitolo: 'Segna le ore lavorate', oreSpiega: 'Scrivi le ore lavorate ogni giorno e premi Invia: il datore le approva e il cedolino si prepara da solo.', previste: 'previste', comeOrario: 'Come da orario', inviaOre: 'Invia le ore', oreInviate: 'Ore inviate', nienteDaInviare: 'Nessuna ora nuova da inviare.', meseChiuso: 'Mese già chiuso: le ore non si possono più cambiare.', riposo: 'riposo', festivo: 'festivo', tabCedolini: 'I miei cedolini', tabRichieste: 'Ferie e permessi', tabDocumenti: 'Documenti',
     ferieResidue: 'Ferie residue', ore: 'ore', tfr: 'TFR accantonato', aggiornati: 'Valori aggiornati all\'ultimo cedolino confermato.',
     vedi: 'Vedi', ricevutoIl: 'ricevuto il', confermoRicevuto: 'Confermo di aver ricevuto', firmaQui: 'Firma qui con il dito',
@@ -18,6 +19,7 @@ const T = {
     voci: {},
   },
   ro: {
+    daFare: 'De făcut', firmaDi: 'Semnează chitanța pentru {mese}', giorniDaSegnare: 'Zile fără ore notate: {n}', segnaOre: 'Notează orele', firmaBreve: 'Semnează',
     tabOre: 'Orele mele', oreTitolo: 'Notează orele lucrate', oreSpiega: 'Scrie orele lucrate în fiecare zi și apasă Trimite: angajatorul le aprobă și fluturașul se pregătește singur.', previste: 'prevăzute', comeOrario: 'Ca în program', inviaOre: 'Trimite orele', oreInviate: 'Ore trimise', nienteDaInviare: 'Nicio oră nouă de trimis.', meseChiuso: 'Luna este închisă: orele nu mai pot fi modificate.', riposo: 'liber', festivo: 'sărbătoare', tabCedolini: 'Fluturașii mei', tabRichieste: 'Concedii și învoiri', tabDocumenti: 'Documente',
     ferieResidue: 'Concediu rămas', ore: 'ore', tfr: 'TFR acumulat (indemnizație de sfârșit de contract)', aggiornati: 'Valori actualizate la ultimul fluturaș confirmat.',
     vedi: 'Vezi', ricevutoIl: 'primit la', confermoRicevuto: 'Confirm că am primit', firmaQui: 'Semnați aici cu degetul',
@@ -38,6 +40,7 @@ const T = {
     },
   },
   uk: {
+    daFare: 'Зробити', firmaDi: 'Підпишіть квитанцію за {mese}', giorniDaSegnare: 'Дні без відмічених годин: {n}', segnaOre: 'Відмітити години', firmaBreve: 'Підписати',
     tabOre: 'Мої години', oreTitolo: 'Відмітьте відпрацьовані години', oreSpiega: 'Записуйте відпрацьовані години щодня й натисніть «Надіслати»: роботодавець їх підтвердить, і розрахунковий лист підготується сам.', previste: 'за графіком', comeOrario: 'За графіком', inviaOre: 'Надіслати години', oreInviate: 'Години надіслано', nienteDaInviare: 'Немає нових годин для надсилання.', meseChiuso: 'Місяць закрито: години вже не можна змінити.', riposo: 'вихідний', festivo: 'свято', tabCedolini: 'Мої розрахункові листи', tabRichieste: 'Відпустки та відгули', tabDocumenti: 'Документи',
     ferieResidue: 'Залишок відпустки', ore: 'год', tfr: 'Накопичений TFR (вихідна допомога)', aggiornati: 'Дані станом на останній підтверджений розрахунковий лист.',
     vedi: 'Переглянути', ricevutoIl: 'отримано', confermoRicevuto: 'Підтверджую, що отримала', firmaQui: 'Підпишіть тут пальцем',
@@ -58,6 +61,7 @@ const T = {
     },
   },
   ru: {
+    daFare: 'Нужно сделать', firmaDi: 'Подпишите квитанцию за {mese}', giorniDaSegnare: 'Дни без отмеченных часов: {n}', segnaOre: 'Отметить часы', firmaBreve: 'Подписать',
     tabOre: 'Мои часы', oreTitolo: 'Отметьте отработанные часы', oreSpiega: 'Записывайте отработанные часы каждый день и нажмите «Отправить»: работодатель их подтвердит, и расчётный лист подготовится сам.', previste: 'по графику', comeOrario: 'По графику', inviaOre: 'Отправить часы', oreInviate: 'Часы отправлены', nienteDaInviare: 'Нет новых часов для отправки.', meseChiuso: 'Месяц закрыт: часы больше нельзя изменить.', riposo: 'выходной', festivo: 'праздник', tabCedolini: 'Мои расчётные листы', tabRichieste: 'Отпуска и отгулы', tabDocumenti: 'Документы',
     ferieResidue: 'Остаток отпуска', ore: 'ч', tfr: 'Накопленный TFR (выходное пособие)', aggiornati: 'Данные на момент последнего подтверждённого расчётного листа.',
     vedi: 'Посмотреть', ricevutoIl: 'получено', confermoRicevuto: 'Подтверждаю получение', firmaQui: 'Распишитесь здесь пальцем',
@@ -78,6 +82,7 @@ const T = {
     },
   },
   en: {
+    daFare: 'To do', firmaDi: 'Sign the receipt for {mese}', giorniDaSegnare: 'Days without hours logged: {n}', segnaOre: 'Log hours', firmaBreve: 'Sign',
     tabOre: 'My hours', oreTitolo: 'Record the hours you worked', oreSpiega: 'Write the hours you worked each day and press Send: your employer approves them and the payslip is prepared automatically.', previste: 'scheduled', comeOrario: 'As scheduled', inviaOre: 'Send hours', oreInviate: 'Hours sent', nienteDaInviare: 'No new hours to send.', meseChiuso: 'Month closed: hours can no longer be changed.', riposo: 'day off', festivo: 'holiday', tabCedolini: 'My payslips', tabRichieste: 'Holidays and leave', tabDocumenti: 'Documents',
     ferieResidue: 'Holiday left', ore: 'hours', tfr: 'Severance pay (TFR) accrued', aggiornati: 'Figures as of the last confirmed payslip.',
     vedi: 'View', ricevutoIl: 'received on', confermoRicevuto: 'I confirm I received', firmaQui: 'Sign here with your finger',

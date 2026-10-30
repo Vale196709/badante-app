@@ -23,6 +23,7 @@ import { sessioneScaduta } from './lib/sblocco.js';
 import { mostraLavoratrice, mostraRichiesteLavoratrice, mostraDocumentiLavoratrice } from './ui/lavoratrice.js';
 import { mostraOreLavoratrice } from './ui/oreLavoratrice.js';
 import { mostraFerie } from './ui/ferie.js';
+import { mostraCoseDaFare } from './ui/cosefare.js';
 
 const root = document.getElementById('app');
 let utenteCorrente;
@@ -31,13 +32,14 @@ const GESTIONE = ['titolare', 'gestore', 'lettore'];
 
 // barra: 'basso' = barra in basso su telefono; 'lato' = colonna laterale su PC
 const SEZIONI = {
-  // ordine del menu scelto dall'utente: Documenti, Report, Simulatore, Presenze, Riepilogo, Scadenze, Impostazioni
+  // ordine del menu scelto dall'utente: Documenti, Report, Simulatore, Presenze, Riepilogo, Cose da fare, Scadenze, Impostazioni
   // (sul telefono i primi quattro sono nella barra in basso, gli altri in "Altro")
   documenti: { titolo: 'Documenti', icona: 'documento', mostra: mostraDocumenti, ruoli: GESTIONE, barra: ['basso', 'lato'] },
   report: { titolo: 'Report', icona: 'grafico', mostra: mostraReport, ruoli: GESTIONE, barra: ['basso', 'lato'] },
   simulatore: { titolo: 'Simulatore', icona: 'bilancia', mostra: mostraSimulatore, ruoli: GESTIONE, barra: ['basso', 'lato'] },
   mesi: { titolo: 'Presenze', titoloLungo: 'Presenze e cedolini', icona: 'calendario', mostra: mostraMesi, ruoli: GESTIONE, barra: ['basso', 'lato'] },
   home: { titolo: 'Riepilogo', icona: 'casa', mostra: mostraHome, ruoli: GESTIONE, barra: ['lato'] },
+  cosefare: { titolo: 'Cose da fare', icona: 'spunta', mostra: mostraCoseDaFare, ruoli: GESTIONE, barra: ['lato'] },
   scadenze: { titolo: 'Scadenze', icona: 'campana', mostra: mostraScadenze, ruoli: GESTIONE, barra: ['lato'] },
   impostazioni: { titolo: 'Impostazioni', icona: 'ingranaggio', mostra: mostraImpostazioni, ruoli: GESTIONE, barra: ['lato'] },
   altro: { titolo: 'Altro', icona: 'altro', mostra: mostraAltro, ruoli: GESTIONE, barra: ['basso'] },

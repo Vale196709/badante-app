@@ -5,6 +5,7 @@ import { apriBonifico } from './bonifico.js';
 import { generaScadenze, avvisiRapporto } from '../engine/scadenze.js';
 import { riepilogoAnno } from '../engine/annuale.js';
 import { condizioniAl } from '../engine/variazioni.js';
+import { cardProssima } from './cosefare.js';
 
 const STATI = { 'da fare': 'Da preparare', bozza: 'Bozza', confermato: 'Confermato', pagato: 'Pagato' };
 
@@ -55,6 +56,8 @@ export function mostraHome(root, { vai }) {
     ${rep?.scostamentoBudget > 0 ? `<button type="button" class="avviso attenzione avviso-link" data-vai="report">La spesa prevista per il ${anno} (${eur(rep.previsione.costo)}) supera il budget di ${eur(rep.scostamentoBudget)} ›</button>` : ''}
     ${((n) => (n ? `<button type="button" class="avviso info avviso-link" data-vai="mesi">${n} ${n === 1 ? 'giorno' : 'giorni'} di ore segnate dalla lavoratrice da approvare ›</button>` : ''))(app.ore.filter((o) => o.stato === 'in attesa').length)}
     ${app.richieste.some((r) => r.stato === 'in attesa') ? `<button type="button" class="avviso info avviso-link" data-vai="mesi">${((n) => `${n} ${n === 1 ? 'richiesta' : 'richieste'} di ferie o permessi in attesa di risposta`)(app.richieste.filter((r) => r.stato === 'in attesa').length)} ›</button>` : ''}
+
+    ${cardProssima()}
 
     <section class="card evidenza">
       <div class="card-testa">

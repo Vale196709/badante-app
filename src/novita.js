@@ -3,6 +3,12 @@ export const VERSIONE = __VERSIONE__;
 export const DATA_BUILD = __DATA_BUILD__;
 
 export const NOVITA = [
+  { versione: '1.7.0', data: '2026-10-30', voci: [
+    'Nuova pagina "Cose da fare": il percorso a tappe del mese (presenze, cedolino, pagamento, ricevuta firmata) che si aggiorna da solo',
+    'Prossime scadenze con i colori: ambra da fare a breve, rosso in ritardo',
+    'Percorsi guidati per ferie, malattia e fine rapporto, con i termini già calcolati',
+    'Nel Riepilogo la scheda "Prossima cosa da fare"; per la lavoratrice il riquadro "Da fare"',
+  ] },
   { versione: '1.6.1', data: '2026-10-30', voci: [
     'CAP, città e provincia nella residenza di datore e lavoratrice, usati in tutti i documenti',
     'Indicazione "Sviluppata da Valentino"',
