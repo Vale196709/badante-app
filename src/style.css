@@ -393,6 +393,10 @@ dialog::backdrop { background: rgba(0, 0, 0, 0.4); }
 .tab-confronto th, .tab-confronto td { padding: 9px 6px; border-top: 0.5px solid var(--separatore); text-align: left; font-weight: 400; }
 .tab-confronto thead th { border-top: 0; font-weight: 600; font-size: 13px; color: var(--testo-2); }
 .tab-confronto tr.forte th, .tab-confronto tr.forte td { font-weight: 700; color: var(--tinta); }
+.tab-confronto .col-nero { color: var(--testo-2); font-style: italic; }
+.tab-confronto tr.forte td.col-nero { color: var(--testo-2); }
+.nota-nero ul { margin: 4px 0 0; padding-left: 20px; }
+.nota-nero p { margin: 12px 0 0; }
 @media (max-width: 480px) { .tab-confronto { font-size: 13px; } .tab-confronto th, .tab-confronto td { padding: 8px 3px; } }
 .scenari { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-bottom: 16px; }
 .scenario { background: var(--riempimento); border-radius: 12px; padding: 10px 10px 0; margin: 0; }

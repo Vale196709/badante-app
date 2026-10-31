@@ -3,6 +3,9 @@ export const VERSIONE = __VERSIONE__;
 export const DATA_BUILD = __DATA_BUILD__;
 
 export const NOVITA = [
+  { versione: '1.7.1', data: '2026-10-31', voci: [
+    'Simulatore: colonna "Non registrata" per confrontare il costo attuale con un rapporto non dichiarato, con i rischi e le agevolazioni perse',
+  ] },
   { versione: '1.7.0', data: '2026-10-30', voci: [
     'Nuova pagina "Cose da fare": il percorso a tappe del mese (presenze, cedolino, pagamento, ricevuta firmata) che si aggiorna da solo',
     'Prossime scadenze con i colori: ambra da fare a breve, rosso in ritardo',

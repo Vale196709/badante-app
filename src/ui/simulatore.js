@@ -99,10 +99,37 @@ export function mostraSimulatore(root) {
       const r = simulaCosto({ pagaOraria: mens ? 0 : s.paga, pagaMensile: mens ? s.paga : 0, tipologia: s.tipologia, vittoAlloggio: s.vitto, livello: s.livello, oreSettimanaliTot: s.ore, anno, tipoContratto: s.tipoContratto, cuaf: d?.cuaf !== false, cassaColf: d?.cassaColf !== false });
       return { s, r, mens, min: r.minimo };
     });
-    const riga = (et, f, forte = false) => `<tr${forte ? ' class="forte"' : ''}><th>${et}</th>${ris.map((x) => `<td class="num">${f(x)}</td>`).join('')}</tr>`;
-    const diff = (x) => { const v = x.r.costoMensile - ris[0].r.costoMensile; return v === 0 ? '—' : `${v > 0 ? '+' : '−'}${eur(Math.abs(v))}`; };
+    // Colonna di confronto: lo scenario Attuale come se il rapporto non fosse registrato.
+    // Ipotesi: la lavoratrice riceve la stessa paga lorda in mano e nient'altro
+    // (niente contributi, Cassa Colf, 13ª, TFR).
+    const a = ris[0];
+    const lordoMese = a.r.retribuzione;
+    ris.push({
+      s: { ...a.s, nome: 'Non registrata' },
+      mens: a.mens,
+      min: null,
+      nero: true,
+      r: {
+        ...a.r,
+        pagaNettaOraria: a.r.pagaOraria,
+        nettaOrariaCon13: a.r.pagaOraria,
+        costoOrario: a.r.oreMese ? euroTondo(lordoMese / a.r.oreMese) : 0,
+        rateo13: 0,
+        inpsDatore: 0,
+        cassaColfDatore: 0,
+        tfr: 0,
+        costoMensile: lordoMese,
+        costoAnnuo: euroTondo(lordoMese * 12),
+        nettoMedioLavoratrice: lordoMese,
+        versamentoTrimestraleInps: 0,
+      },
+    });
+    const nulla = (x, v) => (x.nero ? '—' : v);
+    const riga = (et, f, forte = false) => `<tr${forte ? ' class="forte"' : ''}><th>${et}</th>${ris.map((x) => `<td class="num${x.nero ? ' col-nero' : ''}">${f(x)}</td>`).join('')}</tr>`;
+    const diff = (x) => { const v = euroTondo(x.r.costoMensile - ris[0].r.costoMensile); return v === 0 ? '—' : `${v > 0 ? '+' : '−'}${eur(Math.abs(v))}`; };
+    const risparmioAnno = euroTondo(a.r.costoAnnuo - ris[ris.length - 1].r.costoAnnuo);
     tab.innerHTML = `
-      <thead><tr><th></th>${ris.map((x) => `<th class="num">${esc(x.s.nome)}</th>`).join('')}</tr></thead>
+      <thead><tr><th></th>${ris.map((x) => `<th class="num${x.nero ? ' col-nero' : ''}">${esc(x.s.nome)}</th>`).join('')}</tr></thead>
       <tbody>
         ${riga('Tipo di rapporto', (x) => esc(TIPOLOGIE[x.s.tipologia].breve))}
         ${riga('Paga lorda', (x) => (x.mens ? `${eur(x.s.paga)}/mese` : `${eur(x.s.paga)}/h`))}
@@ -111,20 +138,31 @@ export function mostraSimulatore(root) {
         ${riga('Netta oraria con 13ª', (x) => eur(x.r.nettaOrariaCon13))}
         ${riga('Costo orario per te', (x) => eur(x.r.costoOrario))}
         ${riga('Ore al mese', (x) => num(x.r.oreMese, 1))}
-        ${riga('Minimo CCNL', (x) => (x.min ? (x.s.paga >= x.min ? `✓ ${num(x.min)}` : `<span class="ko">sotto ${num(x.min)}</span>`) : (x.mens ? '<span class="ko">livello non previsto</span>' : 'n.d.')))}
-        ${riga('Fascia INPS', (x) => esc(x.r.fascia.replace(/ \(.*\)/, '')))}
+        ${riga('Minimo CCNL', (x) => nulla(x, x.min ? (x.s.paga >= x.min ? `✓ ${num(x.min)}` : `<span class="ko">sotto ${num(x.min)}</span>`) : (x.mens ? '<span class="ko">livello non previsto</span>' : 'n.d.')))}
+        ${riga('Fascia INPS', (x) => nulla(x, esc(x.r.fascia.replace(/ \(.*\)/, ''))))}
         ${riga('Retribuzione lorda', (x) => eur(x.r.retribuzione))}
-        ${riga('Rateo 13ª', (x) => eur(x.r.rateo13))}
+        ${riga('Rateo 13ª', (x) => nulla(x, eur(x.r.rateo13)))}
         ${ris.some((x) => x.r.vittoAlloggioMese) ? riga('Vitto e alloggio (valore)', (x) => (x.r.vittoAlloggioMese ? eur(x.r.vittoAlloggioMese) : '—')) : ''}
-        ${riga('Contributi a tuo carico', (x) => eur(x.r.inpsDatore + x.r.cassaColfDatore))}
-        ${riga('TFR accantonato', (x) => eur(x.r.tfr))}
+        ${riga('Contributi a tuo carico', (x) => nulla(x, eur(x.r.inpsDatore + x.r.cassaColfDatore)))}
+        ${riga('TFR accantonato', (x) => nulla(x, eur(x.r.tfr)))}
         ${riga('Costo mensile per te', (x) => eur(x.r.costoMensile), true)}
         ${riga('Differenza dall\'attuale', diff)}
         ${riga('Costo annuo', (x) => eur(x.r.costoAnnuo), true)}
         ${riga('Netto medio alla lavoratrice', (x) => eur(x.r.nettoMedioLavoratrice))}
-        ${riga('Versamento INPS trimestrale', (x) => eur(x.r.versamentoTrimestraleInps))}
+        ${riga('Versamento INPS trimestrale', (x) => nulla(x, eur(x.r.versamentoTrimestraleInps)))}
       </tbody>`;
+    notaNero.innerHTML = `
+      <p><strong>Colonna "Non registrata"</strong>: è lo scenario Attuale come se il rapporto non fosse dichiarato, con la stessa paga lorda data tutta in mano e nient'altro. Il risparmio apparente è di ${eur(risparmioAnno)} l'anno, ma non tiene conto di:</p>
+      <ul>
+        <li>deduzione dei contributi e detrazione del 19% che oggi puoi usare nella dichiarazione dei redditi;</li>
+        <li>Prestazione universale, che richiede un contratto regolare;</li>
+        <li>la lavoratrice può chiedere 13ª, ferie, TFR e contributi arretrati fino a 5 anni dalla fine del rapporto, e l'INPS aggiunge le sanzioni per evasione contributiva;</li>
+        <li>senza assicurazione INAIL, un infortunio in casa resta a tuo carico.</li>
+      </ul>`;
   };
+  const notaNero = document.createElement('div');
+  notaNero.className = 'nota nota-nero';
+  tab.closest('.tab-scorre').after(notaNero);
   box.addEventListener('input', confronta);
   confronta();
 
