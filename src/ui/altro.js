@@ -18,7 +18,7 @@ export function mostraAltro(root, { vai, scegliRapporto }) {
       ${riga('data-vai="home"', 'casa', '#1e4e8c', 'Riepilogo', 'Mese in corso, contatori, avvisi e anno')}
       ${riga('data-vai="simulatore"', 'bilancia', '#7a5af8', 'Simulatore', 'Scenari di costo, tipo di rapporto, fine rapporto')}
       ${riga('data-vai="scadenze"', 'campana', '#e0a100', 'Scadenze', 'Stipendi, contributi INPS e pratiche')}
-      ${riga('data-vai="impostazioni"', 'ingranaggio', '#8e8e93', 'Impostazioni', 'Rapporto, variazioni, tabelle, promemoria, accessi, backup, sicurezza')}
+      ${riga('data-vai="impostazioni"', 'ingranaggio', '#8e8e93', 'Impostazioni', 'Rapporto, variazioni, tabelle, promemoria, accessi, registro, backup, sicurezza')}
     </ul>
     <h2 class="testa-gruppo">Rapporti di lavoro</h2>
     <ul class="gruppo">

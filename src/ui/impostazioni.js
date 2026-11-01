@@ -7,6 +7,7 @@ import { mostraBackup } from './backup.js';
 import { mostraVariazioni } from './variazioni.js';
 import { mostraPromemoria } from './promemoria.js';
 import { mostraSicurezza } from './sicurezza.js';
+import { mostraRegistro } from './registro.js';
 
 let attiva = 'rapporto';
 export const apriSchedaImpostazioni = (k) => { attiva = k; };
@@ -18,6 +19,7 @@ export function mostraImpostazioni(root, ctx) {
     ['tabelle', 'Tabelle', mostraTabelle],
     ...(app.rapporto?.ruolo !== 'lettore' ? [['promemoria', 'Promemoria', mostraPromemoria]] : []),
     ...(isTitolare() ? [['accessi', 'Accessi', mostraAccessi]] : []),
+    ['registro', 'Registro', mostraRegistro],
     ['backup', 'Backup', mostraBackup],
     ['sicurezza', 'Sicurezza', mostraSicurezza],
   ];

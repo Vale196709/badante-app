@@ -694,3 +694,8 @@ body.bloccato { overflow: hidden; }
 .file-grande { display: block; border: 2px dashed var(--bordo, #c7cdd8); border-radius: 14px; padding: 18px; text-align: center; cursor: pointer; margin: 12px 0; }
 .file-grande input { display: block; margin: 8px auto 0; }
 .pillola.in-coda { background: rgba(224, 161, 0, 0.18); color: #9a6f00; }
+
+/* Registro delle modifiche (1.8) */
+.registro-riga { display: flex; gap: 12px; align-items: flex-start; }
+.registro-riga .ora { font-variant-numeric: tabular-nums; color: var(--testo-2, #6b7280); min-width: 44px; }
+.registro-riga .chi { opacity: 0.7; }

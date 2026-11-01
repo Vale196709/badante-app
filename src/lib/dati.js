@@ -294,3 +294,12 @@ export async function iscriviDispositivo(rapportoId, sub, dispositivo) {
 export async function togliDispositivo(endpoint) {
   ok(await supabase.from('notifiche_dispositivi').delete().eq('endpoint', endpoint));
 }
+
+// ---------- Registro delle modifiche (script 06) ----------
+/** Ultime modifiche del rapporto; lancia un errore se lo script 06 non è stato eseguito. */
+export async function caricaRegistro(rapportoId, { prima = null, quante = 100 } = {}) {
+  let q = supabase.from('registro').select('id, quando, chi, tabella, azione, oggetto, campi, dettaglio')
+    .eq('rapporto_id', rapportoId).order('quando', { ascending: false }).limit(quante);
+  if (prima) q = q.lt('quando', prima);
+  return ok(await q);
+}
