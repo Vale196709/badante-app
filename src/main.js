@@ -12,6 +12,9 @@ import { mostraImpostazioni } from './ui/impostazioni.js';
 import { mostraHome } from './ui/home.js';
 import { mostraMesi } from './ui/mesi.js';
 import { mostraSimulatore } from './ui/simulatore.js';
+import { applicaLeggibilita, leggiLeggibilita, impostaLeggibilita } from './lib/leggibilita.js';
+
+applicaLeggibilita();
 import { mostraDocumenti } from './ui/documenti.js';
 import { mostraScadenze } from './ui/scadenze.js';
 import { mostraAltro } from './ui/altro.js';
@@ -145,6 +148,7 @@ function disegnaApp() {
         <header class="barra-alta">
           <span class="barra-alta-titolo">${esc(app.rapporto.dati ? nomeRapporto(app.rapporto) : 'Badante di Maria')}</span>
           ${lav ? `<select class="lingua" aria-label="${t('lingua')}">${Object.entries(LINGUE).map(([k, v]) => `<option value="${k}" ${k === linguaCorrente() ? 'selected' : ''}>${v}</option>`).join('')}</select>
+                   <button type="button" class="tondo testo-piu ${leggiLeggibilita().grande ? 'attivo' : ''}" aria-pressed="${leggiLeggibilita().grande}" aria-label="${t('testoGrande')}">A<sup>+</sup></button>
                    <button type="button" class="esci tondo" aria-label="${t('esci')}">${ICONE.esci}</button>` : ''}
         </header>
         <main id="contenuto" class="contenuto"></main>
@@ -156,6 +160,11 @@ function disegnaApp() {
     </div>`;
 
   root.querySelectorAll('.esci').forEach((b) => b.addEventListener('click', () => supabase.auth.signOut()));
+  root.querySelector('.testo-piu')?.addEventListener('click', (e) => {
+    const v = impostaLeggibilita({ grande: !leggiLeggibilita().grande });
+    e.currentTarget.classList.toggle('attivo', v.grande);
+    e.currentTarget.setAttribute('aria-pressed', v.grande);
+  });
   root.querySelectorAll('.lingua').forEach((s) => s.addEventListener('change', (e) => { impostaLingua(e.target.value); disegnaApp(); }));
   root.querySelector('.sel-rapporto')?.addEventListener('change', (e) => scegliRapporto(e.target.value === '__nuovo' ? null : e.target.value));
   root.querySelectorAll('[data-s]').forEach((b) => b.addEventListener('click', () => vai(b.dataset.s)));

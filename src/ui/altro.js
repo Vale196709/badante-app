@@ -29,7 +29,7 @@ export function mostraAltro(root, { vai, scegliRapporto }) {
     <h2 class="testa-gruppo">Account</h2>
     <ul class="gruppo">
       <li class="riga-info"><span>${esc(app.user.email)}</span><small>${RUOLI[app.rapporto.ruolo]}</small></li>
-      ${riga('data-sicurezza', 'scudo', '#1e4e8c', 'Sicurezza', sbloccoAttivo(app.user) ? 'Sblocco con Face ID attivo' : 'Resta collegato, sblocco con Face ID')}
+      ${riga('data-sicurezza', 'scudo', '#1e4e8c', 'Sicurezza', sbloccoAttivo(app.user) ? 'Sblocco con Face ID attivo' : 'Resta collegato, Face ID, testo più grande')}
       ${riga('data-esci', 'esci', '#ff3b30', 'Esci', '', false)}
     </ul>
     <ul class="gruppo">

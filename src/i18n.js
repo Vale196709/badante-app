@@ -13,7 +13,7 @@ const T = {
     orePermesso: 'Ore (solo per un permesso di poche ore)', nota: 'Nota', invia: 'Invia richiesta',
     inAttesa: 'In attesa', approvata: 'Approvata', rifiutata: 'Rifiutata', ritira: 'Ritira', inviata: 'Richiesta inviata',
     mieRichieste: 'Le mie richieste', nessunaRichiesta: 'Nessuna richiesta.', risposta: 'Risposta',
-    docCondivisi: 'Documenti condivisi con te', nessunDocumento: 'Nessun documento.', apri: 'Apri', esci: 'Esci', lingua: 'Lingua',
+    docCondivisi: 'Documenti condivisi con te', nessunDocumento: 'Nessun documento.', apri: 'Apri', esci: 'Esci', lingua: 'Lingua', testoGrande: 'Testo più grande',
     domandaRicevuta: 'Confermi di aver ricevuto {importo} per {mese}?', firmaVuota: 'Firma prima di confermare.',
     mesi: ['Gennaio', 'Febbraio', 'Marzo', 'Aprile', 'Maggio', 'Giugno', 'Luglio', 'Agosto', 'Settembre', 'Ottobre', 'Novembre', 'Dicembre'],
     voci: {},
@@ -28,7 +28,7 @@ const T = {
     orePermesso: 'Ore (doar pentru o învoire de câteva ore)', nota: 'Notă', invia: 'Trimite cererea',
     inAttesa: 'În așteptare', approvata: 'Aprobată', rifiutata: 'Respinsă', ritira: 'Retrage', inviata: 'Cerere trimisă',
     mieRichieste: 'Cererile mele', nessunaRichiesta: 'Nicio cerere.', risposta: 'Răspuns',
-    docCondivisi: 'Documente partajate cu tine', nessunDocumento: 'Niciun document.', apri: 'Deschide', esci: 'Ieșire', lingua: 'Limbă',
+    docCondivisi: 'Documente partajate cu tine', nessunDocumento: 'Niciun document.', apri: 'Deschide', esci: 'Ieșire', lingua: 'Limbă', testoGrande: 'Text mai mare',
     domandaRicevuta: 'Confirmați că ați primit {importo} pentru {mese}?', firmaVuota: 'Semnați înainte de a confirma.',
     mesi: ['Ianuarie', 'Februarie', 'Martie', 'Aprilie', 'Mai', 'Iunie', 'Iulie', 'August', 'Septembrie', 'Octombrie', 'Noiembrie', 'Decembrie'],
     voci: {
@@ -49,7 +49,7 @@ const T = {
     orePermesso: 'Години (лише для відгулу на кілька годин)', nota: 'Примітка', invia: 'Надіслати запит',
     inAttesa: 'Очікує', approvata: 'Схвалено', rifiutata: 'Відхилено', ritira: 'Відкликати', inviata: 'Запит надіслано',
     mieRichieste: 'Мої запити', nessunaRichiesta: 'Запитів немає.', risposta: 'Відповідь',
-    docCondivisi: 'Документи, доступні вам', nessunDocumento: 'Документів немає.', apri: 'Відкрити', esci: 'Вийти', lingua: 'Мова',
+    docCondivisi: 'Документи, доступні вам', nessunDocumento: 'Документів немає.', apri: 'Відкрити', esci: 'Вийти', lingua: 'Мова', testoGrande: 'Більший текст',
     domandaRicevuta: 'Підтверджуєте, що отримали {importo} за {mese}?', firmaVuota: 'Спочатку підпишіть.',
     mesi: ['Січень', 'Лютий', 'Березень', 'Квітень', 'Травень', 'Червень', 'Липень', 'Серпень', 'Вересень', 'Жовтень', 'Листопад', 'Грудень'],
     voci: {
@@ -70,7 +70,7 @@ const T = {
     orePermesso: 'Часы (только для отгула на несколько часов)', nota: 'Примечание', invia: 'Отправить запрос',
     inAttesa: 'Ожидает', approvata: 'Одобрено', rifiutata: 'Отклонено', ritira: 'Отозвать', inviata: 'Запрос отправлен',
     mieRichieste: 'Мои запросы', nessunaRichiesta: 'Запросов нет.', risposta: 'Ответ',
-    docCondivisi: 'Документы, доступные вам', nessunDocumento: 'Документов нет.', apri: 'Открыть', esci: 'Выйти', lingua: 'Язык',
+    docCondivisi: 'Документы, доступные вам', nessunDocumento: 'Документов нет.', apri: 'Открыть', esci: 'Выйти', lingua: 'Язык', testoGrande: 'Крупный текст',
     domandaRicevuta: 'Подтверждаете получение {importo} за {mese}?', firmaVuota: 'Сначала распишитесь.',
     mesi: ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'],
     voci: {
@@ -91,7 +91,7 @@ const T = {
     orePermesso: 'Hours (only for a few hours of leave)', nota: 'Note', invia: 'Send request',
     inAttesa: 'Pending', approvata: 'Approved', rifiutata: 'Declined', ritira: 'Withdraw', inviata: 'Request sent',
     mieRichieste: 'My requests', nessunaRichiesta: 'No requests.', risposta: 'Reply',
-    docCondivisi: 'Documents shared with you', nessunDocumento: 'No documents.', apri: 'Open', esci: 'Log out', lingua: 'Language',
+    docCondivisi: 'Documents shared with you', nessunDocumento: 'No documents.', apri: 'Open', esci: 'Log out', lingua: 'Language', testoGrande: 'Larger text',
     domandaRicevuta: 'Do you confirm you received {importo} for {mese}?', firmaVuota: 'Please sign before confirming.',
     mesi: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
     voci: {

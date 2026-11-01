@@ -716,3 +716,12 @@ body.bloccato { overflow: hidden; }
 .legenda-grafico { flex-wrap: wrap; gap: 6px 14px; }
 .suggerimento i { display: inline-block; width: 8px; height: 8px; border-radius: 2px; margin-right: 5px; }
 .legenda-grafico .prev { background: repeating-linear-gradient(135deg, var(--s-retribuzione) 0 3px, transparent 3px 5px); opacity: 0.6; box-shadow: none; }
+
+/* Leggibilità (1.8): testo più grande e contrasto alto, scelti in Impostazioni → Sicurezza */
+html.testo-grande body { zoom: 1.15; }
+html.contrasto-alto { --testo-2: #2d3446; --testo-3: #4a5268; --separatore: #8d96a8; }
+@media (prefers-color-scheme: dark) { html.contrasto-alto { --testo-2: #d0d8e6; --testo-3: #b4bfd2; --separatore: #5a6987; } }
+html.contrasto-alto .card, html.contrasto-alto .gruppo { box-shadow: 0 0 0 1px var(--separatore); }
+.testo-piu { font-weight: 700; font-size: 15px; }
+.testo-piu sup { font-size: 10px; }
+.testo-piu.attivo { background: var(--tinta); color: var(--sulla-tinta); }
