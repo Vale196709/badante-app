@@ -46,7 +46,7 @@ La versione è in `package.json` e le novità in `src/novita.js`; versione e dat
 - `src/engine/` motore di calcolo (tabelle annuali, cedolino, presenze, catena mensile, scadenze,
   riepilogo annuo, cessazione) – coperto da test (`npm test`).
 - `src/ui/` schermate; `src/lib/` accesso a Supabase.
-- `supabase/` script SQL da eseguire nel SQL Editor, in ordine: 01, 02, 03, 04, 05 (05 = ore segnate dalla lavoratrice).
+- `supabase/` script SQL da eseguire nel SQL Editor, in ordine: 01, 02, 03, 04, 05, 06 (05 = ore segnate dalla lavoratrice, 06 = registro delle modifiche).
 
 ## Aggiornamento annuale
 A inizio anno, in Impostazioni → Tabelle annuali: "+ Nuovo anno", aggiornare minimi CCNL e contributi INPS
@@ -57,6 +57,10 @@ e lo segnala.
     npm install
     npm test
     npm run dev
+
+`test/regressione.test.js` ricalcola mese per mese tre rapporti tipo e li confronta con
+`test/riferimento/regressione.json`: se una modifica cambia anche un centesimo il test fallisce.
+Quando il cambiamento è voluto: `AGGIORNA_RIFERIMENTO=1 npm test`, poi controllare `git diff`.
 
 ## Promemoria: configurazione una tantum
 1. In Supabase crea un utente per i promemoria (Auto Confirm) e invitalo nell'app come "Sola lettura".

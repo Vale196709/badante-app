@@ -3,6 +3,19 @@ export const VERSIONE = __VERSIONE__;
 export const DATA_BUILD = __DATA_BUILD__;
 
 export const NOVITA = [
+  { versione: '1.8.0', data: '2026-11-01', voci: [
+    'Scatti di anzianità (4% del minimo ogni due anni, fino a 7): calcolati da soli nei cedolini, con la data del prossimo tra le Scadenze',
+    'Saldo dei permessi retribuiti per visite mediche e pratiche personali, anche nella vista della lavoratrice',
+    'Abbina l\'estratto conto: carichi il file della banca e l\'app segna come pagati stipendi e contributi INPS',
+    'Scadenze dei documenti della persona assistita e promemoria annuale per il rinnovo dell\'ISEE',
+    'Registro delle modifiche in Impostazioni: chi ha cambiato cosa e quando',
+    'Le ore della lavoratrice restano sul telefono se manca la rete e partono da sole',
+    '"Cose da fare" nella barra in basso, con il numero delle cose urgenti anche sull\'icona dell\'app',
+    'Report: costo di ogni mese diviso in retribuzione, tredicesima, contributi e TFR',
+    'Testo più grande e contrasto alto; stampa pulita di tutte le pagine',
+    'Controllo della paga sui nuovi minimi quando inserisci le tabelle dell\'anno',
+    'Corretti i conteggi di fine rapporto per conviventi e altri rapporti a paga mensile',
+  ] },
   { versione: '1.7.1', data: '2026-10-31', voci: [
     'Simulatore: colonna "Non registrata" per confrontare il costo attuale con un rapporto non dichiarato, con i rischi e le agevolazioni perse',
   ] },

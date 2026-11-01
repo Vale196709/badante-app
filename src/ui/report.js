@@ -43,11 +43,11 @@ function budgetBox(rep) {
 }
 
 function composizione(t) {
-  const voci = [['Retribuzione', t.retribuzione], ['Tredicesima', t.tredicesima], ['Contributi INPS e Cassa Colf', t.contributi], ['TFR', t.tfr]];
+  const voci = [['Retribuzione', t.retribuzione, 'retribuzione'], ['Tredicesima', t.tredicesima, 'tredicesima'], ['Contributi INPS e Cassa Colf', t.contributi, 'contributi'], ['TFR', t.tfr, 'tfr']];
   const totale = voci.reduce((a, [, v]) => a + v, 0) || 1;
-  return `<ul class="composizione">${voci.map(([n, v]) => `
+  return `<ul class="composizione">${voci.map(([n, v, k]) => `
     <li><span class="comp-testa"><span>${n}</span><strong>${eur(v)}</strong></span>
-      <span class="comp-barra"><span style="width:${(v / totale) * 100}%"></span></span>
+      <span class="comp-barra"><span class="seg s-${k}" style="width:${(v / totale) * 100}%"></span></span>
       <small>${num((v / totale) * 100, 0)}%</small></li>`).join('')}</ul>`;
 }
 

@@ -696,7 +696,8 @@ body.bloccato { overflow: hidden; }
 .pillola.in-coda { background: rgba(224, 161, 0, 0.18); color: #9a6f00; }
 
 /* Registro delle modifiche (1.8) */
-.registro-riga { display: flex; gap: 12px; align-items: flex-start; }
+.registro-riga { display: flex; gap: 12px; align-items: flex-start; justify-content: flex-start; }
+.registro-riga .corpo { flex: 1; text-align: left; }
 .registro-riga .ora { font-variant-numeric: tabular-nums; color: var(--testo-2, #6b7280); min-width: 44px; }
 .registro-riga .chi { opacity: 0.7; }
 
