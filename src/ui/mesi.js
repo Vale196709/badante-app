@@ -9,6 +9,7 @@ import { stampaCedolino } from './stampe.js';
 import { cardRichieste } from './richieste.js';
 import { apriBonifico } from './bonifico.js';
 import { cardOre } from './oreApprova.js';
+import { apriRiconciliazione } from './riconcilia.js';
 
 const STATI = { 'da fare': 'Da preparare', bozza: 'Bozza', confermato: 'Confermato', pagato: 'Pagato' };
 const GSETT = ['Lun', 'Mar', 'Mer', 'Gio', 'Ven', 'Sab', 'Dom'];
@@ -38,7 +39,8 @@ export function mostraMesi(root, ctx) {
 
   root.innerHTML = `
     <div class="card-testa"><h1 class="titolo-pagina">Presenze e cedolini</h1>
-      <button type="button" class="secondario vai-ferie">Ferie dell'anno</button></div>
+      <span class="bottoni-testa">${puoModificare() && catena.some((m) => m.stato === 'confermato') ? '<button type="button" class="secondario abbina">Abbina estratto conto</button>' : ''}
+      <button type="button" class="secondario vai-ferie">Ferie dell'anno</button></span></div>
     <section class="card ore-box" hidden></section>
     <section class="card richieste-box" hidden></section>
     <ul class="lista-mesi">
@@ -53,6 +55,7 @@ export function mostraMesi(root, ctx) {
   cardRichieste(root.querySelector('.richieste-box'), () => mostraMesi(root, ctx));
   cardOre(root.querySelector('.ore-box'), () => mostraMesi(root, ctx));
   root.querySelector('.vai-ferie').addEventListener('click', () => ctx.vai('ferie'));
+  root.querySelector('.abbina')?.addEventListener('click', () => apriRiconciliazione(async () => { await ctx.ricaricaDati(); mostraMesi(root, ctx); }));
   root.querySelectorAll('.lista-mesi button').forEach((b) =>
     b.addEventListener('click', () => {
       const [a, m] = b.dataset.k.split('-').map(Number);

@@ -685,3 +685,11 @@ body.bloccato { overflow: hidden; }
 .barra-bassa button span.pallino { top: 2px; left: calc(50% + 6px); }
 .lato-nav button span.pallino { position: static; margin-left: auto; }
 .valore.negativo { color: #ff3b30; }
+
+/* Riconciliazione dei bonifici (1.8) */
+.bottoni-testa { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+.lista-abbinamenti { list-style: none; padding: 0; margin: 12px 0; display: grid; gap: 8px; }
+.lista-abbinamenti li { background: var(--riempimento); border-radius: 12px; padding: 10px 12px; }
+.lista-abbinamenti .spunta { align-items: flex-start; }
+.file-grande { display: block; border: 2px dashed var(--bordo, #c7cdd8); border-radius: 14px; padding: 18px; text-align: center; cursor: pointer; margin: 12px 0; }
+.file-grande input { display: block; margin: 8px auto 0; }

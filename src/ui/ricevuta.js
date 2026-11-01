@@ -5,7 +5,7 @@ import { salvaVersamento, segnaScadenza, caricaVersamenti, caricaFile, caricaDoc
 
 const BASE = import.meta.env.BASE_URL;
 
-async function testoDaPdf(file, avanzamento) {
+export async function testoDaPdf(file, avanzamento) {
   const pdfjs = await import('pdfjs-dist');
   const { default: workerUrl } = await import('pdfjs-dist/build/pdf.worker.min.mjs?url');
   pdfjs.GlobalWorkerOptions.workerSrc = workerUrl;
