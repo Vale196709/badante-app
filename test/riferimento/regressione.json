@@ -1,0 +1,1851 @@
+{
+ "attuale": {
+  "mesi": [
+   {
+    "mese": "2026-10",
+    "lordo": 616.5,
+    "netto": 582.25,
+    "voci": [
+     "ORD 66 594",
+     "FES 2.5 22.5"
+    ],
+    "trattenute": [
+     "Contributi 32.88",
+     "Cassa 1.37"
+    ],
+    "inps": [
+     68.5,
+     98.64,
+     32.88
+    ],
+    "accantonamenti": {
+     "rivalutazioneTfr": 0,
+     "rateoTredicesima": 51.38,
+     "tfrMese": 49.47,
+     "ferieMaturateOre": 5.42
+    },
+    "contatori": {
+     "ferieResidueOre": 5.416667,
+     "tfrAccantonato": 49.47,
+     "tredicesimaMaturata": 51.38,
+     "giorniMalattiaAnno": 0,
+     "tfrFondoInizioAnno": 0,
+     "anticipoTfrAnno": 0,
+     "anno": 2026
+    }
+   },
+   {
+    "mese": "2026-11",
+    "lordo": 636.3,
+    "netto": 601.55,
+    "voci": [
+     "ORD 63 567",
+     "AGG 2 18",
+     "FES 2.5 22.5",
+     "STF 2 28.8"
+    ],
+    "trattenute": [
+     "Contributi 33.36",
+     "Cassa 1.39"
+    ],
+    "inps": [
+     69.5,
+     100.08,
+     33.36
+    ],
+    "accantonamenti": {
+     "rivalutazioneTfr": 0,
+     "rateoTredicesima": 50.63,
+     "tfrMese": 48.75,
+     "ferieMaturateOre": 5.42
+    },
+    "contatori": {
+     "ferieResidueOre": 10.833334,
+     "tfrAccantonato": 98.22,
+     "tredicesimaMaturata": 102.01,
+     "giorniMalattiaAnno": 0,
+     "tfrFondoInizioAnno": 0,
+     "anticipoTfrAnno": 0,
+     "anno": 2026
+    }
+   },
+   {
+    "mese": "2026-12",
+    "lordo": 832.59,
+    "netto": 795.84,
+    "voci": [
+     "ORD 61 549",
+     "FES 7.5 67.5",
+     "PER 2 18",
+     "FLV 3 43.2",
+     "13A  154.89"
+    ],
+    "trattenute": [
+     "Contributi 35.28",
+     "Cassa 1.47"
+    ],
+    "inps": [
+     73.5,
+     105.84,
+     35.28
+    ],
+    "accantonamenti": {
+     "rivalutazioneTfr": 0,
+     "rateoTredicesima": 52.88,
+     "tfrMese": 50.92,
+     "ferieMaturateOre": 5.42
+    },
+    "contatori": {
+     "ferieResidueOre": 16.250001,
+     "tfrAccantonato": 149.14,
+     "tredicesimaMaturata": 0,
+     "giorniMalattiaAnno": 0,
+     "tfrFondoInizioAnno": 0,
+     "anticipoTfrAnno": 0,
+     "anno": 2026
+    }
+   },
+   {
+    "mese": "2027-01",
+    "lordo": 558,
+    "netto": 527,
+    "voci": [
+     "ORD 57 513",
+     "FES 5 45"
+    ],
+    "trattenute": [
+     "Contributi 29.76",
+     "Cassa 1.24"
+    ],
+    "inps": [
+     62,
+     89.28,
+     29.76
+    ],
+    "accantonamenti": {
+     "rivalutazioneTfr": 0,
+     "rateoTredicesima": 46.5,
+     "tfrMese": 44.78,
+     "ferieMaturateOre": 5.42
+    },
+    "contatori": {
+     "ferieResidueOre": 21.666668,
+     "tfrAccantonato": 193.92,
+     "tredicesimaMaturata": 46.5,
+     "giorniMalattiaAnno": 0,
+     "tfrFondoInizioAnno": 149.14,
+     "anticipoTfrAnno": 0,
+     "anno": 2027
+    }
+   },
+   {
+    "mese": "2027-02",
+    "lordo": 499.5,
+    "netto": 469.5,
+    "voci": [
+     "ORD 45 405",
+     "MAL50 9 40.5",
+     "MAL100 6 54"
+    ],
+    "trattenute": [
+     "Contributi 28.8",
+     "Cassa 1.2"
+    ],
+    "inps": [
+     60,
+     86.4,
+     28.8
+    ],
+    "accantonamenti": {
+     "rivalutazioneTfr": 0,
+     "rateoTredicesima": 41.63,
+     "tfrMese": 40.08,
+     "ferieMaturateOre": 5.42
+    },
+    "contatori": {
+     "ferieResidueOre": 27.083335,
+     "tfrAccantonato": 234,
+     "tredicesimaMaturata": 88.13,
+     "giorniMalattiaAnno": 5,
+     "tfrFondoInizioAnno": 149.14,
+     "anticipoTfrAnno": 0,
+     "anno": 2027
+    }
+   },
+   {
+    "mese": "2027-03",
+    "lordo": 643.5,
+    "netto": 608.25,
+    "voci": [
+     "ORD 66 594",
+     "FES 2.5 22.5",
+     "STN 2 27"
+    ],
+    "trattenute": [
+     "Contributi 33.84",
+     "Cassa 1.41"
+    ],
+    "inps": [
+     70.5,
+     101.52,
+     33.84
+    ],
+    "accantonamenti": {
+     "rivalutazioneTfr": 0,
+     "rateoTredicesima": 51.38,
+     "tfrMese": 49.47,
+     "ferieMaturateOre": 5.42
+    },
+    "contatori": {
+     "ferieResidueOre": 32.500002,
+     "tfrAccantonato": 283.47,
+     "tredicesimaMaturata": 139.51,
+     "giorniMalattiaAnno": 5,
+     "tfrFondoInizioAnno": 149.14,
+     "anticipoTfrAnno": 0,
+     "anno": 2027
+    }
+   },
+   {
+    "mese": "2027-04",
+    "lordo": 616.5,
+    "netto": 582.25,
+    "voci": [
+     "ORD 66 594",
+     "FES 2.5 22.5"
+    ],
+    "trattenute": [
+     "Contributi 32.88",
+     "Cassa 1.37"
+    ],
+    "inps": [
+     68.5,
+     98.64,
+     32.88
+    ],
+    "accantonamenti": {
+     "rivalutazioneTfr": 0,
+     "rateoTredicesima": 51.38,
+     "tfrMese": 49.47,
+     "ferieMaturateOre": 5.42
+    },
+    "contatori": {
+     "ferieResidueOre": 37.916669,
+     "tfrAccantonato": 332.94,
+     "tredicesimaMaturata": 190.89,
+     "giorniMalattiaAnno": 5,
+     "tfrFondoInizioAnno": 149.14,
+     "anticipoTfrAnno": 0,
+     "anno": 2027
+    }
+   },
+   {
+    "mese": "2027-05",
+    "lordo": 589.5,
+    "netto": 556.75,
+    "voci": [
+     "ORD 63 567",
+     "FES 2.5 22.5"
+    ],
+    "trattenute": [
+     "Contributi 31.44",
+     "Cassa 1.31"
+    ],
+    "inps": [
+     65.5,
+     94.32,
+     31.44
+    ],
+    "accantonamenti": {
+     "rivalutazioneTfr": 0,
+     "rateoTredicesima": 49.13,
+     "tfrMese": 47.31,
+     "ferieMaturateOre": 5.42
+    },
+    "contatori": {
+     "ferieResidueOre": 43.333336,
+     "tfrAccantonato": 380.25,
+     "tredicesimaMaturata": 240.02,
+     "giorniMalattiaAnno": 5,
+     "tfrFondoInizioAnno": 149.14,
+     "anticipoTfrAnno": 0,
+     "anno": 2027
+    }
+   },
+   {
+    "mese": "2027-06",
+    "lordo": 589.5,
+    "netto": 556.75,
+    "voci": [
+     "ORD 63 567",
+     "FES 2.5 22.5"
+    ],
+    "trattenute": [
+     "Contributi 31.44",
+     "Cassa 1.31"
+    ],
+    "inps": [
+     65.5,
+     94.32,
+     31.44
+    ],
+    "accantonamenti": {
+     "rivalutazioneTfr": 0,
+     "rateoTredicesima": 49.13,
+     "tfrMese": 47.31,
+     "ferieMaturateOre": 5.42
+    },
+    "contatori": {
+     "ferieResidueOre": 48.750003,
+     "tfrAccantonato": 427.56,
+     "tredicesimaMaturata": 289.15,
+     "giorniMalattiaAnno": 5,
+     "tfrFondoInizioAnno": 149.14,
+     "anticipoTfrAnno": 0,
+     "anno": 2027
+    }
+   },
+   {
+    "mese": "2027-07",
+    "lordo": 594,
+    "netto": 561,
+    "voci": [
+     "ORD 66 594"
+    ],
+    "trattenute": [
+     "Contributi 31.68",
+     "Cassa 1.32"
+    ],
+    "inps": [
+     66,
+     95.04,
+     31.68
+    ],
+    "accantonamenti": {
+     "rivalutazioneTfr": 0,
+     "rateoTredicesima": 49.5,
+     "tfrMese": 47.67,
+     "ferieMaturateOre": 5.42
+    },
+    "contatori": {
+     "ferieResidueOre": 54.16667,
+     "tfrAccantonato": 475.23,
+     "tredicesimaMaturata": 338.65,
+     "giorniMalattiaAnno": 5,
+     "tfrFondoInizioAnno": 149.14,
+     "anticipoTfrAnno": 0,
+     "anno": 2027
+    }
+   },
+   {
+    "mese": "2027-08",
+    "lordo": 616.5,
+    "netto": 582.25,
+    "voci": [
+     "ORD 36 324",
+     "FES 2.5 22.5",
+     "FER 30 270"
+    ],
+    "trattenute": [
+     "Contributi 32.88",
+     "Cassa 1.37"
+    ],
+    "inps": [
+     68.5,
+     98.64,
+     32.88
+    ],
+    "accantonamenti": {
+     "rivalutazioneTfr": 0,
+     "rateoTredicesima": 51.38,
+     "tfrMese": 49.47,
+     "ferieMaturateOre": 5.42
+    },
+    "contatori": {
+     "ferieResidueOre": 29.583337,
+     "tfrAccantonato": 524.7,
+     "tredicesimaMaturata": 390.03,
+     "giorniMalattiaAnno": 5,
+     "tfrFondoInizioAnno": 149.14,
+     "anticipoTfrAnno": 0,
+     "anno": 2027
+    }
+   },
+   {
+    "mese": "2027-09",
+    "lordo": 594,
+    "netto": 561,
+    "voci": [
+     "ORD 66 594"
+    ],
+    "trattenute": [
+     "Contributi 31.68",
+     "Cassa 1.32"
+    ],
+    "inps": [
+     66,
+     95.04,
+     31.68
+    ],
+    "accantonamenti": {
+     "rivalutazioneTfr": 0,
+     "rateoTredicesima": 49.5,
+     "tfrMese": 47.67,
+     "ferieMaturateOre": 5.42
+    },
+    "contatori": {
+     "ferieResidueOre": 35.000004,
+     "tfrAccantonato": 572.37,
+     "tredicesimaMaturata": 439.53,
+     "giorniMalattiaAnno": 5,
+     "tfrFondoInizioAnno": 149.14,
+     "anticipoTfrAnno": 0,
+     "anno": 2027
+    }
+   },
+   {
+    "mese": "2027-10",
+    "lordo": 508.5,
+    "netto": 480.25,
+    "voci": [
+     "ORD 54 486",
+     "FES 2.5 22.5"
+    ],
+    "trattenute": [
+     "Contributi 27.12",
+     "Cassa 1.13"
+    ],
+    "inps": [
+     56.5,
+     81.36,
+     27.12
+    ],
+    "accantonamenti": {
+     "rivalutazioneTfr": 0,
+     "rateoTredicesima": 42.38,
+     "tfrMese": 40.81,
+     "ferieMaturateOre": 5.42
+    },
+    "contatori": {
+     "ferieResidueOre": 40.416671,
+     "tfrAccantonato": 613.18,
+     "tredicesimaMaturata": 481.91,
+     "giorniMalattiaAnno": 5,
+     "tfrFondoInizioAnno": 149.14,
+     "anticipoTfrAnno": 0,
+     "anno": 2027
+    }
+   },
+   {
+    "mese": "2027-11",
+    "lordo": 589.5,
+    "netto": 556.75,
+    "voci": [
+     "ORD 63 567",
+     "FES 2.5 22.5"
+    ],
+    "trattenute": [
+     "Contributi 31.44",
+     "Cassa 1.31"
+    ],
+    "inps": [
+     65.5,
+     94.32,
+     31.44
+    ],
+    "accantonamenti": {
+     "rivalutazioneTfr": 0,
+     "rateoTredicesima": 49.13,
+     "tfrMese": 47.31,
+     "ferieMaturateOre": 5.42
+    },
+    "contatori": {
+     "ferieResidueOre": 45.833338,
+     "tfrAccantonato": 660.49,
+     "tredicesimaMaturata": 531.04,
+     "giorniMalattiaAnno": 5,
+     "tfrFondoInizioAnno": 149.14,
+     "anticipoTfrAnno": 0,
+     "anno": 2027
+    }
+   },
+   {
+    "mese": "2027-12",
+    "lordo": 1247.67,
+    "netto": 1210.92,
+    "voci": [
+     "ORD 66 594",
+     "FES 7.5 67.5",
+     "13A  586.17"
+    ],
+    "trattenute": [
+     "Contributi 35.28",
+     "Cassa 1.47"
+    ],
+    "inps": [
+     73.5,
+     105.84,
+     35.28
+    ],
+    "accantonamenti": {
+     "rivalutazioneTfr": 0,
+     "rateoTredicesima": 55.13,
+     "tfrMese": 53.08,
+     "ferieMaturateOre": 5.42
+    },
+    "contatori": {
+     "ferieResidueOre": 51.250005,
+     "tfrAccantonato": 713.57,
+     "tredicesimaMaturata": 0,
+     "giorniMalattiaAnno": 5,
+     "tfrFondoInizioAnno": 149.14,
+     "anticipoTfrAnno": 0,
+     "anno": 2027
+    }
+   },
+   {
+    "mese": "2028-01",
+    "lordo": 558,
+    "netto": 525.5,
+    "voci": [
+     "ORD 51 459",
+     "FES 5 45",
+     "MAL50 6 27",
+     "MAL100 3 27"
+    ],
+    "trattenute": [
+     "Contributi 31.2",
+     "Cassa 1.3"
+    ],
+    "inps": [
+     65,
+     93.6,
+     31.2
+    ],
+    "accantonamenti": {
+     "rivalutazioneTfr": 2.24,
+     "rateoTredicesima": 46.5,
+     "tfrMese": 44.78,
+     "ferieMaturateOre": 5.42
+    },
+    "contatori": {
+     "ferieResidueOre": 56.666672,
+     "tfrAccantonato": 760.59,
+     "tredicesimaMaturata": 46.5,
+     "giorniMalattiaAnno": 5,
+     "tfrFondoInizioAnno": 715.81,
+     "anticipoTfrAnno": 0,
+     "anno": 2028
+    }
+   },
+   {
+    "mese": "2028-02",
+    "lordo": 567,
+    "netto": 535.5,
+    "voci": [
+     "ORD 51 459",
+     "MAL100 12 108"
+    ],
+    "trattenute": [
+     "Contributi 30.24",
+     "Cassa 1.26"
+    ],
+    "inps": [
+     63,
+     90.72,
+     30.24
+    ],
+    "accantonamenti": {
+     "rivalutazioneTfr": 0,
+     "rateoTredicesima": 47.25,
+     "tfrMese": 45.5,
+     "ferieMaturateOre": 5.42
+    },
+    "contatori": {
+     "ferieResidueOre": 62.083339,
+     "tfrAccantonato": 806.09,
+     "tredicesimaMaturata": 93.75,
+     "giorniMalattiaAnno": 9,
+     "tfrFondoInizioAnno": 715.81,
+     "anticipoTfrAnno": 0,
+     "anno": 2028
+    }
+   },
+   {
+    "mese": "2028-03",
+    "lordo": 621,
+    "netto": 586.5,
+    "voci": [
+     "ORD 69 621"
+    ],
+    "trattenute": [
+     "Contributi 33.12",
+     "Cassa 1.38"
+    ],
+    "inps": [
+     69,
+     99.36,
+     33.12
+    ],
+    "accantonamenti": {
+     "rivalutazioneTfr": 0,
+     "rateoTredicesima": 51.75,
+     "tfrMese": 49.83,
+     "ferieMaturateOre": 5.42
+    },
+    "contatori": {
+     "ferieResidueOre": 67.500006,
+     "tfrAccantonato": 855.92,
+     "tredicesimaMaturata": 145.5,
+     "giorniMalattiaAnno": 9,
+     "tfrFondoInizioAnno": 715.81,
+     "anticipoTfrAnno": 0,
+     "anno": 2028
+    }
+   },
+   {
+    "mese": "2028-04",
+    "lordo": 531,
+    "netto": 501.5,
+    "voci": [
+     "ORD 54 486",
+     "FES 5 45"
+    ],
+    "trattenute": [
+     "Contributi 28.32",
+     "Cassa 1.18"
+    ],
+    "inps": [
+     59,
+     84.96,
+     28.32
+    ],
+    "accantonamenti": {
+     "rivalutazioneTfr": 0,
+     "rateoTredicesima": 44.25,
+     "tfrMese": 42.61,
+     "ferieMaturateOre": 5.42
+    },
+    "contatori": {
+     "ferieResidueOre": 72.916673,
+     "tfrAccantonato": 898.53,
+     "tredicesimaMaturata": 189.75,
+     "giorniMalattiaAnno": 9,
+     "tfrFondoInizioAnno": 715.81,
+     "anticipoTfrAnno": 0,
+     "anno": 2028
+    }
+   },
+   {
+    "mese": "2028-05",
+    "lordo": 616.5,
+    "netto": 882.25,
+    "voci": [
+     "ORD 66 594",
+     "FES 2.5 22.5"
+    ],
+    "trattenute": [
+     "Contributi 32.88",
+     "Cassa 1.37"
+    ],
+    "inps": [
+     68.5,
+     98.64,
+     32.88
+    ],
+    "accantonamenti": {
+     "rivalutazioneTfr": 0,
+     "rateoTredicesima": 51.38,
+     "tfrMese": 49.47,
+     "ferieMaturateOre": 5.42
+    },
+    "contatori": {
+     "ferieResidueOre": 78.33334,
+     "tfrAccantonato": 648,
+     "tredicesimaMaturata": 241.13,
+     "giorniMalattiaAnno": 9,
+     "tfrFondoInizioAnno": 715.81,
+     "anticipoTfrAnno": 300,
+     "anno": 2028
+    }
+   },
+   {
+    "mese": "2028-06",
+    "lordo": 589.5,
+    "netto": 556.75,
+    "voci": [
+     "ORD 63 567",
+     "FES 2.5 22.5"
+    ],
+    "trattenute": [
+     "Contributi 31.44",
+     "Cassa 1.31"
+    ],
+    "inps": [
+     65.5,
+     94.32,
+     31.44
+    ],
+    "accantonamenti": {
+     "rivalutazioneTfr": 0,
+     "rateoTredicesima": 49.13,
+     "tfrMese": 47.31,
+     "ferieMaturateOre": 5.42
+    },
+    "contatori": {
+     "ferieResidueOre": 83.750007,
+     "tfrAccantonato": 695.31,
+     "tredicesimaMaturata": 290.26,
+     "giorniMalattiaAnno": 9,
+     "tfrFondoInizioAnno": 715.81,
+     "anticipoTfrAnno": 300,
+     "anno": 2028
+    }
+   },
+   {
+    "mese": "2028-07",
+    "lordo": 567,
+    "netto": 535.5,
+    "voci": [
+     "ORD 63 567"
+    ],
+    "trattenute": [
+     "Contributi 30.24",
+     "Cassa 1.26"
+    ],
+    "inps": [
+     63,
+     90.72,
+     30.24
+    ],
+    "accantonamenti": {
+     "rivalutazioneTfr": 0,
+     "rateoTredicesima": 47.25,
+     "tfrMese": 45.5,
+     "ferieMaturateOre": 5.42
+    },
+    "contatori": {
+     "ferieResidueOre": 89.166674,
+     "tfrAccantonato": 740.81,
+     "tredicesimaMaturata": 337.51,
+     "giorniMalattiaAnno": 9,
+     "tfrFondoInizioAnno": 715.81,
+     "anticipoTfrAnno": 300,
+     "anno": 2028
+    }
+   },
+   {
+    "mese": "2028-08",
+    "lordo": 616.5,
+    "netto": 582.25,
+    "voci": [
+     "ORD 66 594",
+     "FES 2.5 22.5"
+    ],
+    "trattenute": [
+     "Contributi 32.88",
+     "Cassa 1.37"
+    ],
+    "inps": [
+     68.5,
+     98.64,
+     32.88
+    ],
+    "accantonamenti": {
+     "rivalutazioneTfr": 0,
+     "rateoTredicesima": 51.38,
+     "tfrMese": 49.47,
+     "ferieMaturateOre": 5.42
+    },
+    "contatori": {
+     "ferieResidueOre": 94.583341,
+     "tfrAccantonato": 790.28,
+     "tredicesimaMaturata": 388.89,
+     "giorniMalattiaAnno": 9,
+     "tfrFondoInizioAnno": 715.81,
+     "anticipoTfrAnno": 300,
+     "anno": 2028
+    }
+   },
+   {
+    "mese": "2028-09",
+    "lordo": 567,
+    "netto": 535.5,
+    "voci": [
+     "ORD 63 567"
+    ],
+    "trattenute": [
+     "Contributi 30.24",
+     "Cassa 1.26"
+    ],
+    "inps": [
+     63,
+     90.72,
+     30.24
+    ],
+    "accantonamenti": {
+     "rivalutazioneTfr": 0,
+     "rateoTredicesima": 47.25,
+     "tfrMese": 45.5,
+     "ferieMaturateOre": 5.42
+    },
+    "contatori": {
+     "ferieResidueOre": 100.000008,
+     "tfrAccantonato": 835.78,
+     "tredicesimaMaturata": 436.14,
+     "giorniMalattiaAnno": 9,
+     "tfrFondoInizioAnno": 715.81,
+     "anticipoTfrAnno": 300,
+     "anno": 2028
+    }
+   },
+   {
+    "mese": "2028-10",
+    "lordo": 589.5,
+    "netto": 556.75,
+    "voci": [
+     "ORD 63 567",
+     "FES 2.5 22.5"
+    ],
+    "trattenute": [
+     "Contributi 31.44",
+     "Cassa 1.31"
+    ],
+    "inps": [
+     65.5,
+     94.32,
+     31.44
+    ],
+    "accantonamenti": {
+     "rivalutazioneTfr": 0,
+     "rateoTredicesima": 49.13,
+     "tfrMese": 47.31,
+     "ferieMaturateOre": 5.42
+    },
+    "contatori": {
+     "ferieResidueOre": 105.416675,
+     "tfrAccantonato": 883.09,
+     "tredicesimaMaturata": 485.27,
+     "giorniMalattiaAnno": 9,
+     "tfrFondoInizioAnno": 715.81,
+     "anticipoTfrAnno": 300,
+     "anno": 2028
+    }
+   },
+   {
+    "mese": "2028-11",
+    "lordo": 589.5,
+    "netto": 556.75,
+    "voci": [
+     "ORD 63 567",
+     "FES 2.5 22.5"
+    ],
+    "trattenute": [
+     "Contributi 31.44",
+     "Cassa 1.31"
+    ],
+    "inps": [
+     65.5,
+     94.32,
+     31.44
+    ],
+    "accantonamenti": {
+     "rivalutazioneTfr": 0,
+     "rateoTredicesima": 49.13,
+     "tfrMese": 47.31,
+     "ferieMaturateOre": 5.42
+    },
+    "contatori": {
+     "ferieResidueOre": 110.833342,
+     "tfrAccantonato": 930.4,
+     "tredicesimaMaturata": 534.4,
+     "giorniMalattiaAnno": 9,
+     "tfrFondoInizioAnno": 715.81,
+     "anticipoTfrAnno": 300,
+     "anno": 2028
+    }
+   },
+   {
+    "mese": "2028-12",
+    "lordo": 1134.03,
+    "netto": 1103.28,
+    "voci": [
+     "ORD 54 486",
+     "FES 7.5 67.5",
+     "13A  580.53"
+    ],
+    "trattenute": [
+     "Contributi 29.52",
+     "Cassa 1.23"
+    ],
+    "inps": [
+     61.5,
+     88.56,
+     29.52
+    ],
+    "accantonamenti": {
+     "rivalutazioneTfr": 0,
+     "rateoTredicesima": 46.13,
+     "tfrMese": 44.42,
+     "ferieMaturateOre": 5.42
+    },
+    "contatori": {
+     "ferieResidueOre": 116.250009,
+     "tfrAccantonato": 974.82,
+     "tredicesimaMaturata": 0,
+     "giorniMalattiaAnno": 9,
+     "tfrFondoInizioAnno": 715.81,
+     "anticipoTfrAnno": 300,
+     "anno": 2028
+    }
+   }
+  ],
+  "cessazione": {
+   "voci": [
+    "IFE 1046.25",
+    "IPR 289.26",
+    "TFR 1084.49"
+   ],
+   "lordo": 2420,
+   "netto": 2345.81,
+   "contributiDatore": 219.62
+  }
+ },
+ "convivente": {
+  "mesi": [
+   {
+    "mese": "2026-03",
+    "lordo": 592.31,
+    "netto": 550.73,
+    "voci": [
+     "MEN 14 592.31"
+    ],
+    "trattenute": [
+     "Contributi 39.06",
+     "Cassa 2.52"
+    ],
+    "inps": [
+     126,
+     117.18,
+     39.06
+    ],
+    "accantonamenti": {
+     "rivalutazioneTfr": 0,
+     "rateoTredicesima": 63.79,
+     "tfrMese": 61.43,
+     "ferieMaturateOre": 19.5
+    },
+    "contatori": {
+     "ferieResidueOre": 19.5,
+     "tfrAccantonato": 61.43,
+     "tredicesimaMaturata": 63.79,
+     "giorniMalattiaAnno": 0,
+     "tfrFondoInizioAnno": 0,
+     "anticipoTfrAnno": 0,
+     "anno": 2026
+    }
+   },
+   {
+    "mese": "2026-04",
+    "lordo": 1100,
+    "netto": 1022.78,
+    "voci": [
+     "MEN 1 1100"
+    ],
+    "trattenute": [
+     "Contributi 72.54",
+     "Cassa 4.68"
+    ],
+    "inps": [
+     234,
+     217.62,
+     72.54
+    ],
+    "accantonamenti": {
+     "rivalutazioneTfr": 0,
+     "rateoTredicesima": 106.1,
+     "tfrMese": 102.17,
+     "ferieMaturateOre": 19.5
+    },
+    "contatori": {
+     "ferieResidueOre": 39,
+     "tfrAccantonato": 163.6,
+     "tredicesimaMaturata": 169.89,
+     "giorniMalattiaAnno": 0,
+     "tfrFondoInizioAnno": 0,
+     "anticipoTfrAnno": 0,
+     "anno": 2026
+    }
+   },
+   {
+    "mese": "2026-05",
+    "lordo": 1100,
+    "netto": 1022.78,
+    "voci": [
+     "MEN 1 1100"
+    ],
+    "trattenute": [
+     "Contributi 72.54",
+     "Cassa 4.68"
+    ],
+    "inps": [
+     234,
+     217.62,
+     72.54
+    ],
+    "accantonamenti": {
+     "rivalutazioneTfr": 0,
+     "rateoTredicesima": 106.1,
+     "tfrMese": 102.17,
+     "ferieMaturateOre": 19.5
+    },
+    "contatori": {
+     "ferieResidueOre": 58.5,
+     "tfrAccantonato": 265.77,
+     "tredicesimaMaturata": 275.99,
+     "giorniMalattiaAnno": 0,
+     "tfrFondoInizioAnno": 0,
+     "anticipoTfrAnno": 0,
+     "anno": 2026
+    }
+   },
+   {
+    "mese": "2026-06",
+    "lordo": 1100,
+    "netto": 1022.78,
+    "voci": [
+     "MEN 1 1100"
+    ],
+    "trattenute": [
+     "Contributi 72.54",
+     "Cassa 4.68"
+    ],
+    "inps": [
+     234,
+     217.62,
+     72.54
+    ],
+    "accantonamenti": {
+     "rivalutazioneTfr": 0,
+     "rateoTredicesima": 106.1,
+     "tfrMese": 102.17,
+     "ferieMaturateOre": 19.5
+    },
+    "contatori": {
+     "ferieResidueOre": 78,
+     "tfrAccantonato": 367.94,
+     "tredicesimaMaturata": 382.09,
+     "giorniMalattiaAnno": 0,
+     "tfrFondoInizioAnno": 0,
+     "anticipoTfrAnno": 0,
+     "anno": 2026
+    }
+   },
+   {
+    "mese": "2026-07",
+    "lordo": 1100,
+    "netto": 1019.81,
+    "voci": [
+     "MEN 1 1100"
+    ],
+    "trattenute": [
+     "Contributi 75.33",
+     "Cassa 4.86"
+    ],
+    "inps": [
+     243,
+     225.99,
+     75.33
+    ],
+    "accantonamenti": {
+     "rivalutazioneTfr": 0,
+     "rateoTredicesima": 106.1,
+     "tfrMese": 102.17,
+     "ferieMaturateOre": 19.5
+    },
+    "contatori": {
+     "ferieResidueOre": -1.5,
+     "tfrAccantonato": 470.11,
+     "tredicesimaMaturata": 488.19,
+     "giorniMalattiaAnno": 0,
+     "tfrFondoInizioAnno": 0,
+     "anticipoTfrAnno": 0,
+     "anno": 2026
+    }
+   },
+   {
+    "mese": "2026-08",
+    "lordo": 1100,
+    "netto": 1022.78,
+    "voci": [
+     "MEN 1 1100"
+    ],
+    "trattenute": [
+     "Contributi 72.54",
+     "Cassa 4.68"
+    ],
+    "inps": [
+     234,
+     217.62,
+     72.54
+    ],
+    "accantonamenti": {
+     "rivalutazioneTfr": 0,
+     "rateoTredicesima": 106.1,
+     "tfrMese": 102.17,
+     "ferieMaturateOre": 19.5
+    },
+    "contatori": {
+     "ferieResidueOre": 18,
+     "tfrAccantonato": 572.28,
+     "tredicesimaMaturata": 594.29,
+     "giorniMalattiaAnno": 0,
+     "tfrFondoInizioAnno": 0,
+     "anticipoTfrAnno": 0,
+     "anno": 2026
+    }
+   },
+   {
+    "mese": "2026-09",
+    "lordo": 1100,
+    "netto": 1022.78,
+    "voci": [
+     "MEN 1 1100"
+    ],
+    "trattenute": [
+     "Contributi 72.54",
+     "Cassa 4.68"
+    ],
+    "inps": [
+     234,
+     217.62,
+     72.54
+    ],
+    "accantonamenti": {
+     "rivalutazioneTfr": 0,
+     "rateoTredicesima": 106.1,
+     "tfrMese": 102.17,
+     "ferieMaturateOre": 19.5
+    },
+    "contatori": {
+     "ferieResidueOre": 37.5,
+     "tfrAccantonato": 674.45,
+     "tredicesimaMaturata": 700.39,
+     "giorniMalattiaAnno": 0,
+     "tfrFondoInizioAnno": 0,
+     "anticipoTfrAnno": 0,
+     "anno": 2026
+    }
+   },
+   {
+    "mese": "2026-10",
+    "lordo": 1100,
+    "netto": 1016.84,
+    "voci": [
+     "MEN 1 1100"
+    ],
+    "trattenute": [
+     "Contributi 78.12",
+     "Cassa 5.04"
+    ],
+    "inps": [
+     252,
+     234.36,
+     78.12
+    ],
+    "accantonamenti": {
+     "rivalutazioneTfr": 0,
+     "rateoTredicesima": 106.1,
+     "tfrMese": 102.17,
+     "ferieMaturateOre": 19.5
+    },
+    "contatori": {
+     "ferieResidueOre": 57,
+     "tfrAccantonato": 776.62,
+     "tredicesimaMaturata": 806.49,
+     "giorniMalattiaAnno": 0,
+     "tfrFondoInizioAnno": 0,
+     "anticipoTfrAnno": 0,
+     "anno": 2026
+    }
+   },
+   {
+    "mese": "2026-11",
+    "lordo": 1036.54,
+    "netto": 959.32,
+    "voci": [
+     "MEN 1 1100",
+     "MAL50 3 -63.46"
+    ],
+    "trattenute": [
+     "Contributi 72.54",
+     "Cassa 4.68"
+    ],
+    "inps": [
+     234,
+     217.62,
+     72.54
+    ],
+    "accantonamenti": {
+     "rivalutazioneTfr": 0,
+     "rateoTredicesima": 100.81,
+     "tfrMese": 97.07,
+     "ferieMaturateOre": 19.5
+    },
+    "contatori": {
+     "ferieResidueOre": 76.5,
+     "tfrAccantonato": 873.69,
+     "tredicesimaMaturata": 907.3,
+     "giorniMalattiaAnno": 8,
+     "tfrFondoInizioAnno": 0,
+     "anticipoTfrAnno": 0,
+     "anno": 2026
+    }
+   },
+   {
+    "mese": "2026-12",
+    "lordo": 2021.73,
+    "netto": 1947.48,
+    "voci": [
+     "MEN 1 1100",
+     "MALNP 2 -84.62",
+     "13A  1006.35"
+    ],
+    "trattenute": [
+     "Contributi 69.75",
+     "Cassa 4.5"
+    ],
+    "inps": [
+     225,
+     209.25,
+     69.75
+    ],
+    "accantonamenti": {
+     "rivalutazioneTfr": 0,
+     "rateoTredicesima": 99.05,
+     "tfrMese": 95.38,
+     "ferieMaturateOre": 19.5
+    },
+    "contatori": {
+     "ferieResidueOre": 96,
+     "tfrAccantonato": 969.07,
+     "tredicesimaMaturata": 0,
+     "giorniMalattiaAnno": 12,
+     "tfrFondoInizioAnno": 0,
+     "anticipoTfrAnno": 0,
+     "anno": 2026
+    }
+   },
+   {
+    "mese": "2027-01",
+    "lordo": 1100,
+    "netto": 1022.78,
+    "voci": [
+     "MEN 1 1100"
+    ],
+    "trattenute": [
+     "Contributi 72.54",
+     "Cassa 4.68"
+    ],
+    "inps": [
+     234,
+     217.62,
+     72.54
+    ],
+    "accantonamenti": {
+     "rivalutazioneTfr": 0,
+     "rateoTredicesima": 106.1,
+     "tfrMese": 102.17,
+     "ferieMaturateOre": 19.5
+    },
+    "contatori": {
+     "ferieResidueOre": 115.5,
+     "tfrAccantonato": 1071.24,
+     "tredicesimaMaturata": 106.1,
+     "giorniMalattiaAnno": 0,
+     "tfrFondoInizioAnno": 969.07,
+     "anticipoTfrAnno": 0,
+     "anno": 2027
+    }
+   },
+   {
+    "mese": "2027-02",
+    "lordo": 1100,
+    "netto": 1028.72,
+    "voci": [
+     "MEN 1 1100"
+    ],
+    "trattenute": [
+     "Contributi 66.96",
+     "Cassa 4.32"
+    ],
+    "inps": [
+     216,
+     200.88,
+     66.96
+    ],
+    "accantonamenti": {
+     "rivalutazioneTfr": 0,
+     "rateoTredicesima": 106.1,
+     "tfrMese": 102.17,
+     "ferieMaturateOre": 19.5
+    },
+    "contatori": {
+     "ferieResidueOre": 135,
+     "tfrAccantonato": 1173.41,
+     "tredicesimaMaturata": 212.2,
+     "giorniMalattiaAnno": 0,
+     "tfrFondoInizioAnno": 969.07,
+     "anticipoTfrAnno": 0,
+     "anno": 2027
+    }
+   },
+   {
+    "mese": "2027-03",
+    "lordo": 1100,
+    "netto": 1019.81,
+    "voci": [
+     "MEN 1 1100"
+    ],
+    "trattenute": [
+     "Contributi 75.33",
+     "Cassa 4.86"
+    ],
+    "inps": [
+     243,
+     225.99,
+     75.33
+    ],
+    "accantonamenti": {
+     "rivalutazioneTfr": 0,
+     "rateoTredicesima": 106.1,
+     "tfrMese": 102.17,
+     "ferieMaturateOre": 19.5
+    },
+    "contatori": {
+     "ferieResidueOre": 154.5,
+     "tfrAccantonato": 1275.58,
+     "tredicesimaMaturata": 318.3,
+     "giorniMalattiaAnno": 0,
+     "tfrFondoInizioAnno": 969.07,
+     "anticipoTfrAnno": 0,
+     "anno": 2027
+    }
+   },
+   {
+    "mese": "2027-04",
+    "lordo": 1100,
+    "netto": 1019.81,
+    "voci": [
+     "MEN 1 1100"
+    ],
+    "trattenute": [
+     "Contributi 75.33",
+     "Cassa 4.86"
+    ],
+    "inps": [
+     243,
+     225.99,
+     75.33
+    ],
+    "accantonamenti": {
+     "rivalutazioneTfr": 0,
+     "rateoTredicesima": 106.1,
+     "tfrMese": 102.17,
+     "ferieMaturateOre": 19.5
+    },
+    "contatori": {
+     "ferieResidueOre": 174,
+     "tfrAccantonato": 1377.75,
+     "tredicesimaMaturata": 424.4,
+     "giorniMalattiaAnno": 0,
+     "tfrFondoInizioAnno": 969.07,
+     "anticipoTfrAnno": 0,
+     "anno": 2027
+    }
+   },
+   {
+    "mese": "2027-05",
+    "lordo": 1100,
+    "netto": 1022.78,
+    "voci": [
+     "MEN 1 1100"
+    ],
+    "trattenute": [
+     "Contributi 72.54",
+     "Cassa 4.68"
+    ],
+    "inps": [
+     234,
+     217.62,
+     72.54
+    ],
+    "accantonamenti": {
+     "rivalutazioneTfr": 0,
+     "rateoTredicesima": 106.1,
+     "tfrMese": 102.17,
+     "ferieMaturateOre": 19.5
+    },
+    "contatori": {
+     "ferieResidueOre": 193.5,
+     "tfrAccantonato": 1479.92,
+     "tredicesimaMaturata": 530.5,
+     "giorniMalattiaAnno": 0,
+     "tfrFondoInizioAnno": 969.07,
+     "anticipoTfrAnno": 0,
+     "anno": 2027
+    }
+   },
+   {
+    "mese": "2027-06",
+    "lordo": 1100,
+    "netto": 1022.78,
+    "voci": [
+     "MEN 1 1100"
+    ],
+    "trattenute": [
+     "Contributi 72.54",
+     "Cassa 4.68"
+    ],
+    "inps": [
+     234,
+     217.62,
+     72.54
+    ],
+    "accantonamenti": {
+     "rivalutazioneTfr": 0,
+     "rateoTredicesima": 106.1,
+     "tfrMese": 102.17,
+     "ferieMaturateOre": 19.5
+    },
+    "contatori": {
+     "ferieResidueOre": 213,
+     "tfrAccantonato": 1582.09,
+     "tredicesimaMaturata": 636.6,
+     "giorniMalattiaAnno": 0,
+     "tfrFondoInizioAnno": 969.07,
+     "anticipoTfrAnno": 0,
+     "anno": 2027
+    }
+   }
+  ],
+  "cessazione": {
+   "voci": [
+    "IFE 1001.1",
+    "13R 636.6",
+    "TFR 1663.52"
+   ],
+   "lordo": 3301.22,
+   "netto": 3230.93,
+   "contributiDatore": 206.61
+  }
+ },
+ "determinato": {
+  "mesi": [
+   {
+    "mese": "2026-05",
+    "lordo": 1200,
+    "netto": 1160.4,
+    "voci": [
+     "ORD 120 1200"
+    ],
+    "trattenute": [
+     "Contributi 37.2",
+     "Cassa 2.4"
+    ],
+    "inps": [
+     120,
+     122.4,
+     37.2
+    ],
+    "accantonamenti": {
+     "rivalutazioneTfr": 0,
+     "rateoTredicesima": 100,
+     "tfrMese": 96.3,
+     "ferieMaturateOre": 10.83
+    },
+    "contatori": {
+     "ferieResidueOre": 10.833333,
+     "tfrAccantonato": 96.3,
+     "tredicesimaMaturata": 100,
+     "giorniMalattiaAnno": 0,
+     "tfrFondoInizioAnno": 0,
+     "anticipoTfrAnno": 0,
+     "anno": 2026
+    }
+   },
+   {
+    "mese": "2026-06",
+    "lordo": 1310,
+    "netto": 1266.77,
+    "voci": [
+     "ORD 126 1260",
+     "FES 5 50"
+    ],
+    "trattenute": [
+     "Contributi 40.61",
+     "Cassa 2.62"
+    ],
+    "inps": [
+     131,
+     133.62,
+     40.61
+    ],
+    "accantonamenti": {
+     "rivalutazioneTfr": 0,
+     "rateoTredicesima": 109.17,
+     "tfrMese": 105.12,
+     "ferieMaturateOre": 10.83
+    },
+    "contatori": {
+     "ferieResidueOre": 21.666666,
+     "tfrAccantonato": 201.42,
+     "tredicesimaMaturata": 209.17,
+     "giorniMalattiaAnno": 0,
+     "tfrFondoInizioAnno": 0,
+     "anticipoTfrAnno": 0,
+     "anno": 2026
+    }
+   },
+   {
+    "mese": "2026-07",
+    "lordo": 1380,
+    "netto": 1334.46,
+    "voci": [
+     "ORD 138 1380"
+    ],
+    "trattenute": [
+     "Contributi 42.78",
+     "Cassa 2.76"
+    ],
+    "inps": [
+     138,
+     140.76,
+     42.78
+    ],
+    "accantonamenti": {
+     "rivalutazioneTfr": 0,
+     "rateoTredicesima": 115,
+     "tfrMese": 110.74,
+     "ferieMaturateOre": 10.83
+    },
+    "contatori": {
+     "ferieResidueOre": 32.499999,
+     "tfrAccantonato": 312.16,
+     "tredicesimaMaturata": 324.17,
+     "giorniMalattiaAnno": 0,
+     "tfrFondoInizioAnno": 0,
+     "anticipoTfrAnno": 0,
+     "anno": 2026
+    }
+   },
+   {
+    "mese": "2026-08",
+    "lordo": 1310,
+    "netto": 1266.77,
+    "voci": [
+     "ORD 66 660",
+     "FES 5 50",
+     "FER 60 600"
+    ],
+    "trattenute": [
+     "Contributi 40.61",
+     "Cassa 2.62"
+    ],
+    "inps": [
+     131,
+     133.62,
+     40.61
+    ],
+    "accantonamenti": {
+     "rivalutazioneTfr": 0,
+     "rateoTredicesima": 109.17,
+     "tfrMese": 105.12,
+     "ferieMaturateOre": 10.83
+    },
+    "contatori": {
+     "ferieResidueOre": -16.666668,
+     "tfrAccantonato": 417.28,
+     "tredicesimaMaturata": 433.34,
+     "giorniMalattiaAnno": 0,
+     "tfrFondoInizioAnno": 0,
+     "anticipoTfrAnno": 0,
+     "anno": 2026
+    }
+   },
+   {
+    "mese": "2026-09",
+    "lordo": 1320,
+    "netto": 1276.44,
+    "voci": [
+     "ORD 132 1320"
+    ],
+    "trattenute": [
+     "Contributi 40.92",
+     "Cassa 2.64"
+    ],
+    "inps": [
+     132,
+     134.64,
+     40.92
+    ],
+    "accantonamenti": {
+     "rivalutazioneTfr": 0,
+     "rateoTredicesima": 110,
+     "tfrMese": 105.93,
+     "ferieMaturateOre": 10.83
+    },
+    "contatori": {
+     "ferieResidueOre": -5.833335,
+     "tfrAccantonato": 523.21,
+     "tredicesimaMaturata": 543.34,
+     "giorniMalattiaAnno": 0,
+     "tfrFondoInizioAnno": 0,
+     "anticipoTfrAnno": 0,
+     "anno": 2026
+    }
+   },
+   {
+    "mese": "2026-10",
+    "lordo": 1370,
+    "netto": 1324.79,
+    "voci": [
+     "ORD 132 1320",
+     "FES 5 50"
+    ],
+    "trattenute": [
+     "Contributi 42.47",
+     "Cassa 2.74"
+    ],
+    "inps": [
+     137,
+     139.74,
+     42.47
+    ],
+    "accantonamenti": {
+     "rivalutazioneTfr": 0,
+     "rateoTredicesima": 114.17,
+     "tfrMese": 109.94,
+     "ferieMaturateOre": 10.83
+    },
+    "contatori": {
+     "ferieResidueOre": 4.999998,
+     "tfrAccantonato": 633.15,
+     "tredicesimaMaturata": 657.51,
+     "giorniMalattiaAnno": 0,
+     "tfrFondoInizioAnno": 0,
+     "anticipoTfrAnno": 0,
+     "anno": 2026
+    }
+   },
+   {
+    "mese": "2026-11",
+    "lordo": 1310,
+    "netto": 1266.77,
+    "voci": [
+     "ORD 126 1260",
+     "FES 5 50"
+    ],
+    "trattenute": [
+     "Contributi 40.61",
+     "Cassa 2.62"
+    ],
+    "inps": [
+     131,
+     133.62,
+     40.61
+    ],
+    "accantonamenti": {
+     "rivalutazioneTfr": 0,
+     "rateoTredicesima": 109.17,
+     "tfrMese": 105.12,
+     "ferieMaturateOre": 10.83
+    },
+    "contatori": {
+     "ferieResidueOre": 15.833331,
+     "tfrAccantonato": 738.27,
+     "tredicesimaMaturata": 766.68,
+     "giorniMalattiaAnno": 0,
+     "tfrFondoInizioAnno": 0,
+     "anticipoTfrAnno": 0,
+     "anno": 2026
+    }
+   },
+   {
+    "mese": "2026-12",
+    "lordo": 2294.18,
+    "netto": 2247.65,
+    "voci": [
+     "ORD 126 1260",
+     "FES 15 150",
+     "13A  884.18"
+    ],
+    "trattenute": [
+     "Contributi 43.71",
+     "Cassa 2.82"
+    ],
+    "inps": [
+     141,
+     143.82,
+     43.71
+    ],
+    "accantonamenti": {
+     "rivalutazioneTfr": 0,
+     "rateoTredicesima": 117.5,
+     "tfrMese": 113.15,
+     "ferieMaturateOre": 10.83
+    },
+    "contatori": {
+     "ferieResidueOre": 26.666664,
+     "tfrAccantonato": 851.42,
+     "tredicesimaMaturata": 0,
+     "giorniMalattiaAnno": 0,
+     "tfrFondoInizioAnno": 0,
+     "anticipoTfrAnno": 0,
+     "anno": 2026
+    }
+   },
+   {
+    "mese": "2027-01",
+    "lordo": 1240,
+    "netto": 1199.08,
+    "voci": [
+     "ORD 114 1140",
+     "FES 10 100"
+    ],
+    "trattenute": [
+     "Contributi 38.44",
+     "Cassa 2.48"
+    ],
+    "inps": [
+     124,
+     126.48,
+     38.44
+    ],
+    "accantonamenti": {
+     "rivalutazioneTfr": 0,
+     "rateoTredicesima": 103.33,
+     "tfrMese": 99.51,
+     "ferieMaturateOre": 10.83
+    },
+    "contatori": {
+     "ferieResidueOre": 37.499997,
+     "tfrAccantonato": 950.93,
+     "tredicesimaMaturata": 103.33,
+     "giorniMalattiaAnno": 0,
+     "tfrFondoInizioAnno": 851.42,
+     "anticipoTfrAnno": 0,
+     "anno": 2027
+    }
+   },
+   {
+    "mese": "2027-02",
+    "lordo": 1200,
+    "netto": 1160.4,
+    "voci": [
+     "ORD 120 1200"
+    ],
+    "trattenute": [
+     "Contributi 37.2",
+     "Cassa 2.4"
+    ],
+    "inps": [
+     120,
+     122.4,
+     37.2
+    ],
+    "accantonamenti": {
+     "rivalutazioneTfr": 0,
+     "rateoTredicesima": 100,
+     "tfrMese": 96.3,
+     "ferieMaturateOre": 10.83
+    },
+    "contatori": {
+     "ferieResidueOre": 48.33333,
+     "tfrAccantonato": 1047.23,
+     "tredicesimaMaturata": 203.33,
+     "giorniMalattiaAnno": 0,
+     "tfrFondoInizioAnno": 851.42,
+     "anticipoTfrAnno": 0,
+     "anno": 2027
+    }
+   },
+   {
+    "mese": "2027-03",
+    "lordo": 1370,
+    "netto": 1324.79,
+    "voci": [
+     "ORD 132 1320",
+     "FES 5 50"
+    ],
+    "trattenute": [
+     "Contributi 42.47",
+     "Cassa 2.74"
+    ],
+    "inps": [
+     137,
+     139.74,
+     42.47
+    ],
+    "accantonamenti": {
+     "rivalutazioneTfr": 0,
+     "rateoTredicesima": 114.17,
+     "tfrMese": 109.94,
+     "ferieMaturateOre": 10.83
+    },
+    "contatori": {
+     "ferieResidueOre": 59.166663,
+     "tfrAccantonato": 1157.17,
+     "tredicesimaMaturata": 317.5,
+     "giorniMalattiaAnno": 0,
+     "tfrFondoInizioAnno": 851.42,
+     "anticipoTfrAnno": 0,
+     "anno": 2027
+    }
+   },
+   {
+    "mese": "2027-04",
+    "lordo": 1370,
+    "netto": 1324.79,
+    "voci": [
+     "ORD 132 1320",
+     "FES 5 50"
+    ],
+    "trattenute": [
+     "Contributi 42.47",
+     "Cassa 2.74"
+    ],
+    "inps": [
+     137,
+     139.74,
+     42.47
+    ],
+    "accantonamenti": {
+     "rivalutazioneTfr": 0,
+     "rateoTredicesima": 114.17,
+     "tfrMese": 109.94,
+     "ferieMaturateOre": 10.83
+    },
+    "contatori": {
+     "ferieResidueOre": 69.999996,
+     "tfrAccantonato": 1267.11,
+     "tredicesimaMaturata": 431.67,
+     "giorniMalattiaAnno": 0,
+     "tfrFondoInizioAnno": 851.42,
+     "anticipoTfrAnno": 0,
+     "anno": 2027
+    }
+   }
+  ],
+  "cessazione": {
+   "voci": [
+    "IFE 700",
+    "13R 431.67",
+    "TFR 1323.22"
+   ],
+   "lordo": 2454.89,
+   "netto": 2431.79,
+   "contributiDatore": 74.2
+  }
+ }
+}
