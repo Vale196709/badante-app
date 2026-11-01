@@ -725,3 +725,16 @@ html.contrasto-alto .card, html.contrasto-alto .gruppo { box-shadow: 0 0 0 1px v
 .testo-piu { font-weight: 700; font-size: 15px; }
 .testo-piu sup { font-size: 10px; }
 .testo-piu.attivo { background: var(--tinta); color: var(--sulla-tinta); }
+
+/* Stampa di una pagina qualsiasi (Report, Scadenze, Cose da fare…) senza menu e pulsanti (1.8) */
+@media print {
+  html.testo-grande body { zoom: 1; }
+  body:not(.in-stampa) { background: #fff !important; color: #111; }
+  body:not(.in-stampa) .lato, body:not(.in-stampa) .barra-bassa, body:not(.in-stampa) .barra-alta,
+  body:not(.in-stampa) .toast, body:not(.in-stampa) button.link, body:not(.in-stampa) .azioni-mese,
+  body:not(.in-stampa) .sotto-schede, body:not(.in-stampa) .pallino { display: none !important; }
+  body:not(.in-stampa) .guscio, body:not(.in-stampa) .principale, body:not(.in-stampa) .contenuto { display: block; margin: 0; padding: 0; max-width: none; }
+  body:not(.in-stampa) .contenuto { padding: 12mm; }
+  body:not(.in-stampa) .card, body:not(.in-stampa) .gruppo { box-shadow: none; border: 1px solid #ccc; break-inside: avoid; background: #fff; }
+  body:not(.in-stampa) .barra-dato .suggerimento { display: none !important; }
+}
