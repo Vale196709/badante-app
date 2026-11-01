@@ -23,7 +23,18 @@ const iOS = () => /iPhone|iPad/.test(navigator.userAgent);
 async function iscrizioneCorrente() {
   if (!('serviceWorker' in navigator) || !('PushManager' in window)) return null;
   const reg = await navigator.serviceWorker.getRegistration();
-  return reg ? reg.pushManager.getSubscription() : null;
+  const sub = reg ? await reg.pushManager.getSubscription() : null;
+  // iscrizione fatta con una chiave diversa (chiave delle notifiche rigenerata): non vale più
+  const chiave = sub?.options?.applicationServerKey;
+  if (sub && chiave && CHIAVE_PUBBLICA) {
+    const a = new Uint8Array(chiave), b = daBase64(CHIAVE_PUBBLICA);
+    if (a.length !== b.length || a.some((x, i) => x !== b[i])) {
+      try { await togliDispositivo(sub.endpoint); } catch { /* già tolto */ }
+      await sub.unsubscribe();
+      return null;
+    }
+  }
+  return sub;
 }
 
 export async function mostraPromemoria(root) {
