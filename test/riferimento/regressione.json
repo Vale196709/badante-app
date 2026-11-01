@@ -801,11 +801,11 @@
    },
    {
     "mese": "2028-10",
-    "lordo": 589.5,
-    "netto": 556.75,
+    "lordo": 607.84,
+    "netto": 575.09,
     "voci": [
-     "ORD 63 567",
-     "FES 2.5 22.5"
+     "ORD 63 584.64",
+     "FES 2.5 23.2"
     ],
     "trattenute": [
      "Contributi 31.44",
@@ -818,14 +818,14 @@
     ],
     "accantonamenti": {
      "rivalutazioneTfr": 0,
-     "rateoTredicesima": 49.13,
-     "tfrMese": 47.31,
+     "rateoTredicesima": 50.65,
+     "tfrMese": 48.78,
      "ferieMaturateOre": 5.42
     },
     "contatori": {
      "ferieResidueOre": 105.416675,
-     "tfrAccantonato": 883.09,
-     "tredicesimaMaturata": 485.27,
+     "tfrAccantonato": 884.56,
+     "tredicesimaMaturata": 486.79,
      "giorniMalattiaAnno": 9,
      "tfrFondoInizioAnno": 715.81,
      "anticipoTfrAnno": 300,
@@ -834,11 +834,11 @@
    },
    {
     "mese": "2028-11",
-    "lordo": 589.5,
-    "netto": 556.75,
+    "lordo": 607.84,
+    "netto": 575.09,
     "voci": [
-     "ORD 63 567",
-     "FES 2.5 22.5"
+     "ORD 63 584.64",
+     "FES 2.5 23.2"
     ],
     "trattenute": [
      "Contributi 31.44",
@@ -851,14 +851,14 @@
     ],
     "accantonamenti": {
      "rivalutazioneTfr": 0,
-     "rateoTredicesima": 49.13,
-     "tfrMese": 47.31,
+     "rateoTredicesima": 50.65,
+     "tfrMese": 48.78,
      "ferieMaturateOre": 5.42
     },
     "contatori": {
      "ferieResidueOre": 110.833342,
-     "tfrAccantonato": 930.4,
-     "tredicesimaMaturata": 534.4,
+     "tfrAccantonato": 933.34,
+     "tredicesimaMaturata": 537.44,
      "giorniMalattiaAnno": 9,
      "tfrFondoInizioAnno": 715.81,
      "anticipoTfrAnno": 300,
@@ -867,12 +867,12 @@
    },
    {
     "mese": "2028-12",
-    "lordo": 1134.03,
-    "netto": 1103.28,
+    "lordo": 1155.72,
+    "netto": 1124.97,
     "voci": [
-     "ORD 54 486",
-     "FES 7.5 67.5",
-     "13A  580.53"
+     "ORD 54 501.12",
+     "FES 7.5 69.6",
+     "13A  585"
     ],
     "trattenute": [
      "Contributi 29.52",
@@ -885,13 +885,13 @@
     ],
     "accantonamenti": {
      "rivalutazioneTfr": 0,
-     "rateoTredicesima": 46.13,
-     "tfrMese": 44.42,
+     "rateoTredicesima": 47.56,
+     "tfrMese": 45.8,
      "ferieMaturateOre": 5.42
     },
     "contatori": {
      "ferieResidueOre": 116.250009,
-     "tfrAccantonato": 974.82,
+     "tfrAccantonato": 979.14,
      "tredicesimaMaturata": 0,
      "giorniMalattiaAnno": 9,
      "tfrFondoInizioAnno": 715.81,
@@ -902,12 +902,12 @@
   ],
   "cessazione": {
    "voci": [
-    "IFE 1046.25",
-    "IPR 289.26",
-    "TFR 1084.49"
+    "IFE 1078.8",
+    "IPR 298.26",
+    "TFR 1091.88"
    ],
-   "lordo": 2420,
-   "netto": 2345.81,
+   "lordo": 2468.94,
+   "netto": 2394.75,
    "contributiDatore": 219.62
   }
  },

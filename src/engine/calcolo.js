@@ -27,6 +27,63 @@ export function mesiAnzianita(dataAssunzione, alGiorno) {
   return Math.max(0, mesi);
 }
 
+// ---------- Scatti di anzianità (CCNL art. 37) ----------
+// Uno scatto ogni due anni di servizio, pari al 4% della retribuzione minima del livello,
+// fino a 7 scatti. Maturano dal primo giorno del mese successivo all'assunzione (dal giorno
+// stesso se l'assunzione è il primo del mese). Non sono assorbibili dal superminimo:
+// si aggiungono alla paga concordata.
+export function inizioAnzianitaScatti(dataAssunzione) {
+  const [a, m, g] = dataAssunzione.split('-').map(Number);
+  if (g === 1) return dataAssunzione;
+  return m === 12 ? isoDate(a + 1, 1, 1) : isoDate(a, m + 1, 1);
+}
+
+/** Numero di scatti maturati al primo giorno del mese indicato. */
+export function numeroScatti(rapporto, anno, mese) {
+  if (!rapporto?.dataAssunzione || rapporto.scattiAnzianita === false) return 0;
+  const inizio = inizioAnzianitaScatti(rapporto.dataAssunzione);
+  const mesi = mesiAnzianita(inizio, isoDate(anno, mese, 1));
+  if (isoDate(anno, mese, 1) < inizio) return 0;
+  return Math.min(REGOLE_CCNL.scattiAnzianita.massimo, Math.floor(mesi / REGOLE_CCNL.scattiAnzianita.ogniMesi));
+}
+
+/** Data in cui matura lo scatto successivo (null se già al massimo o se disattivati). */
+export function prossimoScatto(rapporto, alGiorno) {
+  if (!rapporto?.dataAssunzione || rapporto.scattiAnzianita === false) return null;
+  const [a, m] = alGiorno.split('-').map(Number);
+  const n = numeroScatti(rapporto, a, m);
+  if (n >= REGOLE_CCNL.scattiAnzianita.massimo) return null;
+  const [ia, im] = inizioAnzianitaScatti(rapporto.dataAssunzione).split('-').map(Number);
+  const tot = (ia * 12 + im - 1) + (n + 1) * REGOLE_CCNL.scattiAnzianita.ogniMesi;
+  return { numero: n + 1, data: isoDate(Math.floor(tot / 12), (tot % 12) + 1, 1) };
+}
+
+/** Quota degli scatti: oraria per i rapporti a ore, mensile per quelli a paga mensile. */
+export function quotaScatti(rapporto, anno, mese) {
+  const numero = numeroScatti(rapporto, anno, mese);
+  if (!numero) return { numero: 0, quota: 0, base: 0 };
+  const t = tabelleAnno(anno);
+  const tip = tipologia(rapporto);
+  let base;
+  if (!tip.mensile) base = t.minimiOrariNonConviventi?.[rapporto.livello];
+  else {
+    const tab = t[tip.minimi];
+    base = typeof tab === 'number' ? tab : tab?.[rapporto.livello]; // senza indennità di funzione
+  }
+  if (!base) return { numero, quota: 0, base: 0 };
+  return { numero, base, quota: euro(base * REGOLE_CCNL.scattiAnzianita.percentuale * numero), mensile: !!tip.mensile };
+}
+
+/** Rapporto con la paga aumentata degli scatti maturati nel mese. */
+export function applicaScatti(rapporto0, anno, mese) {
+  const sc = quotaScatti(rapporto0, anno, mese);
+  if (!sc.quota) return { rapporto: rapporto0, scatti: sc };
+  const r = { ...rapporto0 };
+  if (sc.mensile) r.pagaMensile = euro((Number(r.pagaMensile) || 0) + sc.quota);
+  else r.pagaOraria = euro((Number(r.pagaOraria) || 0) + sc.quota);
+  return { rapporto: r, scatti: sc };
+}
+
 // ---------- Orario ----------
 // rapporto.orario: { 1: 3, 2: 3, 3: 3, 4: 3, 5: 3 } → ore per giorno della settimana
 export function oreSettimanali(orario) {
@@ -143,8 +200,9 @@ export function fasciaContributiva(rapporto0, anno) {
  *                    anno, giorniMalattiaAnno }
  */
 export function calcolaCedolino(rapporto0, presenze, stato = {}) {
-  const rapporto = normalizzaRapporto(rapporto0);
   const { anno, mese } = presenze;
+  const { rapporto: conScatti, scatti } = applicaScatti(rapporto0, anno, mese);
+  const rapporto = normalizzaRapporto(conScatti);
   const t = tabelleAnno(anno);
   const R = REGOLE_CCNL;
   const tip = tipologia(rapporto);
@@ -164,6 +222,9 @@ export function calcolaCedolino(rapporto0, presenze, stato = {}) {
     tfrFondoInizioAnno: stato.tfrFondoInizioAnno ?? 0,
     anticipoTfrAnno: stato.anno === anno ? stato.anticipoTfrAnno ?? 0 : 0,
   };
+  if (scatti.numero && numeroScatti(rapporto0, mese === 1 ? anno - 1 : anno, mese === 1 ? 12 : mese - 1) < scatti.numero) {
+    avvisi.push(`Da questo mese matura il ${scatti.numero}° scatto di anzianità: +${fmtEur(euro(scatti.base * REGOLE_CCNL.scattiAnzianita.percentuale))}${scatti.mensile ? ' al mese' : ' l\'ora'} (in tutto ${fmtEur(scatti.quota)}).`);
+  }
   if (t.provvisorie) {
     avvisi.push(`Tabelle ${anno} non ancora inserite: calcolo provvisorio con i valori ${t.annoTabelle}.`);
   }
@@ -185,10 +246,10 @@ export function calcolaCedolino(rapporto0, presenze, stato = {}) {
   // Controllo minimo contrattuale
   const minimo = minimoContrattuale(t, rapporto);
   if (mensile) {
-    if (minimo && pagaMensile < minimo) avvisi.push(`Retribuzione mensile ${fmtEur(pagaMensile)} sotto il minimo (${tip.breve}, livello ${rapporto.livello}: ${fmtEur(minimo)}).`);
+    if (minimo && pagaMensile - (scatti.mensile ? scatti.quota : 0) < minimo) avvisi.push(`Retribuzione mensile ${fmtEur(pagaMensile)} sotto il minimo (${tip.breve}, livello ${rapporto.livello}: ${fmtEur(minimo)}).`);
     if (minimo == null) avvisi.push(`Il livello ${rapporto.livello} non è previsto per: ${tip.breve.toLowerCase()}.`);
     if (tip.maxSettimanali && settimanali > tip.maxSettimanali) avvisi.push(`Orario di ${fmtOre(settimanali)} h oltre il massimo di ${tip.maxSettimanali} h settimanali.`);
-  } else if (minimo && paga < minimo) {
+  } else if (minimo && paga - scatti.quota < minimo) {
     avvisi.push(`Paga oraria ${fmtEur(paga)} sotto il minimo del livello ${rapporto.livello} (${fmtEur(minimo)}).`);
   }
 
@@ -368,6 +429,7 @@ export function calcolaCedolino(rapporto0, presenze, stato = {}) {
     costoDatore,
     contatori: { ...s, anno },
     anzianitaMesi: anzianita,
+    scatti: scatti.numero ? { numero: scatti.numero, quota: scatti.quota, mensile: !!scatti.mensile } : null,
     avvisi,
   };
 }

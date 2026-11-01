@@ -121,6 +121,7 @@ export async function mostraRapporto(root, { ricaricaDati, vai }) {
         </div>
         <label class="spunta solo-mensile"><input type="checkbox" name="vittoAlloggio" ${d.vittoAlloggio ? 'checked' : ''} /> Vitto e alloggio forniti dal datore (entrano nel calcolo di 13ª, TFR e fascia INPS)</label>
         <label class="spunta"><input type="checkbox" name="tredicesimaMensile" ${d.tredicesimaMensile ? 'checked' : ''} /> Tredicesima pagata ogni mese (invece che a dicembre)</label>
+        <label class="spunta"><input type="checkbox" name="scattiAnzianita" ${d.scattiAnzianita !== false ? 'checked' : ''} /> Scatti di anzianità (4% del minimo ogni 2 anni, fino a 7)</label>
         <label class="spunta"><input type="checkbox" name="cassaColf" ${d.cassaColf !== false ? 'checked' : ''} /> Iscrizione Cassa Colf</label>
         <label class="spunta"><input type="checkbox" name="parente" ${d.cuaf === false ? 'checked' : ''} /> Lavoratrice coniuge o parente convivente (niente quota CUAF)</label>
       </section>
@@ -202,6 +203,7 @@ export async function mostraRapporto(root, { ricaricaDati, vai }) {
     giorniProva: Number(f.giorniProva.value) || 0,
     tredicesimaMensile: f.tredicesimaMensile.checked,
     cassaColf: f.cassaColf.checked,
+    scattiAnzianita: f.scattiAnzianita.checked,
     cuaf: !f.parente.checked,
     scadenzaDocumento: f.scadenzaDocumento.value,
     codiceRapportoInps: f.codiceRapportoInps.value.trim(),

@@ -1,6 +1,6 @@
 import { fmtEur, fmtNum, fmtOre } from './formato.js';
 // Scadenze e avvisi di monitoraggio del rapporto.
-import { euro, isoDate, oreSettimanali } from './calcolo.js';
+import { euro, isoDate, oreSettimanali, prossimoScatto, quotaScatti } from './calcolo.js';
 import { festivitaAnno, tabelleAnno, REGOLE_CCNL as R, minimoContrattuale, tipologia } from './tabelle.js';
 import { variazioniOrdinate, condizioniAl } from './variazioni.js';
 
@@ -159,6 +159,19 @@ export function generaScadenze(rapporto, catena, oggi, fatte = new Set()) {
   // Contratto a termine
   if (rapporto.tipoContratto === 'determinato' && rapporto.dataFineTermine) {
     add({ chiave: `termine-${rapporto.dataFineTermine}`, data: addGiorni(rapporto.dataFineTermine, -30), categoria: 'Contratto', titolo: 'Scadenza del contratto a termine', descrizione: `Il contratto termina il ${rapporto.dataFineTermine.split('-').reverse().join('/')}: decidere se proroga o cessazione.` });
+  }
+
+  // Prossimo scatto di anzianità (informativa: la paga si aggiorna da sola nel cedolino)
+  const sc = prossimoScatto(rapporto, oggi);
+  if (sc && !rapporto.dataCessazione) {
+    const [sa, sm] = sc.data.split('-').map(Number);
+    const q = quotaScatti(rapporto, sa, sm);
+    const unoScatto = q.numero ? euro(q.base * R.scattiAnzianita.percentuale) : 0;
+    add({
+      chiave: `scatto-${sc.data}`, data: sc.data, categoria: 'Contratto', informativa: true,
+      titolo: `${sc.numero}° scatto di anzianità`,
+      descrizione: `Dal ${sc.data.split('-').reverse().join('/')} la paga aumenta del 4% del minimo${unoScatto ? ` (circa ${fmtEur(unoScatto)}${q.mensile ? ' al mese' : ' l\'ora'})` : ''}. L'app lo applica da sola ai cedolini.`,
+    });
   }
 
   return out

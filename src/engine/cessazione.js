@@ -1,6 +1,6 @@
 import { fmtNum } from './formato.js';
 // Conteggi di fine rapporto: preavviso, ferie non godute, ratei di 13ª, TFR.
-import { euro, oreSettimanali, mesiAnzianita, fasciaContributiva, normalizzaRapporto } from './calcolo.js';
+import { euro, oreSettimanali, mesiAnzianita, fasciaContributiva, normalizzaRapporto, applicaScatti } from './calcolo.js';
 import { REGOLE_CCNL as R, tabelleAnno } from './tabelle.js';
 
 export const MOTIVI = {
@@ -27,7 +27,8 @@ export function giorniPreavviso(rapporto, dataCessazione, motivo) {
  */
 export function calcolaCessazione(rapporto0, stato, { dataCessazione, motivo, preavvisoLavorato = true }) {
   // per i rapporti a paga mensile serve la paga oraria equivalente (ferie, preavviso)
-  const rapporto = normalizzaRapporto(rapporto0);
+  const [ac, mc] = dataCessazione.split('-').map(Number);
+  const rapporto = normalizzaRapporto(applicaScatti(rapporto0, ac, mc).rapporto);
   const paga = Number(rapporto.pagaOraria) || 0;
   const sett = oreSettimanali(rapporto.orario);
   const anno = Number(dataCessazione.slice(0, 4));
