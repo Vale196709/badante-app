@@ -57,6 +57,7 @@ async function principale() {
     webpush.setVapidDetails(`mailto:${process.env.GMAIL_USER || 'noreply@example.com'}`, env.VITE_VAPID_PUBLIC_KEY, process.env.VAPID_PRIVATE_KEY);
   }
 
+  const errori = [];
   const oggi = oggiRoma();
   const [anno, mese] = oggi.split('-').map(Number);
   const { data: rapporti, error } = await sb.from('rapporti').select('id, dati');
@@ -110,8 +111,16 @@ async function principale() {
     if (PROVA) { console.log(`[PROVA] email a ${p.email.join(', ')}\n${oggetto}\n${testo}`); continue; }
 
     if (posta && p.email?.length) {
-      await posta.sendMail({ from: `Badante di Maria <${process.env.GMAIL_USER}>`, to: p.email.join(', '), subject: oggetto, text: testo, html });
-      console.log(`Email inviata a ${p.email.length} destinatari.`);
+      try {
+        await posta.sendMail({ from: `Badante di Maria <${process.env.GMAIL_USER}>`, to: p.email.join(', '), subject: oggetto, text: testo, html });
+        console.log(`Email inviata a ${p.email.length} destinatari.`);
+      } catch (e) {
+        // le notifiche partono comunque; l'attività finisce in errore per segnalare il problema
+        errori.push(/535|BadCredentials|Username and Password/i.test(e.message)
+          ? 'Gmail ha rifiutato l\'accesso: controllare i segreti GMAIL_USER (l\'indirizzo completo) e GMAIL_APP_PASSWORD (la password per le app di quello stesso account).'
+          : `Email non inviata: ${e.message}`);
+        console.log(errori[errori.length - 1]);
+      }
     }
     if (process.env.VAPID_PRIVATE_KEY) {
       const { data: disp } = await sb.from('notifiche_dispositivi').select('endpoint, chiavi').eq('rapporto_id', r.id);
@@ -123,6 +132,7 @@ async function principale() {
       console.log(`Notifiche inviate a ${disp?.length ?? 0} dispositivi.`);
     }
   }
+  if (errori.length) throw new Error(errori.join(' '));
 }
 
 if (import.meta.url === `file://${process.argv[1]}`) {
