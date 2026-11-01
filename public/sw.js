@@ -16,6 +16,8 @@ self.addEventListener('fetch', (e) => {
 self.addEventListener('push', (e) => {
   let d = {};
   try { d = e.data ? e.data.json() : {}; } catch { d = { body: e.data?.text() }; }
+  // numero sull'icona dell'app (dove supportato)
+  if (d.conteggio && self.navigator?.setAppBadge) self.navigator.setAppBadge(d.conteggio).catch(() => {});
   e.waitUntil(self.registration.showNotification(d.title || 'Badante di Maria', {
     body: d.body || '',
     icon: `${self.registration.scope}icons/icon-192.png`,

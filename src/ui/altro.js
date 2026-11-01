@@ -16,7 +16,7 @@ export function mostraAltro(root, { vai, scegliRapporto }) {
     <h1 class="titolo-pagina">Altro</h1>
     <ul class="gruppo">
       ${riga('data-vai="home"', 'casa', '#1e4e8c', 'Riepilogo', 'Mese in corso, contatori, avvisi e anno')}
-      ${riga('data-vai="cosefare"', 'spunta', '#2e9f5a', 'Cose da fare', 'Percorso del mese, scadenze e percorsi guidati')}
+      ${riga('data-vai="simulatore"', 'bilancia', '#7a5af8', 'Simulatore', 'Scenari di costo, tipo di rapporto, fine rapporto')}
       ${riga('data-vai="scadenze"', 'campana', '#e0a100', 'Scadenze', 'Stipendi, contributi INPS e pratiche')}
       ${riga('data-vai="impostazioni"', 'ingranaggio', '#8e8e93', 'Impostazioni', 'Rapporto, variazioni, tabelle, promemoria, accessi, backup, sicurezza')}
     </ul>

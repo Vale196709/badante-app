@@ -674,3 +674,13 @@ body.bloccato { overflow: hidden; }
 /* Vista lavoratrice: da fare */
 .lav-dafare { display: flex; flex-direction: column; gap: 8px; }
 .lav-dafare .riga-dafare { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; font-size: 15px; }
+
+/* Pallino con il numero di cose urgenti (1.8) */
+.barra-bassa button, .lato-nav button { position: relative; }
+.barra-bassa button span.pallino, .lato-nav button span.pallino {
+  position: absolute; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 9px;
+  background: #ff3b30; color: #fff; font-size: 11px; font-weight: 700; line-height: 18px;
+  text-align: center; max-width: none; overflow: visible;
+}
+.barra-bassa button span.pallino { top: 2px; left: calc(50% + 6px); }
+.lato-nav button span.pallino { position: static; margin-left: auto; }

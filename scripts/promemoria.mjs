@@ -100,7 +100,7 @@ async function principale() {
     }
     if (process.env.VAPID_PRIVATE_KEY) {
       const { data: disp } = await sb.from('notifiche_dispositivi').select('endpoint, chiavi').eq('rapporto_id', r.id);
-      const corpo = JSON.stringify({ title: elenco.length ? `${elenco[0].titolo}` : 'Richieste in attesa', body: righe.map((x) => x.slice(2)).join('\n'), tag: `promemoria-${oggi}`, url: URL_APP });
+      const corpo = JSON.stringify({ title: elenco.length ? `${elenco[0].titolo}` : 'Richieste in attesa', body: righe.map((x) => x.slice(2)).join('\n'), tag: `promemoria-${oggi}`, url: URL_APP, conteggio: elenco.length + inAttesa });
       for (const d of disp || []) {
         try { await webpush.sendNotification({ endpoint: d.endpoint, keys: d.chiavi }, corpo); }
         catch (e) { console.log(`Notifica non consegnata (${e.statusCode ?? e.message}): dispositivo probabilmente disiscritto.`); }

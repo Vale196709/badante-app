@@ -23,7 +23,7 @@ import { sessioneScaduta } from './lib/sblocco.js';
 import { mostraLavoratrice, mostraRichiesteLavoratrice, mostraDocumentiLavoratrice } from './ui/lavoratrice.js';
 import { mostraOreLavoratrice } from './ui/oreLavoratrice.js';
 import { mostraFerie } from './ui/ferie.js';
-import { mostraCoseDaFare } from './ui/cosefare.js';
+import { mostraCoseDaFare, datiCoseDaFare } from './ui/cosefare.js';
 
 const root = document.getElementById('app');
 let utenteCorrente;
@@ -33,13 +33,13 @@ const GESTIONE = ['titolare', 'gestore', 'lettore'];
 // barra: 'basso' = barra in basso su telefono; 'lato' = colonna laterale su PC
 const SEZIONI = {
   // ordine del menu scelto dall'utente: Documenti, Report, Simulatore, Presenze, Riepilogo, Cose da fare, Scadenze, Impostazioni
-  // (sul telefono i primi quattro sono nella barra in basso, gli altri in "Altro")
+  // (dalla 1.8 sul telefono la barra in basso ha Documenti, Report, Presenze e Cose da fare; il Simulatore è in "Altro")
   documenti: { titolo: 'Documenti', icona: 'documento', mostra: mostraDocumenti, ruoli: GESTIONE, barra: ['basso', 'lato'] },
   report: { titolo: 'Report', icona: 'grafico', mostra: mostraReport, ruoli: GESTIONE, barra: ['basso', 'lato'] },
-  simulatore: { titolo: 'Simulatore', icona: 'bilancia', mostra: mostraSimulatore, ruoli: GESTIONE, barra: ['basso', 'lato'] },
+  simulatore: { titolo: 'Simulatore', icona: 'bilancia', mostra: mostraSimulatore, ruoli: GESTIONE, barra: ['lato'] },
   mesi: { titolo: 'Presenze', titoloLungo: 'Presenze e cedolini', icona: 'calendario', mostra: mostraMesi, ruoli: GESTIONE, barra: ['basso', 'lato'] },
   home: { titolo: 'Riepilogo', icona: 'casa', mostra: mostraHome, ruoli: GESTIONE, barra: ['lato'] },
-  cosefare: { titolo: 'Cose da fare', icona: 'spunta', mostra: mostraCoseDaFare, ruoli: GESTIONE, barra: ['lato'] },
+  cosefare: { titolo: 'Cose da fare', icona: 'spunta', mostra: mostraCoseDaFare, ruoli: GESTIONE, barra: ['basso', 'lato'] },
   scadenze: { titolo: 'Scadenze', icona: 'campana', mostra: mostraScadenze, ruoli: GESTIONE, barra: ['lato'] },
   impostazioni: { titolo: 'Impostazioni', icona: 'ingranaggio', mostra: mostraImpostazioni, ruoli: GESTIONE, barra: ['lato'] },
   altro: { titolo: 'Altro', icona: 'altro', mostra: mostraAltro, ruoli: GESTIONE, barra: ['basso'] },
@@ -100,6 +100,7 @@ export function vai(nome) {
   // sul telefono le sezioni fuori dalla barra in basso evidenziano "Altro"
   const basso = root.querySelector('.barra-bassa');
   if (basso && !basso.querySelector(`[data-s="${nome}"]`)) basso.querySelector('[data-s=altro]')?.setAttribute('aria-current', '');
+  aggiornaPallini();
   const el = root.querySelector('#contenuto');
   el.innerHTML = '';
   window.scrollTo(0, 0);
@@ -159,6 +160,23 @@ function disegnaApp() {
   root.querySelector('.sel-rapporto')?.addEventListener('change', (e) => scegliRapporto(e.target.value === '__nuovo' ? null : e.target.value));
   root.querySelectorAll('[data-s]').forEach((b) => b.addEventListener('click', () => vai(b.dataset.s)));
   vai(sezione);
+}
+
+/** Numero di cose urgenti (in ritardo o da fare entro 10 giorni) su "Cose da fare" e sull'icona dell'app. */
+export function aggiornaPallini() {
+  let n = 0;
+  try {
+    if (app.rapporto?.dati && app.rapporto.ruolo !== 'lavoratrice') {
+      const { percorso, scadenze } = datiCoseDaFare();
+      n = scadenze.filter((x) => x.stato === 'ritardo' || x.stato === 'ora').length
+        + (percorso?.passi.filter((p) => p.stato === 'ritardo').length || 0);
+    }
+  } catch { n = 0; }
+  root.querySelectorAll('[data-s=cosefare]').forEach((b) => {
+    b.querySelector('.pallino')?.remove();
+    if (n) b.insertAdjacentHTML('beforeend', `<span class="pallino" aria-label="${n} da fare">${n > 9 ? '9+' : n}</span>`);
+  });
+  try { if ('setAppBadge' in navigator) (n ? navigator.setAppBadge(n) : navigator.clearAppBadge()).catch(() => {}); } catch { /* non supportato */ }
 }
 
 async function mostraApp(user) {
