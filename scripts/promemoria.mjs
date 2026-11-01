@@ -84,12 +84,18 @@ async function principale() {
     const elenco = FORZA
       ? scadenze.filter((s) => !s.fatta && giorniTra(oggi, s.data) <= 30).map((s) => ({ ...s, tra: giorniTra(oggi, s.data) }))
       : daRicordare(scadenze, oggi, p.giorni_anticipo);
-    if (FORZA) console.log(`Invio di prova: ${elenco.length} scadenze aperte.`);
+    if (FORZA) {
+      const aperte = scadenze.filter((x) => !x.fatta);
+      console.log(`Invio di prova: ${scadenze.length} scadenze in tutto, ${aperte.length} aperte, ${elenco.length} scadute o entro 30 giorni. Prossima aperta: ${aperte[0] ? `${aperte[0].data} ${aperte[0].titolo}` : 'nessuna'}. Mesi calcolati: ${catena.length}.`);
+    }
     const inAttesa = (richieste || []).filter((x) => x.stato === 'in attesa').length;
+    if (FORZA && !elenco.length && !inAttesa) {
+      elenco.push({ titolo: 'Prova dei promemoria', descrizione: '', data: oggi, tra: 0, prova: true });
+    }
     if (!elenco.length && !inAttesa) { console.log(`${r.dati.lavoratrice?.nome}: niente da ricordare.`); continue; }
 
     const nome = r.dati.lavoratrice?.nome || 'rapporto di lavoro';
-    const righe = elenco.map((s) => `• ${s.titolo}${s.importo != null ? ` (${fmtEur(s.importo)})` : ''}: ${quando(s.tra)}, ${dataIt(s.data)}`);
+    const righe = elenco.map((s) => s.prova ? '• Prova riuscita: email e notifiche funzionano. Nei prossimi 30 giorni non ci sono scadenze aperte.' : `• ${s.titolo}${s.importo != null ? ` (${fmtEur(s.importo)})` : ''}: ${quando(s.tra)}, ${dataIt(s.data)}`);
     if (inAttesa) righe.push(`• ${inAttesa} ${inAttesa === 1 ? 'richiesta' : 'richieste'} di ferie o permessi in attesa di risposta`);
     const oggetto = elenco.length
       ? `Badante di Maria – ${elenco.length === 1 ? elenco[0].titolo : `${elenco.length} scadenze`} (${nome})`
