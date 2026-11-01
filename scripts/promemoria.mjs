@@ -18,6 +18,8 @@ import { fmtEur } from '../src/engine/formato.js';
 const env = Object.fromEntries(readFileSync(new URL('../.env.production', import.meta.url), 'utf8')
   .split('\n').filter((r) => r.includes('=')).map((r) => [r.slice(0, r.indexOf('=')).trim(), r.slice(r.indexOf('=') + 1).trim()]));
 const PROVA = process.env.PROMEMORIA_PROVA === '1';
+// Invio di prova (dal pulsante Run workflow): manda subito tutte le scadenze aperte, scadute o entro 30 giorni.
+const FORZA = process.env.PROMEMORIA_FORZA === 'true' || process.env.PROMEMORIA_FORZA === '1';
 const URL_APP = 'https://vale196709.github.io/badante-app/';
 
 function oggiRoma() {
@@ -79,7 +81,10 @@ async function principale() {
     for (const c of cedolini || []) if (c.anno > fino.anno || (c.anno === fino.anno && c.mese > fino.mese)) fino = { anno: c.anno, mese: c.mese };
     const catena = calcolaCatena(r.dati, cedolini || [], fino);
     const scadenze = generaScadenze(r.dati, catena, oggi, new Set((fatte || []).map((f) => f.chiave)));
-    const elenco = daRicordare(scadenze, oggi, p.giorni_anticipo);
+    const elenco = FORZA
+      ? scadenze.filter((s) => !s.fatta && giorniTra(oggi, s.data) <= 30).map((s) => ({ ...s, tra: giorniTra(oggi, s.data) }))
+      : daRicordare(scadenze, oggi, p.giorni_anticipo);
+    if (FORZA) console.log(`Invio di prova: ${elenco.length} scadenze aperte.`);
     const inAttesa = (richieste || []).filter((x) => x.stato === 'in attesa').length;
     if (!elenco.length && !inAttesa) { console.log(`${r.dati.lavoratrice?.nome}: niente da ricordare.`); continue; }
 

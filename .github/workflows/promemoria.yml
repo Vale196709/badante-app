@@ -4,6 +4,11 @@ on:
   schedule:
     - cron: '23 5 * * *'   # ogni mattina, verso le 7 ora italiana
   workflow_dispatch:
+    inputs:
+      prova:
+        description: 'Invio di prova: manda subito tutte le scadenze aperte'
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -26,3 +31,4 @@ jobs:
           GMAIL_USER: ${{ secrets.GMAIL_USER }}
           GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
           VAPID_PRIVATE_KEY: ${{ secrets.VAPID_PRIVATE_KEY }}
+          PROMEMORIA_FORZA: ${{ inputs.prova }}
