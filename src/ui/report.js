@@ -9,17 +9,22 @@ let annoScelto = null;
 let ambito = 'questo';
 const cacheCedolini = new Map();
 
+const SERIE = [['retribuzione', 'Retribuzione'], ['tredicesima', 'Tredicesima'], ['contributi', 'Contributi'], ['tfr', 'TFR']];
+
+// Barre impilate: il costo di ogni mese diviso nelle sue parti (dalla 1.8).
 function grafico(mesi) {
   const max = Math.max(...mesi.map((m) => m.costo), 1);
   return `
-    <figure class="grafico" aria-label="Costo mensile: consuntivo e previsione">
-      <div class="legenda-grafico"><span><i class="cons"></i>Consuntivo</span><span><i class="prev"></i>Previsione</span></div>
+    <figure class="grafico" aria-label="Costo mensile diviso in retribuzione, tredicesima, contributi e TFR">
+      <div class="legenda-grafico">${SERIE.map(([k, n]) => `<span><i class="s-${k}"></i>${n}</span>`).join('')}<span><i class="prev"></i>Previsione</span></div>
       <div class="barre">
         ${Array.from({ length: 12 }, (_, i) => {
           const m = mesi.find((x) => x.mese === i + 1);
           const h = m ? Math.max(2, (m.costo / max) * 100) : 0;
-          return `<div class="colonna" style="width:${100 / 12}%">${m ? `<button type="button" class="barra-dato ${m.consuntivo ? '' : 'prevista'}" style="height:${h}%" aria-label="${nomeMeseMaiusc(i + 1)}: ${eur(m.costo)}${m.consuntivo ? '' : ', previsione'}">
-            <span class="suggerimento">${nomeMeseMaiusc(i + 1)}${m.consuntivo ? '' : ' (previsione)'}<br><strong>${eur(m.costo)}</strong><br>netto ${eur(m.netto)}</span></button>` : ''}</div>`;
+          return `<div class="colonna" style="width:${100 / 12}%">${m ? `<button type="button" class="barra-dato pila ${m.consuntivo ? '' : 'prevista'}" style="height:${h}%" aria-label="${nomeMeseMaiusc(i + 1)}: ${eur(m.costo)}${m.consuntivo ? '' : ', previsione'}">
+            ${[...SERIE].reverse().map(([k]) => (m[k] > 0 ? `<span class="seg s-${k}" style="flex-grow:${m[k]}"></span>` : '')).join('')}
+            <span class="suggerimento">${nomeMeseMaiusc(i + 1)}${m.consuntivo ? '' : ' (previsione)'}<br><strong>${eur(m.costo)}</strong>
+              ${SERIE.map(([k, n]) => `<br><i class="s-${k}"></i>${n} ${eur(m[k] || 0)}`).join('')}<br>netto ${eur(m.netto)}</span></button>` : ''}</div>`;
         }).join('')}
       </div>
       <div class="asse">${MESI_BREVI.map((l) => `<span>${l}</span>`).join('')}</div>
