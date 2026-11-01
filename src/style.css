@@ -684,3 +684,4 @@ body.bloccato { overflow: hidden; }
 }
 .barra-bassa button span.pallino { top: 2px; left: calc(50% + 6px); }
 .lato-nav button span.pallino { position: static; margin-left: auto; }
+.valore.negativo { color: #ff3b30; }

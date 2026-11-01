@@ -46,3 +46,21 @@ test('scatti: convivente, quota mensile senza indennità di funzione', () => {
   const c = calcolaCedolino(r, { anno: 2026, mese: 3 });
   assert.equal(c.voci.find((v) => v.codice === 'MEN').importo, 1868.54);
 });
+
+import { orePermessiAnnue, saldoPermessi } from '../src/engine/annuale.js';
+import { calcolaCatena } from '../src/engine/catena.js';
+
+test('permessi retribuiti: ore annue per tipo di rapporto', () => {
+  assert.equal(orePermessiAnnue(muoara), 6); // 15 h su 30 → 6 ore
+  assert.equal(orePermessiAnnue({ ...muoara, orario: { 1: 6, 2: 6, 3: 6, 4: 6, 5: 6 } }), 12);
+  assert.equal(orePermessiAnnue({ tipologia: 'convivente', orario: {} }), 16);
+  assert.equal(orePermessiAnnue({ tipologia: 'conviventePT', orario: {} }), 12);
+});
+
+test('permessi retribuiti: proporzione nell\'anno di assunzione e ore usate', () => {
+  const ced = [{ anno: 2026, mese: 12, stato: 'bozza', presenze: { giorni: { '2026-12-22': { tipo: 'P', ore: 2 } }, extra: {} } }];
+  const cat = calcolaCatena(muoara, ced, { anno: 2026, mese: 12 });
+  const s = saldoPermessi(muoara, cat, 2026); // ottobre-dicembre: 3/12 di 6 ore
+  assert.deepEqual(s, { annue: 6, spettanti: 1.5, usate: 2, residue: -0.5, mensile: false });
+  assert.equal(saldoPermessi(muoara, cat, 2027).spettanti, 6);
+});

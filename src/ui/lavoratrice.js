@@ -1,6 +1,7 @@
 // Vista della lavoratrice, tradotta nella lingua scelta: cedolini con firma per ricevuta,
 // richieste di ferie e permessi, documenti condivisi.
 import { app, eur, num, esc, dataIt, toast, oggiIso } from '../stato.js';
+import { saldoPermessi } from '../engine/annuale.js';
 import { firmaRicevutaConFirma, creaRichiesta, ritiraRichiesta, caricaRichieste } from '../lib/dati.js';
 import { stampaCedolino } from './stampe.js';
 import { apriFile } from './documenti.js';
@@ -43,6 +44,8 @@ export function mostraLavoratrice(root, ctx) {
       <div class="cifre">
         <div><span class="etichetta">${t('ferieResidue')}</span><span class="valore">${num(ultimo.ferieResidueOre, 1)} ${t('ore')}</span></div>
         <div><span class="etichetta">${t('tfr')}</span><span class="valore">${eur(ultimo.tfrAccantonato)}</span></div>
+        ${((p) => (p && !p.mensile ? `<div><span class="etichetta">${t('permessiResidui')}</span><span class="valore">${num(Math.max(0, p.residue), 1)} ${t('ore')}</span></div>` : ''))(
+          saldoPermessi(app.rapporto.dati, visibili.map((c) => ({ anno: c.anno, presenze: { orePermessi: (c.risultato?.voci || []).filter((v) => v.codice === 'PER').reduce((x, v) => x + (v.quantita || 0), 0) } })), Number(oggiIso().slice(0, 4))))}
       </div>
       <p class="nota">${t('aggiornati')}</p>
     </section>

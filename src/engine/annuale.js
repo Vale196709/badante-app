@@ -1,5 +1,7 @@
 // Riepiloghi annuali: dichiarazione dei compensi per la lavoratrice e quadro dei costi per il datore.
-import { euro } from './calcolo.js';
+import { euro, oreSettimanali } from './calcolo.js';
+import { condizioniAl } from './variazioni.js';
+import { tipologia } from './tabelle.js';
 import { REGOLE_CCNL } from './tabelle.js';
 
 const somma = (arr, f) => euro(arr.reduce((s, x) => s + (f(x) || 0), 0));
@@ -138,4 +140,37 @@ export function verificaAgevolazioni(dati = {}, oggi = new Date().toISOString().
   });
   out.push({ chiave: 'deduzione', nome: 'Deduzione dei contributi INPS', esito: 'si', testo: 'Sempre, fino a 1.549,37 € l\'anno di contributi a tuo carico pagati (rigo E23).' });
   return out;
+}
+
+/**
+ * Permessi individuali retribuiti (CCNL art. 19: visite mediche documentate e pratiche personali
+ * che cadono nell'orario di lavoro). Ore annue: conviventi 16 (part-time 12); non conviventi 12
+ * con almeno 30 h settimanali, riproporzionate sotto le 30. Nell'anno di assunzione o di
+ * cessazione spettano in proporzione ai mesi di servizio.
+ */
+export function orePermessiAnnue(rapporto) {
+  const t = rapporto?.tipologia || 'ore';
+  if (t === 'convivente') return REGOLE_CCNL.permessi.conviventi;
+  if (t === 'conviventePT') return REGOLE_CCNL.permessi.conviventiPT;
+  const sett = oreSettimanali(rapporto?.orario || {});
+  const base = REGOLE_CCNL.permessi.nonConviventi;
+  return sett >= REGOLE_CCNL.permessi.oreSogliaPiena ? base : euro((base * sett) / REGOLE_CCNL.permessi.oreSogliaPiena);
+}
+
+export function saldoPermessi(rapporto, catena, anno) {
+  if (!rapporto?.dataAssunzione) return null;
+  const [aa, ma] = rapporto.dataAssunzione.split('-').map(Number);
+  if (aa > anno) return null;
+  const da = aa === anno ? ma : 1;
+  let a = 12;
+  if (rapporto.dataCessazione) {
+    const [ac, mc] = rapporto.dataCessazione.split('-').map(Number);
+    if (ac < anno) return null;
+    if (ac === anno) a = mc;
+  }
+  const cond = condizioniAl(rapporto, `${anno}-12-31` < (rapporto.dataCessazione || '9999') ? `${anno}-12-31` : rapporto.dataCessazione);
+  const annue = orePermessiAnnue(cond);
+  const spettanti = euro((annue * (a - da + 1)) / 12);
+  const usate = euro(catena.filter((m) => m.anno === anno).reduce((s, m) => s + (m.presenze?.orePermessi || 0), 0));
+  return { annue, spettanti, usate, residue: euro(spettanti - usate), mensile: !!tipologia(cond).mensile };
 }

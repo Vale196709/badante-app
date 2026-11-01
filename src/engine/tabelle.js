@@ -105,6 +105,8 @@ export const REGOLE_CCNL = {
   rivalutazioneTfrFissa: 0.015,
   rivalutazioneTfrQuotaIstat: 0.75,
   anticipoTfrMassimo: 0.70, // una volta l'anno
+  // Permessi individuali retribuiti (art. 19), ore annue
+  permessi: { conviventi: 16, conviventiPT: 12, nonConviventi: 12, oreSogliaPiena: 30 },
   // Scatti di anzianità (art. 37): 4% del minimo per ogni biennio, massimo 7, non assorbibili.
   scattiAnzianita: { percentuale: 0.04, ogniMesi: 24, massimo: 7 },
   // Malattia: giorni retribuiti nell'anno solare e conservazione del posto, per anzianità.

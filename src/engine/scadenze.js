@@ -3,6 +3,7 @@ import { fmtEur, fmtNum, fmtOre } from './formato.js';
 import { euro, isoDate, oreSettimanali, prossimoScatto, quotaScatti } from './calcolo.js';
 import { festivitaAnno, tabelleAnno, REGOLE_CCNL as R, minimoContrattuale, tipologia } from './tabelle.js';
 import { variazioniOrdinate, condizioniAl } from './variazioni.js';
+import { saldoPermessi } from './annuale.js';
 
 const addGiorni = (iso, n) => new Date(new Date(iso + 'T00:00:00Z').getTime() + n * 86400000).toISOString().slice(0, 10);
 const ultimoGiorno = (a, m) => isoDate(a, m, new Date(Date.UTC(a, m, 0)).getUTCDate());
@@ -201,6 +202,8 @@ export function avvisiRapporto(rapporto, catena, oggi) {
   if (tipologia(c).mensile) {
     if (minimo && (Number(c.pagaMensile) || 0) < minimo) avvisi.push({ livello: 'grave', testo: `La retribuzione mensile è sotto il minimo del livello ${c.livello} (${fmtEur(minimo)}).` });
   } else if (minimo && c.pagaOraria < minimo) avvisi.push({ livello: 'grave', testo: `La paga oraria è sotto il minimo del livello ${c.livello} (${fmtEur(minimo)}).` });
+  const ps = saldoPermessi(rapporto, catena, Number(oggi.slice(0, 4)));
+  if (ps && ps.residue < 0) avvisi.push({ livello: 'attenzione', testo: `Permessi retribuiti oltre quelli spettanti nell'anno: ${fmtNum(ps.usate, 1)} ore usate su ${fmtNum(ps.spettanti, 1)}. Le ore in più si possono segnare come ferie o assenza non retribuita.` });
   for (const m of catena) for (const a of m.risultato.avvisi || []) {
     if (a.includes('conservazione del posto') || a.includes('non pagata')) avvisi.push({ livello: 'attenzione', testo: `${nomeMese(m.mese)} ${m.anno}: ${a}` });
   }

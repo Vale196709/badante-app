@@ -3,7 +3,7 @@ import { app, catenaCorrente, eur, num, esc, dataIt, oggiIso, nomeMeseMaiusc } f
 import { reportAnno } from '../engine/report.js';
 import { apriBonifico } from './bonifico.js';
 import { generaScadenze, avvisiRapporto } from '../engine/scadenze.js';
-import { riepilogoAnno } from '../engine/annuale.js';
+import { riepilogoAnno, saldoPermessi } from '../engine/annuale.js';
 import { condizioniAl } from '../engine/variazioni.js';
 import { cardProssima } from './cosefare.js';
 
@@ -82,6 +82,7 @@ export function mostraHome(root, { vai }) {
         <div><span class="etichetta">TFR accantonato</span><span class="valore">${eur(s.tfrAccantonato)}</span></div>
         <div><span class="etichetta">${d.tredicesimaMensile ? 'Tredicesima' : '13ª maturata'}</span><span class="valore">${d.tredicesimaMensile ? 'mensile' : eur(s.tredicesimaMaturata)}</span></div>
         <div><span class="etichetta">Malattia ${anno}</span><span class="valore">${s.anno === anno ? s.giorniMalattiaAnno : 0} gg</span></div>
+        ${((p) => (p ? `<div><span class="etichetta">Permessi retribuiti ${anno}</span><span class="valore${p.residue < 0 ? ' negativo' : ''}">${num(p.residue, 1)} h</span><span class="sotto">usate ${num(p.usate, 1)} su ${num(p.spettanti, 1)}</span></div>` : ''))(saldoPermessi(d, catena, anno))}
       </div>
     </section>
 
