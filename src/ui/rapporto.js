@@ -35,6 +35,7 @@ export const RAPPORTO_VUOTO = {
   budgetAnnuo: null,
   detrazione: { assistito: '', nonAutosufficiente: false, redditoEntroLimite: false },
   agevolazioni: { over80: false, accompagnamento: false, iseeEntroLimite: false, prestazioneUniversale: false },
+  documentiAssistito: { revisioneInvalidita: '', certificatoNonAutosufficienza: '', altroNome: '', altroData: '' },
 };
 
 const campiLocalita = (pre, p) => `
@@ -56,6 +57,7 @@ export async function mostraRapporto(root, { ricaricaDati, vai }) {
   d.pagamento = { ...RAPPORTO_VUOTO.pagamento, ...d.pagamento };
   d.detrazione = { ...RAPPORTO_VUOTO.detrazione, ...d.detrazione };
   d.agevolazioni = { ...RAPPORTO_VUOTO.agevolazioni, ...d.agevolazioni };
+  d.documentiAssistito = { ...RAPPORTO_VUOTO.documentiAssistito, ...d.documentiAssistito };
   const nuovo = !app.rapporto?.dati;
 
   root.innerHTML = `
@@ -157,6 +159,15 @@ export async function mostraRapporto(root, { ricaricaDati, vai }) {
       </section>
 
       <section>
+        <h2>Documenti della persona assistita</h2>
+        <small class="nota">Le agevolazioni dipendono da documenti che scadono. L'app li mette tra le Scadenze due mesi prima. Il rinnovo dell'ISEE si ricorda da solo ogni gennaio se usi la Prestazione universale.</small>
+        <label>Revisione dell'invalidità o dell'accompagnamento<input name="revisioneInvalidita" type="date" value="${esc(d.documentiAssistito.revisioneInvalidita)}" /></label>
+        <label>Scadenza del certificato di non autosufficienza<input name="certificatoNonAutosufficienza" type="date" value="${esc(d.documentiAssistito.certificatoNonAutosufficienza)}" /></label>
+        ${campo('Altro documento', 'altroDocNome', d.documentiAssistito.altroNome, 'placeholder="es. carta d\'identità, tessera sanitaria"')}
+        <label>Scadenza dell'altro documento<input name="altroDocData" type="date" value="${esc(d.documentiAssistito.altroData)}" /></label>
+      </section>
+
+      <section>
         <h2>INPS e fine rapporto</h2>
         ${campo('Codice rapporto INPS', 'codiceRapportoInps', d.codiceRapportoInps, 'placeholder="dalla ricevuta di assunzione INPS"')}
         <label>Data di cessazione<input name="dataCessazione" type="date" value="${esc(d.dataCessazione)}" /></label>
@@ -212,6 +223,7 @@ export async function mostraRapporto(root, { ricaricaDati, vai }) {
     budgetAnnuo: Number(f.budgetAnnuo.value) > 0 ? Number(f.budgetAnnuo.value) : null,
     detrazione: { assistito: f.assistito.value.trim(), nonAutosufficiente: f.nonAutosufficiente.checked, redditoEntroLimite: f.redditoEntroLimite.checked },
     agevolazioni: { over80: f.over80.checked, accompagnamento: f.accompagnamento.checked, iseeEntroLimite: f.iseeEntroLimite.checked, prestazioneUniversale: f.prestazioneUniversale.checked },
+    documentiAssistito: { revisioneInvalidita: f.revisioneInvalidita.value, certificatoNonAutosufficienza: f.certificatoNonAutosufficienza.value, altroNome: f.altroDocNome.value.trim(), altroData: f.altroDocData.value },
   });
 
   let tipologiaPrima = d.tipologia || 'ore';

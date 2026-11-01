@@ -137,6 +137,26 @@ export function generaScadenze(rapporto, catena, oggi, fatte = new Set()) {
     add({ chiave: `doc-${rapporto.scadenzaDocumento}`, data: addGiorni(rapporto.scadenzaDocumento, -60), categoria: 'Contratto', titolo: 'Rinnovo documento della lavoratrice', descrizione: `Il documento scade il ${rapporto.scadenzaDocumento.split('-').reverse().join('/')}: verificare per tempo il rinnovo.` });
   }
 
+  // Documenti della persona assistita (le agevolazioni ne dipendono)
+  const da = rapporto.documentiAssistito || {};
+  const chi = rapporto.detrazione?.assistito || 'la persona assistita';
+  const docAss = [
+    ['revisioneInvalidita', 'Revisione dell\'invalidità o dell\'accompagnamento', 'Preparare la documentazione medica: senza accompagnamento decadono la Prestazione universale e alcune agevolazioni.'],
+    ['certificatoNonAutosufficienza', 'Rinnovo del certificato di non autosufficienza', 'Serve per la detrazione del 19% sulle spese di assistenza.'],
+    ['altroData', da.altroNome ? `Rinnovo: ${da.altroNome}` : 'Rinnovo di un documento', ''],
+  ];
+  for (const [k, titolo, nota] of docAss) {
+    if (!da[k]) continue;
+    add({ chiave: `docass-${k}-${da[k]}`, data: addGiorni(da[k], -60), categoria: 'Documenti', titolo, descrizione: `Scade il ${da[k].split('-').reverse().join('/')} (${chi}). ${nota}`.trim() });
+  }
+  // ISEE sociosanitario: la DSU vale fino al 31 dicembre, va rinnovata a inizio anno
+  if (rapporto.agevolazioni?.prestazioneUniversale || rapporto.agevolazioni?.iseeEntroLimite) {
+    for (let a = Math.max(annoAss + 1, annoOggi); a <= annoOggi + 1; a++) {
+      add({ chiave: `isee-${a}`, data: primoLavorativo(isoDate(a, 1, 15)), categoria: 'Documenti', titolo: `Rinnovo ISEE sociosanitario ${a}`,
+        descrizione: 'La DSU dell\'anno prima è scaduta il 31 dicembre: presentarne una nuova (CAF o sito INPS) per non perdere la Prestazione universale e le altre agevolazioni legate all\'ISEE.' });
+    }
+  }
+
   // Pratiche INPS: assunzione, variazioni, cessazione
   add({
     chiave: 'inps-assunzione', data: addGiorni(rapporto.dataAssunzione, -1), informativa: true, categoria: 'Pratiche INPS',

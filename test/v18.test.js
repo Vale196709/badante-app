@@ -64,3 +64,17 @@ test('permessi retribuiti: proporzione nell\'anno di assunzione e ore usate', ()
   assert.deepEqual(s, { annue: 6, spettanti: 1.5, usate: 2, residue: -0.5, mensile: false });
   assert.equal(saldoPermessi(muoara, cat, 2027).spettanti, 6);
 });
+
+import { generaScadenze } from '../src/engine/scadenze.js';
+
+test('scadenze: documenti della persona assistita e rinnovo ISEE', () => {
+  const r = { ...muoara, agevolazioni: { prestazioneUniversale: true }, documentiAssistito: { certificatoNonAutosufficienza: '2027-05-31', altroNome: 'Carta d\'identità', altroData: '2027-03-01' } };
+  const cat = calcolaCatena(r, [], { anno: 2026, mese: 11 });
+  const sc = generaScadenze(r, cat, '2026-11-01');
+  const cert = sc.find((s) => s.chiave === 'docass-certificatoNonAutosufficienza-2027-05-31');
+  assert.equal(cert.data, '2027-04-01');
+  assert.ok(sc.find((s) => s.titolo === 'Rinnovo: Carta d\'identità'));
+  assert.equal(sc.find((s) => s.chiave === 'isee-2027').data, '2027-01-15');
+  const scatto = sc.find((s) => s.chiave === 'scatto-2028-10-01');
+  assert.ok(scatto && scatto.informativa);
+});
