@@ -693,3 +693,4 @@ body.bloccato { overflow: hidden; }
 .lista-abbinamenti .spunta { align-items: flex-start; }
 .file-grande { display: block; border: 2px dashed var(--bordo, #c7cdd8); border-radius: 14px; padding: 18px; text-align: center; cursor: pointer; margin: 12px 0; }
 .file-grande input { display: block; margin: 8px auto 0; }
+.pillola.in-coda { background: rgba(224, 161, 0, 0.18); color: #9a6f00; }
