@@ -63,7 +63,11 @@ async function principale() {
 
   for (const r of rapporti) {
     const { data: p } = await sb.from('promemoria').select('*').eq('rapporto_id', r.id).maybeSingle();
-    if (!p?.attivo || !r.dati?.dataAssunzione) continue;
+    const chi = r.dati?.lavoratrice?.nome || r.id;
+    if (!p) { console.log(`${chi}: impostazioni dei promemoria non salvate nell'app (Impostazioni → Promemoria).`); continue; }
+    if (!p.attivo) { console.log(`${chi}: promemoria disattivati ("Promemoria attivi" non spuntato).`); continue; }
+    if (!r.dati?.dataAssunzione) { console.log(`${chi}: manca la data di assunzione.`); continue; }
+    console.log(`${chi}: promemoria attivi, ${p.email?.length || 0} destinatari, anticipo ${p.giorni_anticipo} giorni. Email ${process.env.GMAIL_APP_PASSWORD ? 'configurate' : 'NON configurate'}, notifiche ${process.env.VAPID_PRIVATE_KEY ? 'configurate' : 'NON configurate'}.`);
     const [{ data: cedolini }, { data: fatte }, { data: tabelle }, { data: richieste }] = await Promise.all([
       sb.from('cedolini').select('*').eq('rapporto_id', r.id),
       sb.from('scadenze_fatte').select('chiave').eq('rapporto_id', r.id),
