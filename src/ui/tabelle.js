@@ -1,6 +1,9 @@
 // Tabelle annuali modificabili: minimi CCNL, contributi INPS, Cassa Colf, inflazione per il TFR.
 import { app, puoModificare, esc, oggiIso, toast } from '../stato.js';
-import { TABELLE, tutteLeTabelle, impostaTabellePersonalizzate } from '../engine/tabelle.js';
+import { TABELLE, tutteLeTabelle, impostaTabellePersonalizzate, tabelleAnno, minimoContrattuale, tipologia } from '../engine/tabelle.js';
+import { condizioniAl } from '../engine/variazioni.js';
+import { quotaScatti } from '../engine/calcolo.js';
+import { fmtEur } from '../engine/formato.js';
 import { salvaTabelle, eliminaTabelle, caricaTabelle } from '../lib/dati.js';
 import { fmtNum } from '../engine/formato.js';
 
@@ -172,10 +175,30 @@ export function mostraTabelle(root, ctx) {
         await ricarica();
         toast(`Tabelle ${anno} salvate: i cedolini in bozza sono già ricalcolati`);
         mostraTabelle(root, ctx);
+        root.insertAdjacentHTML('afterbegin', controlloMinimi(anno));
       } catch (err) { toast(`Errore: ${err.message}`, 'ko'); }
     });
   };
 
   const ricarica = async () => impostaTabellePersonalizzate(await caricaTabelle(app.rapporto.id));
   disegna();
+}
+
+/** Dopo aver inserito le tabelle di un anno: la paga resta sopra il nuovo minimo? */
+export function controlloMinimi(anno) {
+  const d = app.rapporto?.dati;
+  if (!d?.dataAssunzione) return '';
+  const c = condizioniAl(d, `${anno}-01-01`);
+  const t = tabelleAnno(anno);
+  const min = minimoContrattuale(t, c);
+  if (min == null) return '';
+  const tip = tipologia(c);
+  const paga = tip.mensile ? Number(c.pagaMensile) || 0 : Number(c.pagaOraria) || 0;
+  const unita = tip.mensile ? ' al mese' : ' l\'ora';
+  const sc = quotaScatti(c, anno, 1);
+  const nome = esc(d.lavoratrice?.nome || 'la lavoratrice');
+  if (paga >= min) {
+    return `<div class="avviso info">Controllo ${anno}: la paga di ${nome} (${fmtEur(paga)}${unita}) resta sopra il nuovo minimo del livello ${esc(c.livello)} (${fmtEur(min)}), con un margine di ${fmtEur(paga - min)}${sc.numero ? `; in più spettano ${sc.numero} scatti di anzianità (${fmtEur(sc.quota)}${unita})` : ''}.</div>`;
+  }
+  return `<div class="avviso grave">Controllo ${anno}: la paga di ${nome} (${fmtEur(paga)}${unita}) è sotto il nuovo minimo del livello ${esc(c.livello)} (${fmtEur(min)}). Va adeguata di almeno ${fmtEur(min - paga)}${unita}: registra l'aumento in Impostazioni → Variazioni con decorrenza 1° gennaio ${anno}.</div>`;
 }
