@@ -1,7 +1,7 @@
 // Riepiloghi annuali: dichiarazione dei compensi per la lavoratrice e quadro dei costi per il datore.
 import { euro, oreSettimanali } from './calcolo.js';
 import { condizioniAl } from './variazioni.js';
-import { tipologia } from './tabelle.js';
+import { tipologia, prestazioneUniversaleVigente } from './tabelle.js';
 import { REGOLE_CCNL } from './tabelle.js';
 
 const somma = (arr, f) => euro(arr.reduce((s, x) => s + (f(x) || 0), 0));
@@ -110,16 +110,19 @@ export function verificaAgevolazioni(dati = {}, oggi = new Date().toISOString().
   const ore = Object.values(dati.orario || {}).reduce((s, h) => s + h, 0);
 
   // Prestazione universale
-  const pu = R.prestazioneUniversale;
+  const pu = prestazioneUniversaleVigente();
+  const pr = R.prestazioneUniversale.proroga;
+  const prorogaInAttesa = pr && !pr.approvata && oggi <= pu.fine;
   let esitoPu;
   if (a.prestazioneUniversale) esitoPu = 'si';
   else if (!a.over80 || !a.accompagnamento || !a.iseeEntroLimite || oggi > pu.fine) esitoPu = 'no';
   else esitoPu = 'forse'; // requisiti principali presenti: serve la domanda e l'accertamento INPS
   out.push({
     chiave: 'pu', nome: 'Prestazione universale (850 € al mese)', esito: esitoPu,
-    testo: a.prestazioneUniversale
+    testo: (a.prestazioneUniversale
       ? `Ricevuta: va spesa per il lavoro domestico regolare${ore < pu.oreMinime ? ` (attenzione: servono almeno ${pu.oreMinime} ore settimanali, il rapporto ne ha ${ore})` : ''} e rendicontata ogni trimestre con i cedolini pagati.`
-      : `Per chi ha almeno ${pu.etaMinima} anni, l'indennità di accompagnamento, ISEE sociosanitario fino a ${pu.iseeMassimo.toLocaleString('it-IT')} € e bisogno assistenziale gravissimo accertato dall'INPS. In vigore fino al ${pu.fine.split('-').reverse().join('/')}, salvo proroga.`,
+      : `Per chi ha almeno ${pu.etaMinima} anni, l'indennità di accompagnamento, ISEE sociosanitario fino a ${pu.iseeMassimo.toLocaleString('it-IT')} € e bisogno assistenziale gravissimo accertato dall'INPS. In vigore fino al ${pu.fine.split('-').reverse().join('/')}.`)
+      + (prorogaInAttesa ? ` Il ${pr.fonte} propone la proroga fino al ${pr.fine.split('-').reverse().join('/')} con ISEE fino a ${pr.iseeMassimo.toLocaleString('it-IT')} €: va approvato entro fine anno.` : ''),
   });
 
   // Esonero contributivo over 80

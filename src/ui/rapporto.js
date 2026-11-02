@@ -2,7 +2,7 @@
 import { salvaRapporto } from '../lib/dati.js';
 import { verificaCodiceFiscale } from '../lib/codiceFiscale.js';
 import { fasciaContributiva, oreSettimanali, simulaCosto, normalizzaRapporto } from '../engine/calcolo.js';
-import { tabelleAnno, TIPOLOGIE, tipologia, minimoContrattuale } from '../engine/tabelle.js';
+import { tabelleAnno, TIPOLOGIE, tipologia, minimoContrattuale, prestazioneUniversaleVigente } from '../engine/tabelle.js';
 import { verificaIban, formattaIban } from '../lib/iban.js';
 import { verificaAgevolazioni } from '../engine/annuale.js';
 import { app, puoModificare, eur, esc, oggiIso, toast } from '../stato.js';
@@ -153,7 +153,7 @@ export async function mostraRapporto(root, { ricaricaDati, vai }) {
         <small class="nota">Servono per calcolare la detrazione del 19% sulle spese per l'assistenza personale (fino a 2.100 € di spesa, cioè 399 € di sconto). I contributi INPS sono invece deducibili sempre, fino a 1.549,37 €.</small>
         <label class="spunta"><input type="checkbox" name="over80" ${d.agevolazioni.over80 ? 'checked' : ''} /> La persona assistita ha almeno 80 anni</label>
         <label class="spunta"><input type="checkbox" name="accompagnamento" ${d.agevolazioni.accompagnamento ? 'checked' : ''} /> Riceve l'indennità di accompagnamento</label>
-        <label class="spunta"><input type="checkbox" name="iseeEntroLimite" ${d.agevolazioni.iseeEntroLimite ? 'checked' : ''} /> ISEE sociosanitario fino a 6.000 €</label>
+        <label class="spunta"><input type="checkbox" name="iseeEntroLimite" ${d.agevolazioni.iseeEntroLimite ? 'checked' : ''} /> ISEE sociosanitario fino a ${prestazioneUniversaleVigente().iseeMassimo.toLocaleString('it-IT')} €</label>
         <label class="spunta"><input type="checkbox" name="prestazioneUniversale" ${d.agevolazioni.prestazioneUniversale ? 'checked' : ''} /> Riceve già la Prestazione universale (assegno di 850 € al mese)</label>
         <div class="verifica-agevolazioni"></div>
       </section>

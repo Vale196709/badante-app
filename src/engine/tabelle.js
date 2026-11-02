@@ -130,7 +130,10 @@ export const REGOLE_CCNL = {
   // Prestazione universale (D.Lgs. 29/2024): assegno di assistenza per over 80 con accompagnamento,
   // ISEE sociosanitario fino a 6.000 €, da usare per lavoro domestico regolare (almeno 15 h/sett.)
   // e da rendicontare ogni trimestre. In vigore fino al 31/12/2026 salvo proroga.
-  prestazioneUniversale: { importoMensile: 850, etaMinima: 80, iseeMassimo: 6000, oreMinime: 15, fine: '2026-12-31' },
+  prestazioneUniversale: { importoMensile: 850, etaMinima: 80, iseeMassimo: 6000, oreMinime: 15, fine: '2026-12-31',
+    // Proroga proposta dal ddl di bilancio 2027 (art. 53, testo del 30/10/2026): fino al 31/12/2027 e ISEE fino a 12.000 €.
+    // Quando la legge è approvata (entro il 31/12/2026): mettere approvata: true.
+    proroga: { fine: '2027-12-31', iseeMassimo: 12000, fonte: 'ddl di bilancio 2027, art. 53', approvata: false } },
   // Esonero contributivo per assunzioni a tempo indeterminato da parte di over 80 con accompagnamento
   // (DL 19/2024): finestra 1/4/2024–31/12/2025, mai resa operativa dall'INPS, non rinnovata per il 2026.
   esoneroOver80: { dal: '2024-04-01', al: '2025-12-31', massimoAnnuo: 3000, operativo: false },
@@ -191,6 +194,12 @@ function ripristinaInfinito(t) {
 }
 
 /** Tabelle dell'anno; se mancano usa l'ultimo anno disponibile, segnalandolo. */
+/** Regole della Prestazione universale in vigore (con la proroga, se approvata). */
+export function prestazioneUniversaleVigente() {
+  const pu = REGOLE_CCNL.prestazioneUniversale;
+  return pu.proroga?.approvata ? { ...pu, fine: pu.proroga.fine, iseeMassimo: pu.proroga.iseeMassimo } : pu;
+}
+
 export function tabelleAnno(anno) {
   const tutte = tutteLeTabelle();
   const anni = Object.keys(tutte).map(Number).sort((a, b) => a - b);

@@ -1,7 +1,7 @@
 import { fmtEur, fmtNum, fmtOre } from './formato.js';
 // Scadenze e avvisi di monitoraggio del rapporto.
 import { euro, isoDate, oreSettimanali, prossimoScatto, quotaScatti } from './calcolo.js';
-import { festivitaAnno, tabelleAnno, REGOLE_CCNL as R, minimoContrattuale, tipologia } from './tabelle.js';
+import { festivitaAnno, tabelleAnno, REGOLE_CCNL as R, minimoContrattuale, tipologia, prestazioneUniversaleVigente } from './tabelle.js';
 import { variazioniOrdinate, condizioniAl } from './variazioni.js';
 import { saldoPermessi } from './annuale.js';
 
@@ -58,7 +58,7 @@ export function generaScadenze(rapporto, catena, oggi, fatte = new Set()) {
   }
 
   // Rendiconto trimestrale della Prestazione universale (buste paga quietanzate)
-  const pu = rapporto.agevolazioni?.prestazioneUniversale ? R.prestazioneUniversale : null;
+  const pu = rapporto.agevolazioni?.prestazioneUniversale ? prestazioneUniversaleVigente() : null;
   if (pu) {
     for (const t of trimestri.values()) {
       const inizioQ = isoDate(t.anno, (t.q - 1) * 3 + 1, 1);
