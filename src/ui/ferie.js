@@ -6,7 +6,7 @@ import { giorniMese } from '../engine/presenze.js';
 import { oreSettimanali } from '../engine/calcolo.js';
 import { condizioniAl } from '../engine/variazioni.js';
 import { REGOLE_CCNL } from '../engine/tabelle.js';
-import { apriSchedaImpostazioni } from './impostazioni.js';
+import { apriSchedaImpostazioni } from './schede.js';
 
 const GS = ['L', 'M', 'M', 'G', 'V', 'S', 'D'];
 let annoScelto = null;

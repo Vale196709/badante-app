@@ -3,14 +3,15 @@
 // l'app non può verificare si segnano a mano.
 import { app, catenaCorrente, puoModificare, esc, dataIt, oggiIso, eur, toast } from '../stato.js';
 import { percorsoMese, scadenzeDaFare, prossimaCosa, passoAttuale, percorsoFerie, percorsoMalattia, percorsoFine, percorsoInizio } from '../engine/workflow.js';
-import { stampaLetteraAssunzione, stampaPrivacy } from './stampe.js';
+const stampaLetteraAssunzione = async (...a) => (await import('./stampe.js')).stampaLetteraAssunzione(...a);
+const stampaPrivacy = async (...a) => (await import('./stampe.js')).stampaPrivacy(...a);
 import { generaScadenze } from '../engine/scadenze.js';
 import { segnaScadenza } from '../lib/dati.js';
 import { apriBonifico } from './bonifico.js';
-import { stampaCedolino } from './stampe.js';
-import { apriLettera } from './lettere.js';
-import { apriPratica } from './pratiche.js';
-import { apriSchedaImpostazioni } from './impostazioni.js';
+const stampaCedolino = async (...a) => (await import('./stampe.js')).stampaCedolino(...a);
+const apriLettera = async (...a) => (await import('./lettere.js')).apriLettera(...a);
+const apriPratica = async (...a) => (await import('./pratiche.js')).apriPratica(...a);
+import { apriSchedaImpostazioni } from './schede.js';
 import { apriMese } from './mesi.js';
 import { ICONE } from './icone.js';
 

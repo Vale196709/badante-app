@@ -5,11 +5,11 @@ import { giorniMese, TIPI } from '../engine/presenze.js';
 import { nomeFestivita } from '../engine/tabelle.js';
 import { condizioniMese } from '../engine/variazioni.js';
 import { salvaCedolino } from '../lib/dati.js';
-import { stampaCedolino } from './stampe.js';
+const stampaCedolino = async (...a) => (await import('./stampe.js')).stampaCedolino(...a);
 import { cardRichieste } from './richieste.js';
 import { apriBonifico } from './bonifico.js';
 import { cardOre } from './oreApprova.js';
-import { apriRiconciliazione } from './riconcilia.js';
+const apriRiconciliazione = async (...a) => (await import('./riconcilia.js')).apriRiconciliazione(...a);
 
 const STATI = { 'da fare': 'Da preparare', bozza: 'Bozza', confermato: 'Confermato', pagato: 'Pagato' };
 const GSETT = ['Lun', 'Mar', 'Mer', 'Gio', 'Ven', 'Sab', 'Dom'];

@@ -8,26 +8,45 @@ import { app, esc, nomeRapporto, oggiIso } from './stato.js';
 import { ICONE } from './ui/icone.js';
 import { mostraLogin } from './ui/login.js';
 import { RAPPORTO_VUOTO } from './ui/rapporto.js';
-import { mostraImpostazioni } from './ui/impostazioni.js';
 import { mostraHome } from './ui/home.js';
 import { mostraMesi } from './ui/mesi.js';
-import { mostraSimulatore } from './ui/simulatore.js';
 import { applicaLeggibilita, leggiLeggibilita, impostaLeggibilita } from './lib/leggibilita.js';
 
 applicaLeggibilita();
-import { mostraDocumenti } from './ui/documenti.js';
-import { mostraScadenze } from './ui/scadenze.js';
 import { mostraAltro } from './ui/altro.js';
-import { mostraInfo } from './ui/info.js';
-import { mostraReport } from './ui/report.js';
 import { VERSIONE, dataBuildIt } from './novita.js';
 import { controllaBlocco } from './ui/blocco.js';
 import { sessioneScaduta } from './lib/sblocco.js';
 import { mostraLavoratrice, mostraRichiesteLavoratrice, mostraDocumentiLavoratrice } from './ui/lavoratrice.js';
 import { mostraOreLavoratrice } from './ui/oreLavoratrice.js';
-import { mostraFerie } from './ui/ferie.js';
 import { mostraCoseDaFare, datiCoseDaFare, haAccessoLavoratrice } from './ui/cosefare.js';
 import { percorsoInizio } from './engine/workflow.js';
+
+
+// Sezioni usate di rado: si scaricano solo quando servono, così la prima apertura è più veloce.
+const pigro = (carica, nome) => async (el, ctx) => {
+  const chiesta = sezione;
+  el.innerHTML = '<p class="caricamento">Caricamento…</p>';
+  let m;
+  try {
+    m = await carica();
+  } catch {
+    // dopo un aggiornamento dell'app i vecchi file non esistono più: si ricarica la versione nuova
+    el.innerHTML = '<p class="caricamento">Aggiorno l\'app…</p>';
+    location.reload();
+    return;
+  }
+  if (sezione !== chiesta) return; // nel frattempo si è passati a un'altra sezione
+  el.innerHTML = '';
+  m[nome](el, ctx);
+};
+const mostraImpostazioni = pigro(() => import('./ui/impostazioni.js'), 'mostraImpostazioni');
+const mostraSimulatore = pigro(() => import('./ui/simulatore.js'), 'mostraSimulatore');
+const mostraDocumenti = pigro(() => import('./ui/documenti.js'), 'mostraDocumenti');
+const mostraScadenze = pigro(() => import('./ui/scadenze.js'), 'mostraScadenze');
+const mostraInfo = pigro(() => import('./ui/info.js'), 'mostraInfo');
+const mostraReport = pigro(() => import('./ui/report.js'), 'mostraReport');
+const mostraFerie = pigro(() => import('./ui/ferie.js'), 'mostraFerie');
 
 const root = document.getElementById('app');
 let utenteCorrente;

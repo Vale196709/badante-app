@@ -3,8 +3,8 @@
 import { app, eur, num, esc, dataIt, toast, oggiIso } from '../stato.js';
 import { saldoPermessi } from '../engine/annuale.js';
 import { firmaRicevutaConFirma, creaRichiesta, ritiraRichiesta, caricaRichieste } from '../lib/dati.js';
-import { stampaCedolino } from './stampe.js';
-import { apriFile } from './documenti.js';
+const stampaCedolino = async (...a) => (await import('./stampe.js')).stampaCedolino(...a);
+import { apriFile } from './apriFile.js';
 import { t, meseT } from '../i18n.js';
 import { calendarioMese } from '../engine/calcolo.js';
 import { condizioniMese } from '../engine/variazioni.js';

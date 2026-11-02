@@ -3,7 +3,7 @@ import { app, isTitolare, esc, nomeRapporto } from '../stato.js';
 import { ICONE, tessera } from './icone.js';
 import { supabase } from '../lib/supabase.js';
 import { VERSIONE, dataBuildIt } from '../novita.js';
-import { apriSchedaImpostazioni } from './impostazioni.js';
+import { apriSchedaImpostazioni } from './schede.js';
 import { sbloccoAttivo } from '../lib/sblocco.js';
 
 const RUOLI = { titolare: 'Titolare', gestore: 'Gestore', lettore: 'Sola lettura', lavoratrice: 'Lavoratrice' };
