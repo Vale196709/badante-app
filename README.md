@@ -46,7 +46,7 @@ La versione è in `package.json` e le novità in `src/novita.js`; versione e dat
 - `src/engine/` motore di calcolo (tabelle annuali, cedolino, presenze, catena mensile, scadenze,
   riepilogo annuo, cessazione) – coperto da test (`npm test`).
 - `src/ui/` schermate; `src/lib/` accesso a Supabase.
-- `supabase/` script SQL da eseguire nel SQL Editor, in ordine: 01, 02, 03, 04, 05, 06 (05 = ore segnate dalla lavoratrice, 06 = registro delle modifiche).
+- `supabase/` script SQL da eseguire nel SQL Editor, in ordine: 01, 02, 03, 04, 05, 06, 07 (05 = ore segnate dalla lavoratrice, 06 = registro delle modifiche, 07 = registro degli errori).
 
 ## Aggiornamento annuale
 A inizio anno, in Impostazioni → Tabelle annuali: "+ Nuovo anno", aggiornare minimi CCNL e contributi INPS
@@ -69,3 +69,10 @@ Quando il cambiamento è voluto: `AGGIORNA_RIFERIMENTO=1 npm test`, poi controll
    `GMAIL_USER`, `GMAIL_APP_PASSWORD` (password per le app di Google),
    `VAPID_PRIVATE_KEY` (chiave privata delle notifiche).
 3. In Impostazioni → Promemoria attiva gli invii e, sul telefono, le notifiche.
+
+## Backup automatico settimanale
+L'attività "Backup settimanale" (ogni domenica) esporta i dati con l'utente "Sola lettura", li cifra
+(AES-256-GCM, chiave dalla password con PBKDF2) e li manda per email come file `.badante`.
+Segreti in più: `BACKUP_PASSWORD` (almeno 10 caratteri, da conservare: senza non si apre il backup)
+e, facoltativo, `BACKUP_EMAIL` (destinatario; altrimenti `GMAIL_USER`).
+Ripristino: app → Impostazioni → Backup → Ripristina da un backup → scegliere il file e inserire la password.

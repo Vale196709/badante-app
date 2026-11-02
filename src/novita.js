@@ -3,6 +3,16 @@ export const VERSIONE = __VERSIONE__;
 export const DATA_BUILD = __DATA_BUILD__;
 
 export const NOVITA = [
+  { versione: '1.9.0', data: '2026-11-02', voci: [
+    'Percorso "Inizio rapporto" in Cose da fare e conto alla rovescia nel Riepilogo: tutto si sposta da solo se cambia la data di assunzione',
+    'Backup automatico ogni domenica per email, cifrato con una password: si ripristina dall\'app in Impostazioni → Backup',
+    'Riepilogo mensile per email il 1° del mese: quanto pagare, costo del mese e scadenze',
+    'Prestazione universale: indicata la proroga al 31/12/2027 con ISEE fino a 12.000 € proposta dalla legge di bilancio',
+    'Benvenuto per la lavoratrice al primo accesso, nella sua lingua (si rivede col pulsante ?)',
+    'Apertura più veloce: le pagine usate di rado si caricano solo quando servono',
+    'Schermata di avvio su iPhone senza lampo bianco',
+    'Gli errori dell\'app vengono annotati e si vedono in Impostazioni → Registro',
+  ] },
   { versione: '1.8.0', data: '2026-11-01', voci: [
     'Scatti di anzianità (4% del minimo ogni due anni, fino a 7): calcolati da soli nei cedolini, con la data del prossimo tra le Scadenze',
     'Saldo dei permessi retribuiti per visite mediche e pratiche personali, anche nella vista della lavoratrice',
