@@ -749,3 +749,19 @@ html.contrasto-alto .card, html.contrasto-alto .gruppo { box-shadow: 0 0 0 1px v
 .card.prossima.conto-rovescia .giorni-mancanti strong { font-size: 40px; line-height: 1.05; color: var(--tinta); display: inline; }
 .errori-app summary { cursor: pointer; padding: 2px 0; }
 .errori-app .gruppo { margin-top: 10px; }
+
+/* Benvenuto della lavoratrice (1.9) */
+.benvenuto { position: fixed; inset: 0; z-index: 50; background: rgba(11, 18, 32, 0.45); display: flex; align-items: flex-end; justify-content: center; padding: 16px; padding-bottom: calc(16px + env(safe-area-inset-bottom)); }
+@media (min-width: 700px) { .benvenuto { align-items: center; } }
+.benvenuto-foglio { background: var(--superficie); color: var(--testo); border-radius: 22px; padding: 26px 22px 20px; width: 100%; max-width: 420px; text-align: center; box-shadow: var(--ombra-foglio); position: relative; }
+.benvenuto-foglio .lingua { position: absolute; top: 14px; right: 14px; width: auto; font-size: 14px; }
+.benvenuto-icona { width: 64px; height: 64px; border-radius: 18px; background: var(--tinta-fondo); color: var(--tinta); display: grid; place-items: center; margin: 8px auto 14px; }
+.benvenuto-icona .ico, .benvenuto-icona svg { width: 32px; height: 32px; }
+.benvenuto-foglio h2 { margin: 0 0 8px; font-size: 24px; }
+.benvenuto-foglio p { margin: 0 0 18px; color: var(--testo-2); font-size: 17px; line-height: 1.45; }
+.benvenuto-punti { display: flex; gap: 6px; justify-content: center; margin-bottom: 18px; }
+.benvenuto-punti span { width: 7px; height: 7px; border-radius: 50%; background: var(--separatore); }
+.benvenuto-punti span.attivo { background: var(--tinta); width: 20px; border-radius: 4px; }
+.benvenuto-azioni { display: flex; gap: 12px; justify-content: space-between; align-items: center; }
+.benvenuto-azioni .primario { flex: 1; }
+.tondo.aiuto { font-weight: 700; font-size: 17px; }

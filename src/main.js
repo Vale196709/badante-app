@@ -22,6 +22,7 @@ import { controllaBlocco } from './ui/blocco.js';
 import { sessioneScaduta } from './lib/sblocco.js';
 import { mostraLavoratrice, mostraRichiesteLavoratrice, mostraDocumentiLavoratrice } from './ui/lavoratrice.js';
 import { mostraOreLavoratrice } from './ui/oreLavoratrice.js';
+import { mostraBenvenuto, benvenutoVisto } from './ui/benvenuto.js';
 import { mostraCoseDaFare, datiCoseDaFare, haAccessoLavoratrice } from './ui/cosefare.js';
 import { percorsoInizio } from './engine/workflow.js';
 
@@ -179,6 +180,7 @@ function disegnaApp() {
         <header class="barra-alta">
           <span class="barra-alta-titolo">${esc(app.rapporto.dati ? nomeRapporto(app.rapporto) : 'Badante di Maria')}</span>
           ${lav ? `<select class="lingua" aria-label="${t('lingua')}">${Object.entries(LINGUE).map(([k, v]) => `<option value="${k}" ${k === linguaCorrente() ? 'selected' : ''}>${v}</option>`).join('')}</select>
+                   <button type="button" class="tondo aiuto" aria-label="?">?</button>
                    <button type="button" class="tondo testo-piu ${leggiLeggibilita().grande ? 'attivo' : ''}" aria-pressed="${leggiLeggibilita().grande}" aria-label="${t('testoGrande')}">A<sup>+</sup></button>
                    <button type="button" class="esci tondo" aria-label="${t('esci')}">${ICONE.esci}</button>` : ''}
         </header>
@@ -191,6 +193,8 @@ function disegnaApp() {
     </div>`;
 
   root.querySelectorAll('.esci').forEach((b) => b.addEventListener('click', () => supabase.auth.signOut()));
+  root.querySelector('.aiuto')?.addEventListener('click', () => mostraBenvenuto({ allaFine: disegnaApp }));
+  if (lav && !benvenutoVisto()) setTimeout(() => mostraBenvenuto({ allaFine: disegnaApp }), 300);
   root.querySelector('.testo-piu')?.addEventListener('click', (e) => {
     const v = impostaLeggibilita({ grande: !leggiLeggibilita().grande });
     e.currentTarget.classList.toggle('attivo', v.grande);
@@ -223,7 +227,7 @@ export function aggiornaPallini() {
 }
 
 async function mostraApp(user) {
-  root.innerHTML = '<p class="caricamento">Caricamento…</p>';
+  if (!root.querySelector('.avvio')) root.innerHTML = '<p class="caricamento">Caricamento…</p>';
   controllaBlocco(user);
   try {
     app.user = user;
