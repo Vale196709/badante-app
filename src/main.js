@@ -148,7 +148,7 @@ function disegnaApp() {
   const lav = ruolo === 'lavoratrice';
   const visibili = Object.entries(SEZIONI).filter(([, s]) => s.ruoli.includes(ruolo));
   // si apre sul Riepilogo (la lavoratrice sui suoi cedolini)
-  if (!sezione || !SEZIONI[sezione]?.ruoli.includes(ruolo)) sezione = lav ? visibili[0][0] : app.rapporto.dati ? 'home' : 'impostazioni';
+  if (!sezione || !SEZIONI[sezione]?.ruoli.includes(ruolo)) sezione = lav ? 'lavoratrice' : app.rapporto.dati ? 'home' : 'impostazioni';
   const piu = app.rapporti.length > 1;
 
   root.innerHTML = `

@@ -765,3 +765,12 @@ html.contrasto-alto .card, html.contrasto-alto .gruppo { box-shadow: 0 0 0 1px v
 .benvenuto-azioni { display: flex; gap: 12px; justify-content: space-between; align-items: center; }
 .benvenuto-azioni .primario { flex: 1; }
 .tondo.aiuto { font-weight: 700; font-size: 17px; }
+.barra-alta .tondo.testo-piu { right: 52px; }
+.barra-alta .tondo.aiuto { right: 92px; }
+.barra-alta-titolo { max-width: calc(100% - 270px); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.barra-alta .lingua { max-width: 96px; }
+.barra-alta .tondo { width: 32px; height: 32px; }
+.barra-alta .tondo.testo-piu { right: 48px; white-space: nowrap; font-size: 14px; }
+.barra-alta .tondo.aiuto { right: 84px; }
+.barra-alta-titolo { max-width: 150px; }
+.barra-alta .tondo.testo-piu { display: flex; align-items: center; justify-content: center; gap: 0; }
