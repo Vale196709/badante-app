@@ -648,7 +648,7 @@ body.bloccato { overflow: hidden; }
 .lista-cose .data { font-variant-numeric: tabular-nums; color: var(--testo-2); font-size: 14px; white-space: nowrap; }
 .lista-cose li.ritardo .data { color: var(--rosso); font-weight: 600; }
 
-.tessere-percorsi { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.tessere-percorsi { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
 .tessera-percorso {
   position: relative; display: flex; flex-direction: column; align-items: center; gap: 6px;
   padding: 14px 6px 12px; border: 0; border-radius: 12px; background: var(--riempimento); color: var(--tinta);
@@ -739,3 +739,11 @@ html.contrasto-alto .card, html.contrasto-alto .gruppo { box-shadow: 0 0 0 1px v
   body:not(.in-stampa) .card, body:not(.in-stampa) .gruppo { box-shadow: none; border: 1px solid #ccc; break-inside: avoid; background: #fff; }
   body:not(.in-stampa) .barra-dato .suggerimento { display: none !important; }
 }
+
+/* Preparazione dell'inizio rapporto (1.9) */
+.giorni-mancanti { font-family: var(--cifre); color: var(--testo-2); }
+.giorni-mancanti strong { font-size: 44px; line-height: 1.05; color: var(--tinta); font-weight: 700; margin-right: 4px; }
+.card.conto { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; }
+.card.conto small { color: var(--testo-2); }
+.conto-rovescia .giorni-mancanti { margin: 4px 0 2px; }
+.card.prossima.conto-rovescia .giorni-mancanti strong { font-size: 40px; line-height: 1.05; color: var(--tinta); display: inline; }

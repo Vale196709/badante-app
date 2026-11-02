@@ -180,3 +180,44 @@ export function percorsoFine(rapporto, catena, { fatte = new Set(), oggi }) {
   ];
   return { id: 'fine', titolo: dc ? `Fine rapporto il ${dataIt(dc)}` : 'Fine rapporto', passi };
 }
+
+/**
+ * Inizio rapporto: dati → lettera di assunzione → privacy → INPS → accesso all'app → primo mese.
+ * Tutte le date derivano dalla data di assunzione: se slitta, basta cambiarla nel Rapporto.
+ * @param accessoLavoratrice true se la lavoratrice ha già un accesso (o un invito) all'app
+ */
+export function percorsoInizio(rapporto, { fatte = new Set(), oggi, accessoLavoratrice = false }) {
+  const da = rapporto.dataAssunzione;
+  const giorni = Math.round((new Date(da + 'T00:00:00Z') - new Date(oggi + 'T00:00:00Z')) / 86400000);
+  const entroInps = addGiorni(da, -1);
+  const l = rapporto.lavoratrice || {};
+  const mancano = [
+    !l.nome && 'nome', !l.cf && 'codice fiscale', !(l.indirizzo || l.via) && 'residenza',
+    !rapporto.pagamento?.iban && rapporto.pagamento?.modalita !== 'contanti' && 'IBAN',
+    !rapporto.datore?.cf && 'tuo codice fiscale',
+  ].filter(Boolean);
+  const stato = (k, scadenza = null) => (fatte.has(k) ? 'fatto' : scadenza && oggi > scadenza ? 'ritardo' : 'ora');
+  const passi = [
+    { id: 'dati', titolo: 'Completa i dati del rapporto', stato: mancano.length ? 'ora' : 'fatto',
+      dettaglio: mancano.length ? `Mancano: ${mancano.join(', ')}. Servono per contratto, comunicazione INPS e cedolini.` : 'Anagrafiche, orario, paga e pagamento sono completi.',
+      azione: mancano.length ? { tipo: 'impostazioni', scheda: 'rapporto', etichetta: 'Impostazioni' } : null },
+    { id: 'lettera', titolo: 'Lettera di assunzione firmata', stato: stato('wf-inizio-lettera', da),
+      dettaglio: `Due copie firmate da te e dalla lavoratrice entro il primo giorno (${dataIt(da)}), con orario, paga, livello e periodo di prova.`,
+      azione: { tipo: 'stampa-assunzione', etichetta: 'Stampa la lettera' }, manuale: 'wf-inizio-lettera' },
+    { id: 'privacy', titolo: 'Informativa sulla privacy', stato: stato('wf-inizio-privacy', da),
+      dettaglio: 'Da far firmare insieme alla lettera: spiega quali dati tratti e perché.',
+      azione: { tipo: 'stampa-privacy', etichetta: 'Stampa l\'informativa' }, manuale: 'wf-inizio-privacy' },
+    { id: 'inps', titolo: 'Comunica l\'assunzione all\'INPS', stato: stato('inps-assunzione', entroInps),
+      dettaglio: `Entro le 24 del ${dataIt(entroInps)}, il giorno prima dell'inizio. Ti serve lo SPID; la ricevuta col codice rapporto va poi in Impostazioni → Rapporto.`,
+      azione: { tipo: 'pratica', chiave: 'assunzione', etichetta: 'Guida INPS' }, manuale: 'inps-assunzione' },
+    { id: 'codice', titolo: 'Inserisci il codice rapporto INPS', stato: rapporto.codiceRapportoInps ? 'fatto' : fatte.has('inps-assunzione') ? 'ora' : 'attesa',
+      dettaglio: rapporto.codiceRapportoInps ? `Codice ${rapporto.codiceRapportoInps}.` : 'È sulla ricevuta della comunicazione: serve per pagare i contributi.',
+      azione: rapporto.codiceRapportoInps ? null : { tipo: 'impostazioni', scheda: 'rapporto', etichetta: 'Impostazioni' } },
+    { id: 'accesso', titolo: 'Dai l\'accesso all\'app alla lavoratrice', stato: accessoLavoratrice || fatte.has('wf-inizio-accesso') ? 'fatto' : 'ora',
+      dettaglio: 'Così segna le ore, chiede ferie e firma le ricevute dal suo telefono, nella sua lingua. Facoltativo.',
+      azione: { tipo: 'impostazioni', scheda: 'accessi', etichetta: 'Accessi' }, manuale: 'wf-inizio-accesso' },
+    { id: 'primo', titolo: 'Primo giorno di lavoro', stato: giorni > 0 ? 'attesa' : 'fatto',
+      dettaglio: giorni > 0 ? `${dataIt(da)}: ${giorni === 1 ? 'domani' : `tra ${giorni} giorni`}. Da lì l'app prepara presenze e cedolini da sola.` : `Iniziato il ${dataIt(da)}.` },
+  ];
+  return { id: 'inizio', titolo: `Inizio rapporto il ${dataIt(da)}`, passi, giorni };
+}

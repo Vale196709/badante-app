@@ -2,7 +2,9 @@
 // (ferie, malattia, fine rapporto). Gli stati si calcolano dai dati; i passi che
 // l'app non può verificare si segnano a mano.
 import { app, catenaCorrente, puoModificare, esc, dataIt, oggiIso, eur, toast } from '../stato.js';
-import { percorsoMese, scadenzeDaFare, prossimaCosa, passoAttuale, percorsoFerie, percorsoMalattia, percorsoFine } from '../engine/workflow.js';
+import { percorsoMese, scadenzeDaFare, prossimaCosa, passoAttuale, percorsoFerie, percorsoMalattia, percorsoFine, percorsoInizio } from '../engine/workflow.js';
+import { stampaLetteraAssunzione, stampaPrivacy } from './stampe.js';
+import { generaScadenze } from '../engine/scadenze.js';
 import { segnaScadenza } from '../lib/dati.js';
 import { apriBonifico } from './bonifico.js';
 import { stampaCedolino } from './stampe.js';
@@ -70,20 +72,22 @@ export function mostraCoseDaFare(root, ctx) {
   if (!d) { ctx.vai('impostazioni'); return; }
   const oggi = oggiIso();
   const { catena, percorso, scadenze } = datiCoseDaFare();
-  if (!catena.length) {
-    root.innerHTML = `<h1 class="titolo-pagina">Cose da fare</h1><div class="avviso info">Il rapporto inizia il ${dataIt(d.dataAssunzione)}: le cose da fare compaiono dal primo mese di lavoro.</div>`;
+  if (!catena.length || oggi < d.dataAssunzione) {
+    mostraPreparazione(root, ctx);
     return;
   }
   const guidati = {
     ferie: () => percorsoFerie(d, catena, { richieste: app.richieste, fatte: app.fatte, oggi }),
     malattia: () => percorsoMalattia(d, catena, { documenti: app.documenti, fatte: app.fatte, oggi }),
     fine: () => percorsoFine(d, catena, { fatte: app.fatte, oggi }),
+    inizio: () => percorsoInizio(d, { fatte: app.fatte, oggi, accessoLavoratrice: haAccessoLavoratrice() }),
   };
   // un pallino sulle tessere dei percorsi già in corso
   const attivi = {
     ferie: app.richieste.some((r) => r.tipo === 'F' && (r.stato === 'in attesa' || (r.stato === 'approvata' && r.al >= oggi))),
     malattia: guidati.malattia().titolo !== 'Malattia',
     fine: !!d.dataCessazione,
+    inizio: percorsoInizio(d, { fatte: app.fatte, oggi, accessoLavoratrice: haAccessoLavoratrice() }).passi.some((p) => p.stato === 'ora' || p.stato === 'ritardo'),
   };
   if (!aperto && attivi.fine) aperto = 'fine';
   const guidato = aperto ? guidati[aperto]() : null;
@@ -115,7 +119,7 @@ export function mostraCoseDaFare(root, ctx) {
         <section class="card">
           <h2>Avvia un percorso</h2>
           <div class="tessere-percorsi">
-            ${[['ferie', 'valigia', 'Ferie'], ['malattia', 'croce', 'Malattia'], ['fine', 'esci', 'Fine rapporto']].map(([k, ic, n]) => `
+            ${[['inizio', 'spunta', 'Inizio rapporto'], ['ferie', 'valigia', 'Ferie'], ['malattia', 'croce', 'Malattia'], ['fine', 'esci', 'Fine rapporto']].map(([k, ic, n]) => `
               <button type="button" class="tessera-percorso" data-percorso="${k}" ${aperto === k ? 'aria-pressed="true"' : 'aria-pressed="false"'}>
                 ${ICONE[ic]}<span>${n}</span>${attivi[k] ? '<span class="punto-attivo" aria-label="in corso"></span>' : ''}</button>`).join('')}
           </div>
@@ -131,6 +135,7 @@ export function mostraCoseDaFare(root, ctx) {
 
   const ridisegna = () => mostraCoseDaFare(root, ctx);
   const passiDi = (box) => (box.closest('.percorso-guidato') ? guidato.passi : percorso.passi);
+  collegaAzioni(root, ctx, catena, passiDi, ridisegna);
 
   root.querySelectorAll('[data-vai]').forEach((b) => b.addEventListener('click', () => ctx.vai(b.dataset.vai)));
   root.querySelectorAll('[data-percorso]').forEach((b) => b.addEventListener('click', () => {
@@ -140,6 +145,9 @@ export function mostraCoseDaFare(root, ctx) {
   }));
   root.querySelector('.chiudi-percorso')?.addEventListener('click', () => { aperto = null; ridisegna(); });
 
+}
+
+function collegaAzioni(root, ctx, catena, passiDi, ridisegna) {
   root.querySelectorAll('[data-az]').forEach((b) => b.addEventListener('click', () => {
     const [i, n] = b.dataset.az.split(':').map(Number);
     const p = passiDi(b)[i];
@@ -160,6 +168,58 @@ export function mostraCoseDaFare(root, ctx) {
   }));
 }
 
+/** Prima dell'assunzione: conto alla rovescia e percorso "Inizio rapporto". */
+export function haAccessoLavoratrice() {
+  return !!app.rapporto?.accessoLavoratrice || app.fatte.has('wf-inizio-accesso');
+}
+
+export function cardPreparazione() {
+  const d = app.rapporto?.dati;
+  if (!d?.dataAssunzione) return '';
+  const p = percorsoInizio(d, { fatte: app.fatte, oggi: oggiIso(), accessoLavoratrice: haAccessoLavoratrice() });
+  if (p.giorni <= 0) return '';
+  const fatti = p.passi.filter((x) => x.stato === 'fatto').length;
+  const prossimo = passoAttuale(p.passi);
+  return `<button type="button" class="card prossima conto-rovescia stato-${prossimo?.stato || 'fatto'}" data-vai="cosefare">
+    <span class="prossima-testa"><span class="etichetta">Si comincia il ${dataIt(d.dataAssunzione)}</span><span class="nota-breve">${fatti} di ${p.passi.length} pronti</span></span>
+    <span class="giorni-mancanti"><strong>${p.giorni}</strong> ${p.giorni === 1 ? 'giorno' : 'giorni'}</span>
+    ${prossimo ? `<span class="sotto">Prossimo passo: ${esc(prossimo.titolo)}</span>` : ''}
+    <span class="prossima-link">Prepara l'inizio ${ICONE.chevron}</span>
+  </button>`;
+}
+
+function mostraPreparazione(root, ctx) {
+  const d = app.rapporto.dati;
+  const oggi = oggiIso();
+  const p = percorsoInizio(d, { fatte: app.fatte, oggi, accessoLavoratrice: haAccessoLavoratrice() });
+  const fatti = p.passi.filter((x) => x.stato === 'fatto').length;
+  const prossime = generaScadenze(d, [], oggi, app.fatte).filter((s) => !s.fatta && s.data >= oggi).slice(0, 4);
+  root.innerHTML = `
+    <h1 class="titolo-pagina">Cose da fare</h1>
+    <div class="griglia-cose">
+      <section class="card">
+        <div class="card-testa"><h2>${esc(p.titolo)}</h2><span class="nota-breve">${fatti} di ${p.passi.length}</span></div>
+        <div class="avanzamento" role="progressbar" aria-valuemin="0" aria-valuemax="${p.passi.length}" aria-valuenow="${fatti}" aria-label="Preparazione"><span style="width:${Math.round((fatti / p.passi.length) * 100)}%"></span></div>
+        ${htmlPercorso(p.passi)}
+        <p class="nota">Se l'inizio slitta, cambia la data in Impostazioni → Rapporto: tappe, scadenze e promemoria si spostano da soli.</p>
+      </section>
+      <div class="colonna-cose">
+        <section class="card conto">
+          <span class="etichetta">Mancano</span>
+          <span class="giorni-mancanti"><strong>${Math.max(0, p.giorni)}</strong> ${p.giorni === 1 ? 'giorno' : 'giorni'}</span>
+          <small>al ${dataIt(d.dataAssunzione)}</small>
+        </section>
+        <section class="card">
+          <div class="card-testa"><h2>Prime scadenze</h2><button type="button" class="link" data-vai="scadenze">Tutte</button></div>
+          <ul class="lista-cose">${prossime.map((s) => `<li class="attesa"><span class="pallino" aria-hidden="true"></span><span class="cosa">${esc(s.titolo)}</span><span class="data">${dataIt(s.data)}</span></li>`).join('') || '<li class="attesa"><span class="cosa">Nessuna.</span></li>'}</ul>
+        </section>
+      </div>
+    </div>
+    <dialog class="dlg-lettera"></dialog>`;
+  root.querySelectorAll('[data-vai]').forEach((b) => b.addEventListener('click', () => ctx.vai(b.dataset.vai)));
+  collegaAzioni(root, ctx, [], () => p.passi, () => mostraPreparazione(root, ctx));
+}
+
 function esegui(a, ctx, root, catena) {
   if (!a) return;
   switch (a.tipo) {
@@ -175,6 +235,8 @@ function esegui(a, ctx, root, catena) {
     case 'pratica': apriPratica(a.chiave); break;
     case 'impostazioni': apriSchedaImpostazioni(a.scheda); ctx.vai('impostazioni'); break;
     case 'vai': ctx.vai(a.dest); break;
+    case 'stampa-assunzione': stampaLetteraAssunzione(); break;
+    case 'stampa-privacy': stampaPrivacy(); break;
     default: break;
   }
 }

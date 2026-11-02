@@ -5,7 +5,7 @@ import { apriBonifico } from './bonifico.js';
 import { generaScadenze, avvisiRapporto } from '../engine/scadenze.js';
 import { riepilogoAnno, saldoPermessi } from '../engine/annuale.js';
 import { condizioniAl } from '../engine/variazioni.js';
-import { cardProssima } from './cosefare.js';
+import { cardProssima, cardPreparazione } from './cosefare.js';
 
 const STATI = { 'da fare': 'Da preparare', bozza: 'Bozza', confermato: 'Confermato', pagato: 'Pagato' };
 
@@ -37,8 +37,10 @@ export function mostraHome(root, { vai }) {
   const anno = Number(oggi.slice(0, 4));
   const mese = Number(oggi.slice(5, 7));
   const catena = catenaCorrente();
-  if (!catena.length) {
-    root.innerHTML = `<div class="avviso info">Il rapporto inizia il ${dataIt(d.dataAssunzione)}: il riepilogo si attiva dal primo mese di lavoro. Intanto puoi usare il Simulatore.</div>`;
+  if (!catena.length || oggi < d.dataAssunzione) {
+    root.innerHTML = `<h1 class="titolo-pagina">Riepilogo</h1>${cardPreparazione()}
+      <div class="avviso info">Il riepilogo con cedolini, contatori e costi si attiva dal primo mese di lavoro. Intanto puoi preparare l'inizio e provare i costi nel Simulatore.</div>`;
+    root.querySelectorAll('[data-vai]').forEach((b) => b.addEventListener('click', () => vai(b.dataset.vai)));
     return;
   }
   const corrente = catena.find((m) => m.anno === anno && m.mese === mese) ?? catena[catena.length - 1];

@@ -1,10 +1,10 @@
 import './style.css';
 import { supabase } from './lib/supabase.js';
-import { caricaOreSegnate } from './lib/dati.js';
+import { caricaOreSegnate, caricaAccessi } from './lib/dati.js';
 import { caricaContesto, caricaCedolini, caricaScadenzeFatte, caricaTabelle, caricaVersamenti, caricaRichieste, caricaDocumenti } from './lib/dati.js';
 import { impostaTabellePersonalizzate } from './engine/tabelle.js';
 import { LINGUE, linguaCorrente, impostaLingua, t } from './i18n.js';
-import { app, esc, nomeRapporto } from './stato.js';
+import { app, esc, nomeRapporto, oggiIso } from './stato.js';
 import { ICONE } from './ui/icone.js';
 import { mostraLogin } from './ui/login.js';
 import { RAPPORTO_VUOTO } from './ui/rapporto.js';
@@ -26,7 +26,8 @@ import { sessioneScaduta } from './lib/sblocco.js';
 import { mostraLavoratrice, mostraRichiesteLavoratrice, mostraDocumentiLavoratrice } from './ui/lavoratrice.js';
 import { mostraOreLavoratrice } from './ui/oreLavoratrice.js';
 import { mostraFerie } from './ui/ferie.js';
-import { mostraCoseDaFare, datiCoseDaFare } from './ui/cosefare.js';
+import { mostraCoseDaFare, datiCoseDaFare, haAccessoLavoratrice } from './ui/cosefare.js';
+import { percorsoInizio } from './engine/workflow.js';
 
 const root = document.getElementById('app');
 let utenteCorrente;
@@ -71,6 +72,13 @@ export async function ricaricaDati() {
     caricaOreSegnate(id),
   ]);
   Object.assign(app, { cedolini, fatte, versamenti, richieste, documenti, ore });
+  // per il percorso "Inizio rapporto": la lavoratrice ha già un accesso o un invito?
+  if (app.rapporto.ruolo === 'titolare') {
+    try {
+      const { accessi, inviti } = await caricaAccessi(id);
+      app.rapporto.accessoLavoratrice = [...accessi, ...inviti].some((a) => a.ruolo === 'lavoratrice');
+    } catch { /* non indispensabile */ }
+  }
   impostaTabellePersonalizzate(tabelle);
 }
 
@@ -179,6 +187,9 @@ export function aggiornaPallini() {
       const { percorso, scadenze } = datiCoseDaFare();
       n = scadenze.filter((x) => x.stato === 'ritardo' || x.stato === 'ora').length
         + (percorso?.passi.filter((p) => p.stato === 'ritardo').length || 0);
+      // nell'ultimo mese prima dell'assunzione contano anche i passi di preparazione
+      const ini = percorsoInizio(app.rapporto.dati, { fatte: app.fatte, oggi: oggiIso(), accessoLavoratrice: haAccessoLavoratrice() });
+      if (ini.giorni > 0 && ini.giorni <= 30) n += ini.passi.filter((p) => p.stato === 'ora' || p.stato === 'ritardo').length;
     }
   } catch { n = 0; }
   root.querySelectorAll('[data-s=cosefare]').forEach((b) => {

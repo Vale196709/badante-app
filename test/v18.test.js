@@ -78,3 +78,22 @@ test('scadenze: documenti della persona assistita e rinnovo ISEE', () => {
   const scatto = sc.find((s) => s.chiave === 'scatto-2028-10-01');
   assert.ok(scatto && scatto.informativa);
 });
+
+import { percorsoInizio } from '../src/engine/workflow.js';
+
+test('inizio rapporto: tappe dalla data di assunzione, anche se slitta', () => {
+  const r = { ...muoara, dataAssunzione: '2027-01-01', lavoratrice: { nome: 'Miora' }, datore: { cf: 'X' }, pagamento: { iban: 'IT00' } };
+  const p = percorsoInizio(r, { oggi: '2026-11-02' });
+  assert.equal(p.giorni, 60);
+  assert.match(p.passi.find((x) => x.id === 'inps').dettaglio, /31\/12\/2026/);
+  assert.match(p.passi.find((x) => x.id === 'dati').dettaglio, /codice fiscale, residenza/);
+  // slitta a marzo: la scadenza INPS si sposta
+  const s = percorsoInizio({ ...r, dataAssunzione: '2027-03-01' }, { oggi: '2026-11-02' });
+  assert.match(s.passi.find((x) => x.id === 'inps').dettaglio, /28\/02\/2027/);
+  // lettera non firmata dopo il primo giorno: in ritardo
+  const tardi = percorsoInizio(r, { oggi: '2027-01-02' });
+  assert.equal(tardi.passi.find((x) => x.id === 'lettera').stato, 'ritardo');
+  const fatto = percorsoInizio(r, { oggi: '2027-01-02', fatte: new Set(['wf-inizio-lettera', 'inps-assunzione']) });
+  assert.equal(fatto.passi.find((x) => x.id === 'lettera').stato, 'fatto');
+  assert.equal(fatto.passi.find((x) => x.id === 'codice').stato, 'ora');
+});
