@@ -187,7 +187,7 @@ const daBase64 = (b64, tipo) => {
 /** Esporta tutti i dati del rapporto; con includiFile anche il contenuto dei file dell'archivio. */
 export async function esportaTutto(rapporto, { includiFile = false, versioneApp = '', avanzamento = () => {} } = {}) {
   const id = rapporto.id;
-  const [cedolini, fatte, tabelle, versamenti, richieste, documenti, promemoria] = await Promise.all([
+  const [cedolini, fatte, tabelle, versamenti, richieste, documenti, promemoria, ore] = await Promise.all([
     caricaCedolini(id),
     facoltativo(supabase.from('scadenze_fatte').select('chiave, fatto_at, nota').eq('rapporto_id', id), []),
     facoltativo(supabase.from('tabelle_annuali').select('anno, dati').eq('rapporto_id', id), []),
@@ -195,6 +195,7 @@ export async function esportaTutto(rapporto, { includiFile = false, versioneApp 
     caricaRichieste(id),
     caricaDocumenti(id),
     caricaPromemoria(id),
+    caricaOreSegnate(id),
   ]);
   const docs = [];
   for (const [i, { id: _i, rapporto_id: _r, ...x }] of documenti.entries()) {
@@ -217,6 +218,7 @@ export async function esportaTutto(rapporto, { includiFile = false, versioneApp 
     tabelle_annuali: tabelle,
     versamenti,
     richieste: richieste.map(({ id: _i, rapporto_id: _r, ...x }) => x),
+    ore_segnate: ore.map(({ rapporto_id: _r, ...x }) => x),
     documenti: docs,
     promemoria: promemoria ? { attivo: promemoria.attivo, email: promemoria.email, giorni_anticipo: promemoria.giorni_anticipo } : null,
     fileInclusi: includiFile,
@@ -256,6 +258,7 @@ export async function importaTutto(rapportoId, b, { avanzamento = () => {} } = {
   if (b.scadenze_fatte?.length) ok(await supabase.from('scadenze_fatte').upsert(conId(b.scadenze_fatte)));
   if (b.tabelle_annuali?.length) ok(await supabase.from('tabelle_annuali').upsert(conId(b.tabelle_annuali)));
   if (b.versamenti?.length) ok(await supabase.from('versamenti').upsert(conId(b.versamenti)));
+  if (b.ore_segnate?.length) await facoltativo(supabase.from('ore_segnate').upsert(conId(b.ore_segnate)), null);
   if (b.promemoria) await facoltativo(supabase.from('promemoria').upsert({ rapporto_id: id, ...b.promemoria }), null);
   if (b.richieste?.length && !rapportoId) {
     // solo su un rapporto nuovo, per non duplicare le richieste esistenti

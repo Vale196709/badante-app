@@ -1,0 +1,29 @@
+name: Backup settimanale
+
+on:
+  schedule:
+    - cron: '41 6 * * 0'   # ogni domenica, verso le 8 ora italiana
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  backup:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Esporta, cifra e invia il backup
+        run: node scripts/backup.mjs
+        env:
+          PROMEMORIA_EMAIL: ${{ secrets.PROMEMORIA_EMAIL }}
+          PROMEMORIA_PASSWORD: ${{ secrets.PROMEMORIA_PASSWORD }}
+          GMAIL_USER: ${{ secrets.GMAIL_USER }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          BACKUP_PASSWORD: ${{ secrets.BACKUP_PASSWORD }}
+          BACKUP_EMAIL: ${{ secrets.BACKUP_EMAIL }}

@@ -2,6 +2,7 @@
 // ripristino con anteprima nel rapporto attuale o come nuovo rapporto.
 import { app, isTitolare, catenaCorrente, oggiIso, toast, esc, dataIt, nomeRapporto } from '../stato.js';
 import { esportaTutto, importaTutto, descriviBackup } from '../lib/dati.js';
+import { eCifrato, decifraBackup } from '../lib/cifra.js';
 import { fmtNum } from '../engine/formato.js';
 import { VERSIONE } from '../novita.js';
 
@@ -45,8 +46,8 @@ export function mostraBackup(root) {
     </section>` : ''}
     ${puoRipristinare ? `<section class="card">
       <h2>Ripristina da un backup</h2>
-      <p class="nota" style="margin:-4px 0 12px">Scegli un file di backup scaricato da questa app: prima di ripristinare ti mostro cosa contiene.</p>
-      <label>File di backup (.json)<input type="file" name="file" accept=".json,application/json" /></label>
+      <p class="nota" style="margin:-4px 0 12px">Scegli un file di backup scaricato da questa app (.json) o arrivato con l'email del backup settimanale (.badante, ti chiedo la password): prima di ripristinare ti mostro cosa contiene.</p>
+      <label>File di backup<input type="file" name="file" accept=".json,.badante,application/json,application/octet-stream" /></label>
       <div class="anteprima-backup"></div>
     </section>` : ''}`;
 
@@ -71,9 +72,16 @@ export function mostraBackup(root) {
     let b, info;
     try {
       b = JSON.parse(await file.text());
+      if (eCifrato(b)) {
+        const pw = prompt('Password del backup (quella del segreto BACKUP_PASSWORD su GitHub):');
+        if (!pw) { box.innerHTML = ''; e.target.value = ''; return; }
+        box.innerHTML = '<p class="nota">Decifro il backup…</p>';
+        b = await decifraBackup(b, pw);
+      }
       info = descriviBackup(b);
     } catch (err) {
       box.innerHTML = `<div class="avviso grave">${esc(err.message.includes('JSON') ? 'Il file non è leggibile come backup.' : err.message)}</div>`;
+      e.target.value = '';
       return;
     }
     box.innerHTML = `
