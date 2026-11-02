@@ -1,6 +1,7 @@
 // Registro delle modifiche: chi ha cambiato cosa e quando (tabella "registro", script 06).
-import { app, esc } from '../stato.js';
+import { app, esc, isTitolare } from '../stato.js';
 import { caricaRegistro } from '../lib/dati.js';
+import { caricaErrori } from '../lib/errori.js';
 import { nomeMese } from '../engine/scadenze.js';
 
 const TABELLE = {
@@ -48,6 +49,16 @@ export async function mostraRegistro(root) {
     root.innerHTML = `<div class="avviso attenzione">Il registro delle modifiche non è ancora attivo nel database: esegui lo script <code>supabase/06_registro.sql</code> nel SQL Editor di Supabase. Da quel momento ogni modifica viene annotata.</div>`;
     return;
   }
+  let errori = null;
+  if (isTitolare() || app.rapporto?.ruolo === 'gestore') {
+    try { errori = await caricaErrori(app.rapporto.id); } catch { errori = null; }
+  }
+  const boxErrori = () => (errori === null ? `<p class="nota">Il registro degli errori dell'app si attiva eseguendo lo script <code>supabase/07_errori.sql</code>.</p>`
+    : errori.length ? `<details class="card errori-app"><summary><strong>Errori dell'app</strong> · ${errori.length} negli ultimi 90 giorni</summary>
+      <p class="nota">Se qualcosa non ha funzionato su un telefono, qui c'è la traccia tecnica: mandala a chi ti aiuta con l'app.</p>
+      <ul class="gruppo registro">${errori.map((x) => `<li class="riga-info registro-riga"><span class="ora">${fmtGiorno.format(new Date(x.quando)).replace(/^\w+ /, '')} ${fmtOra.format(new Date(x.quando))}</span>
+        <span class="corpo"><strong>${esc(x.messaggio)}</strong><br><small>${esc([x.pagina && `pagina ${x.pagina}`, x.chi, x.ruolo, x.versione && `v${x.versione}`].filter(Boolean).join(' · '))}</small></span></li>`).join('')}</ul></details>`
+    : '<p class="nota">Nessun errore dell\'app negli ultimi 90 giorni.</p>');
   const disegna = () => {
     const perGiorno = new Map();
     for (const r of righe) {
@@ -56,6 +67,7 @@ export async function mostraRegistro(root) {
       perGiorno.get(g).push(r);
     }
     root.innerHTML = `
+      ${boxErrori()}
       <p class="nota">Ogni modifica fatta da chi ha accesso al rapporto, con l'ora e l'autore. Le righe non si possono cancellare dall'app.</p>
       ${righe.length ? [...perGiorno].map(([g, lista]) => `
         <h2 class="testa-gruppo">${esc(g)}</h2>

@@ -747,3 +747,5 @@ html.contrasto-alto .card, html.contrasto-alto .gruppo { box-shadow: 0 0 0 1px v
 .card.conto small { color: var(--testo-2); }
 .conto-rovescia .giorni-mancanti { margin: 4px 0 2px; }
 .card.prossima.conto-rovescia .giorni-mancanti strong { font-size: 40px; line-height: 1.05; color: var(--tinta); display: inline; }
+.errori-app summary { cursor: pointer; padding: 2px 0; }
+.errori-app .gruppo { margin-top: 10px; }

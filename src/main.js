@@ -13,6 +13,9 @@ import { mostraMesi } from './ui/mesi.js';
 import { applicaLeggibilita, leggiLeggibilita, impostaLeggibilita } from './lib/leggibilita.js';
 
 applicaLeggibilita();
+import { attivaSegnalazioni, impostaContestoErrori } from './lib/errori.js';
+
+attivaSegnalazioni();
 import { mostraAltro } from './ui/altro.js';
 import { VERSIONE, dataBuildIt } from './novita.js';
 import { controllaBlocco } from './ui/blocco.js';
@@ -49,6 +52,7 @@ const mostraReport = pigro(() => import('./ui/report.js'), 'mostraReport');
 const mostraFerie = pigro(() => import('./ui/ferie.js'), 'mostraFerie');
 
 const root = document.getElementById('app');
+impostaContestoErrori(() => ({ rapportoId: app.rapporto?.id, ruolo: app.rapporto?.ruolo, pagina: sezione, versione: VERSIONE }));
 let utenteCorrente;
 let sezione = null;
 const GESTIONE = ['titolare', 'gestore', 'lettore'];
