@@ -20,6 +20,31 @@ const env = Object.fromEntries(readFileSync(new URL('../.env.production', import
 const PROVA = process.env.PROMEMORIA_PROVA === '1';
 // Invio di prova (dal pulsante Run workflow): manda subito tutte le scadenze aperte, scadute o entro 30 giorni.
 const FORZA = process.env.PROMEMORIA_FORZA === 'true' || process.env.PROMEMORIA_FORZA === '1';
+// Riepilogo mensile: il 1° del mese, oppure su richiesta dal pulsante Run workflow.
+const RIEPILOGO = process.env.PROMEMORIA_RIEPILOGO === 'true' || process.env.PROMEMORIA_RIEPILOGO === '1';
+const MESI = ['gennaio', 'febbraio', 'marzo', 'aprile', 'maggio', 'giugno', 'luglio', 'agosto', 'settembre', 'ottobre', 'novembre', 'dicembre'];
+
+/** Riepilogo del mese appena chiuso e di quello che inizia (testo semplice, una riga per voce). */
+export function riepilogoMensile(rapporto, catena, scadenze, oggi) {
+  const [a, m] = oggi.split('-').map(Number);
+  const pa = m === 1 ? a - 1 : a, pm = m === 1 ? 12 : m - 1;
+  const prec = catena.find((x) => x.anno === pa && x.mese === pm);
+  const fineMese = `${a}-${String(m).padStart(2, '0')}-31`;
+  const delMese = scadenze.filter((s) => !s.fatta && s.data >= oggi && s.data <= fineMese && !s.chiave.startsWith('scatto-'));
+  const scadute = scadenze.filter((s) => !s.fatta && s.data < oggi && !s.informativa);
+  const righe = [];
+  if (prec) {
+    const r = prec.risultato;
+    righe.push(`${MESI[pm - 1]} ${pa}: netto da pagare ${fmtEur(r.netto)} (${prec.stato === 'pagato' ? 'già pagato' : prec.stato === 'confermato' ? 'cedolino confermato, da pagare' : 'cedolino da preparare'}), costo per te ${fmtEur(r.costoDatore)}, ${String(r.oreLavorate).replace('.', ',')} ore.`);
+  } else if (oggi < rapporto.dataAssunzione) {
+    const g = Math.round((new Date(rapporto.dataAssunzione + 'T00:00:00Z') - new Date(oggi + 'T00:00:00Z')) / 86400000);
+    righe.push(`Il rapporto inizia il ${dataIt(rapporto.dataAssunzione)}, tra ${g} giorni: in app trovi il percorso "Inizio rapporto" in Cose da fare.`);
+  }
+  for (const s of delMese) righe.push(`Entro il ${dataIt(s.data)}: ${s.titolo}${s.importo != null ? ` (${fmtEur(s.importo)})` : ''}.`);
+  if (scadute.length) righe.push(`Ancora da fare: ${scadute.length} ${scadute.length === 1 ? 'scadenza passata' : 'scadenze passate'} (${scadute.slice(0, 3).map((s) => s.titolo).join('; ')}${scadute.length > 3 ? '…' : ''}).`);
+  if (!delMese.length && !scadute.length) righe.push(`Nessuna scadenza a ${MESI[m - 1]}.`);
+  return { titolo: `Riepilogo di ${MESI[m - 1]} ${a}`, righe };
+}
 const URL_APP = 'https://vale196709.github.io/badante-app/';
 
 function oggiRoma() {
@@ -82,6 +107,19 @@ async function principale() {
     for (const c of cedolini || []) if (c.anno > fino.anno || (c.anno === fino.anno && c.mese > fino.mese)) fino = { anno: c.anno, mese: c.mese };
     const catena = calcolaCatena(r.dati, cedolini || [], fino);
     const scadenze = generaScadenze(r.dati, catena, oggi, new Set((fatte || []).map((f) => f.chiave)));
+    if ((oggi.endsWith('-01') || RIEPILOGO) && posta && p.email?.length) {
+      const rm = riepilogoMensile(r.dati, catena, scadenze, oggi);
+      const ogg = `Badante di Maria – ${rm.titolo} (${chi})`;
+      if (PROVA) console.log(`[PROVA] ${ogg}\n${rm.righe.join('\n')}`);
+      else {
+        try {
+          await posta.sendMail({ from: `Badante di Maria <${process.env.GMAIL_USER}>`, to: p.email.join(', '), subject: ogg,
+            text: `${rm.titolo} per ${chi}:\n\n${rm.righe.map((x) => `• ${x}`).join('\n')}\n\nApri l'app: ${URL_APP}\n`,
+            html: `<div style="font-family:-apple-system,Segoe UI,Roboto,sans-serif;font-size:15px;color:#111"><p><strong>${rm.titolo}</strong> per ${chi}:</p><ul style="padding-left:18px">${rm.righe.map((x) => `<li style="margin-bottom:6px">${x}</li>`).join('')}</ul><p><a href="${URL_APP}" style="display:inline-block;background:#1e4e8c;color:#fff;padding:10px 16px;border-radius:10px;text-decoration:none">Apri l'app</a></p></div>` });
+          console.log('Riepilogo mensile inviato.');
+        } catch (e) { errori.push(`Riepilogo mensile non inviato: ${e.message}`); }
+      }
+    }
     const elenco = FORZA
       ? scadenze.filter((s) => !s.fatta && giorniTra(oggi, s.data) <= 30).map((s) => ({ ...s, tra: giorniTra(oggi, s.data) }))
       : daRicordare(scadenze, oggi, p.giorni_anticipo);

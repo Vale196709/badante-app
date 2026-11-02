@@ -9,6 +9,10 @@ on:
         description: 'Invio di prova: manda subito tutte le scadenze aperte'
         type: boolean
         default: false
+      riepilogo:
+        description: 'Manda anche il riepilogo del mese (di solito parte da solo il 1° del mese)'
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -32,3 +36,4 @@ jobs:
           GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
           VAPID_PRIVATE_KEY: ${{ secrets.VAPID_PRIVATE_KEY }}
           PROMEMORIA_FORZA: ${{ inputs.prova }}
+          PROMEMORIA_RIEPILOGO: ${{ inputs.riepilogo }}
