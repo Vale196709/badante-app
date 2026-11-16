@@ -1,0 +1,90 @@
+// Versioni dell'app e novità principali.
+export const VERSIONE = __VERSIONE__;
+export const DATA_BUILD = __DATA_BUILD__;
+
+export const NOVITA = [
+  { versione: '1.9.1', data: '2026-11-16', voci: [
+    'Simulatore con quattro colonne: Attuale, Ipotesi A, Ipotesi B e Convivente, con i campi da modificare dentro la tabella',
+    '"Attuale" è il rapporto non registrato (senza contributi, Cassa Colf, 13ª e TFR); le altre colonne sono rapporti regolari da confrontare',
+  ] },
+  { versione: '1.9.0', data: '2026-11-02', voci: [
+    'Percorso "Inizio rapporto" in Cose da fare e conto alla rovescia nel Riepilogo: tutto si sposta da solo se cambia la data di assunzione',
+    'Backup automatico ogni domenica per email, cifrato con una password: si ripristina dall\'app in Impostazioni → Backup',
+    'Riepilogo mensile per email il 1° del mese: quanto pagare, costo del mese e scadenze',
+    'Prestazione universale: indicata la proroga al 31/12/2027 con ISEE fino a 12.000 € proposta dalla legge di bilancio',
+    'Benvenuto per la lavoratrice al primo accesso, nella sua lingua (si rivede col pulsante ?)',
+    'Apertura più veloce: le pagine usate di rado si caricano solo quando servono',
+    'Schermata di avvio su iPhone senza lampo bianco',
+    'Gli errori dell\'app vengono annotati e si vedono in Impostazioni → Registro',
+  ] },
+  { versione: '1.8.0', data: '2026-11-01', voci: [
+    'Scatti di anzianità (4% del minimo ogni due anni, fino a 7): calcolati da soli nei cedolini, con la data del prossimo tra le Scadenze',
+    'Saldo dei permessi retribuiti per visite mediche e pratiche personali, anche nella vista della lavoratrice',
+    'Abbina l\'estratto conto: carichi il file della banca e l\'app segna come pagati stipendi e contributi INPS',
+    'Scadenze dei documenti della persona assistita e promemoria annuale per il rinnovo dell\'ISEE',
+    'Registro delle modifiche in Impostazioni: chi ha cambiato cosa e quando',
+    'Le ore della lavoratrice restano sul telefono se manca la rete e partono da sole',
+    '"Cose da fare" nella barra in basso, con il numero delle cose urgenti anche sull\'icona dell\'app',
+    'Report: costo di ogni mese diviso in retribuzione, tredicesima, contributi e TFR',
+    'Testo più grande e contrasto alto; stampa pulita di tutte le pagine',
+    'Controllo della paga sui nuovi minimi quando inserisci le tabelle dell\'anno',
+    'Corretti i conteggi di fine rapporto per conviventi e altri rapporti a paga mensile',
+  ] },
+  { versione: '1.7.1', data: '2026-10-31', voci: [
+    'Simulatore: colonna "Non registrata" per confrontare il costo attuale con un rapporto non dichiarato, con i rischi e le agevolazioni perse',
+  ] },
+  { versione: '1.7.0', data: '2026-10-30', voci: [
+    'Nuova pagina "Cose da fare": il percorso a tappe del mese (presenze, cedolino, pagamento, ricevuta firmata) che si aggiorna da solo',
+    'Prossime scadenze con i colori: ambra da fare a breve, rosso in ritardo',
+    'Percorsi guidati per ferie, malattia e fine rapporto, con i termini già calcolati',
+    'Nel Riepilogo la scheda "Prossima cosa da fare"; per la lavoratrice il riquadro "Da fare"',
+  ] },
+  { versione: '1.6.1', data: '2026-10-30', voci: [
+    'CAP, città e provincia nella residenza di datore e lavoratrice, usati in tutti i documenti',
+    'Indicazione "Sviluppata da Valentino"',
+  ] },
+  { versione: '1.6.0', data: '2026-10-29', voci: [
+    'La lavoratrice segna le ore dal suo telefono, il datore le approva e vanno nelle presenze',
+    'Lettura delle ricevute dei contributi da PDF o foto, con registrazione del pagamento',
+    'Calendario annuale delle ferie con saldo previsto e "Prepara sostituta"',
+    'Contratti di sostituzione senza contributo aggiuntivo dei contratti a termine',
+    'Verifica delle agevolazioni: Prestazione universale, esonero over 80, detrazione e deduzione',
+    'Rendiconto trimestrale della Prestazione universale e link "+ Google Calendar" per ogni scadenza',
+  ] },
+  { versione: '1.5.1', data: '2026-10-29', voci: [
+    'Nuovo ordine del menu: Documenti, Report, Simulatore, Presenze, Riepilogo, Scadenze, Impostazioni',
+  ] },
+  { versione: '1.5.0', data: '2026-10-29', voci: [
+    'Accesso rapido: "Resta collegato" e sblocco con Face ID, Touch ID o impronta',
+    'Dati per il bonifico dello stipendio con causale e QR code per l\'app della banca',
+    'Budget annuo con avviso nel Riepilogo e nel Report',
+    'Pacchetto per commercialista o CAF: contributi deducibili, detrazione del 19% e documenti da portare',
+    'Rapporti con paga mensile: convivente, convivente part-time, assistenza e presenza notturna',
+    'Minimi 2026 completi per tutti i livelli',
+  ] },
+  { versione: '1.4.0', data: '2026-10-29', voci: [
+    'Nuovo nome: Badante di Maria',
+    'Nuovi colori: blu notte e ambra',
+    'Report: consuntivo e previsione dell\'anno, composizione dei costi, uscite dei prossimi 90 giorni',
+    'Ripristino da backup con anteprima, anche come nuovo rapporto e con i file dell\'archivio',
+    'Versione e data di aggiornamento visibili',
+  ] },
+  { versione: '1.3.0', data: '2026-10-29', voci: [
+    'Grafica stile iPhone con barra in basso e colonna laterale su PC',
+    'Più rapporti di lavoro, variazioni di paga e orario',
+    'Lettere pronte e pratiche INPS guidate',
+    'Promemoria via email e notifiche (da configurare)',
+  ] },
+  { versione: '1.2.0', data: '2026-10-29', voci: [
+    'Archivio documenti, registro dei versamenti INPS',
+    'Richieste di ferie e permessi, firma col dito, vista lavoratrice in 5 lingue',
+    'Tabelle annuali modificabili, backup JSON e CSV',
+  ] },
+  { versione: '1.1.0', data: '2026-10-29', voci: ['Importi nel formato 1.234,56 €', 'Paga oraria netta nel simulatore'] },
+  { versione: '1.0.0', data: '2026-10-29', voci: ['Presenze, cedolini, scadenze, simulatore, documenti, accessi profilati'] },
+];
+
+export const dataBuildIt = () => {
+  const d = new Date(DATA_BUILD);
+  return `${d.toLocaleDateString('it-IT', { day: '2-digit', month: '2-digit', year: 'numeric', timeZone: 'Europe/Rome' })} alle ${d.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Rome' })}`;
+};
