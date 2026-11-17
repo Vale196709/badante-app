@@ -2,6 +2,7 @@ import { fmtNum } from './formato.js';
 // Conteggi di fine rapporto: preavviso, ferie non godute, ratei di 13ª, TFR.
 import { euro, oreSettimanali, mesiAnzianita, fasciaContributiva, normalizzaRapporto, applicaScatti } from './calcolo.js';
 import { REGOLE_CCNL as R, tabelleAnno } from './tabelle.js';
+import { finePeriodoProva } from './prova.js';
 
 export const MOTIVI = {
   licenziamento: 'Licenziamento',
@@ -14,6 +15,9 @@ export const MOTIVI = {
 
 export function giorniPreavviso(rapporto, dataCessazione, motivo) {
   if (['giustaCausa', 'consensuale', 'termine'].includes(motivo)) return 0;
+  // durante il periodo di prova ciascuna parte può recedere in qualsiasi momento, senza preavviso (art. 12)
+  const fineProva = finePeriodoProva(rapporto);
+  if (fineProva && dataCessazione <= fineProva) return 0;
   const sett = oreSettimanali(rapporto.orario);
   const anni = mesiAnzianita(rapporto.dataAssunzione, dataCessazione) / 12;
   const regola = R.preavviso.find((p) => sett >= p.oreDa && anni < p.finoAnni);
@@ -57,6 +61,7 @@ export function calcolaCessazione(rapporto0, stato, { dataCessazione, motivo, pr
       voci.push({ codice: 'IPR', descrizione: `Indennità sostitutiva del preavviso (${giorni} giorni)`, importo: preavviso, soggettaInps: true, ore: orePreavviso });
     }
   }
+  if (giorni === 0 && ['licenziamento', 'dimissioni'].includes(motivo)) note.push('Durante il periodo di prova il rapporto si può interrompere in qualsiasi momento senza preavviso (CCNL art. 12): spetta la retribuzione per il lavoro prestato.');
   if (motivo === 'decesso') note.push('In caso di decesso del datore il rapporto può proseguire con gli eredi o cessare con il preavviso: verificare il caso concreto.');
 
   // TFR: fondo accantonato + rivalutazione dell'anno in corso (solo quota fissa, pro rata)

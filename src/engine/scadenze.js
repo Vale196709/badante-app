@@ -4,6 +4,7 @@ import { euro, isoDate, oreSettimanali, prossimoScatto, quotaScatti } from './ca
 import { festivitaAnno, tabelleAnno, REGOLE_CCNL as R, minimoContrattuale, tipologia, prestazioneUniversaleVigente } from './tabelle.js';
 import { variazioniOrdinate, condizioniAl } from './variazioni.js';
 import { saldoPermessi } from './annuale.js';
+import { finePeriodoProva } from './prova.js';
 
 const addGiorni = (iso, n) => new Date(new Date(iso + 'T00:00:00Z').getTime() + n * 86400000).toISOString().slice(0, 10);
 const ultimoGiorno = (a, m) => isoDate(a, m, new Date(Date.UTC(a, m, 0)).getUTCDate());
@@ -123,12 +124,7 @@ export function generaScadenze(rapporto, catena, oggi, fatte = new Set()) {
   // Fine del periodo di prova (giorni di lavoro effettivo)
   const giorniProva = Number(rapporto.giorniProva) || 0;
   if (giorniProva > 0 && oreSettimanali(rapporto.orario) > 0) {
-    let d = rapporto.dataAssunzione, contati = 0;
-    for (let i = 0; i < 400 && contati < giorniProva; i++) {
-      const dow = ((new Date(d + 'T00:00:00Z').getUTCDay() + 6) % 7) + 1;
-      if ((rapporto.orario[dow] || 0) > 0 && !festivitaAnno(Number(d.slice(0, 4))).includes(d)) contati++;
-      if (contati < giorniProva) d = addGiorni(d, 1);
-    }
+    const d = finePeriodoProva(rapporto);
     add({ chiave: 'prova', data: d, informativa: true, categoria: 'Contratto', titolo: 'Fine del periodo di prova', descrizione: `${giorniProva} giorni di lavoro effettivo. Durante la prova si può recedere senza preavviso.` });
   }
 
