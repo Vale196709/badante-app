@@ -2,6 +2,7 @@
 import { salvaRapporto } from '../lib/dati.js';
 import { verificaCodiceFiscale } from '../lib/codiceFiscale.js';
 import { fasciaContributiva, oreSettimanali, simulaCosto, normalizzaRapporto } from '../engine/calcolo.js';
+import { giorniProvaCcnl } from '../engine/prova.js';
 import { tabelleAnno, TIPOLOGIE, tipologia, minimoContrattuale, prestazioneUniversaleVigente } from '../engine/tabelle.js';
 import { verificaIban, formattaIban } from '../lib/iban.js';
 import { verificaAgevolazioni } from '../engine/annuale.js';
@@ -121,6 +122,7 @@ export async function mostraRapporto(root, { ricaricaDati, vai }) {
           ${campo('Fascia oraria abituale', 'fasciaOraria', d.fasciaOraria, 'placeholder="es. 09:00–12:00"')}
           <label>Periodo di prova (giorni di lavoro)<input name="giorniProva" type="number" min="0" max="60" value="${d.giorniProva}" /></label>
         </div>
+        <small class="nota">CCNL art. 12: 30 giorni di lavoro effettivo per i conviventi e per i livelli D e DS, 8 giorni per gli altri. Deve risultare per iscritto (lettera di assunzione). Durante la prova si può recedere senza preavviso.</small>
         <label class="spunta solo-mensile"><input type="checkbox" name="vittoAlloggio" ${d.vittoAlloggio ? 'checked' : ''} /> Vitto e alloggio forniti dal datore (entrano nel calcolo di 13ª, TFR e fascia INPS)</label>
         <label class="spunta"><input type="checkbox" name="tredicesimaMensile" ${d.tredicesimaMensile ? 'checked' : ''} /> Tredicesima pagata ogni mese (invece che a dicembre)</label>
         <label class="spunta"><input type="checkbox" name="scattiAnzianita" ${d.scattiAnzianita !== false ? 'checked' : ''} /> Scatti di anzianità (4% del minimo ogni 2 anni, fino a 7)</label>
@@ -227,6 +229,7 @@ export async function mostraRapporto(root, { ricaricaDati, vai }) {
   });
 
   let tipologiaPrima = d.tipologia || 'ore';
+  let provaPer = `${d.tipologia || 'ore'}|${d.livello}`;
   const aggiorna = () => {
     const v = leggi();
     termine.hidden = v.tipoContratto !== 'determinato';
@@ -237,6 +240,11 @@ export async function mostraRapporto(root, { ricaricaDati, vai }) {
     root.querySelector('.avviso-contanti').hidden = v.pagamento.modalita !== 'contanti';
     const anno = Number(oggiIso().slice(0, 4));
     const t = tabelleAnno(anno);
+    // al cambio di tipologia o livello propone la prova del CCNL (30 giorni conviventi e D/DS, 8 gli altri)
+    if (`${v.tipologia}|${v.livello}` !== provaPer) {
+      provaPer = `${v.tipologia}|${v.livello}`;
+      if ([8, 30].includes(Number(f.giorniProva.value))) f.giorniProva.value = giorniProvaCcnl(v);
+    }
     // al cambio di tipologia propone minimo, vitto e alloggio
     if (v.tipologia !== tipologiaPrima) {
       tipologiaPrima = v.tipologia;
