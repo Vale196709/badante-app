@@ -124,7 +124,7 @@ function editorMese(root, ctx, anno, mese) {
         const ore = g.tipo === 'L' || g.tipo === 'P' ? Number(g.ore) || 0 : 0;
         const cambiato = !!giorniSalvati[g.data];
         return `<button type="button" class="cella t-${g.tipo || 'R'} ${g.festivita ? 'fest' : ''} ${g.attivo ? '' : 'fuori'} ${cambiato ? 'cambiato' : ''}"
-          data-d="${g.data}" ${mod && g.attivo ? '' : 'disabled'} title="${g.festivita ? esc(nomeFestivita(g.data)) : ''}">
+          data-d="${g.data}" ${mod && g.attivo ? '' : 'disabled'} title="${g.festivita ? esc(nomeFestivita(g.data, d.santoPatrono)) : ''}">
           <span class="n">${n}</span>
           <span class="info">${g.tipo === 'L' || (g.tipo === 'P' && ore) ? `${num(ore, ore % 1 ? 1 : 0)}h` : SIGLE[g.tipo]}${Number(g.extra) ? `<b>+${g.extra}</b>` : ''}</span>
         </button>`;
@@ -226,7 +226,7 @@ function editorMese(root, ctx, anno, mese) {
     const [a, m, gg] = data.split('-');
     dlg.innerHTML = `
       <form method="dialog" class="form-giorno">
-        <h3>${GSETT[g.giornoSettimana - 1]} ${Number(gg)}/${Number(m)}/${a}${g.festivita ? ` · <span class="fest-nome">${esc(nomeFestivita(data))}</span>` : ''}</h3>
+        <h3>${GSETT[g.giornoSettimana - 1]} ${Number(gg)}/${Number(m)}/${a}${g.festivita ? ` · <span class="fest-nome">${esc(nomeFestivita(data, d.santoPatrono))}</span>` : ''}</h3>
         <p class="nota">Orario programmato: ${g.oreProgrammate} h${g.festivita ? ' · la festività è pagata comunque (1/6 dell\'orario settimanale)' : ''}</p>
         <div class="scelte">${Object.entries(TIPI).map(([k, v]) => `<label class="scelta"><input type="radio" name="tipo" value="${k}" ${g.tipo === k ? 'checked' : ''}/><span>${v}</span></label>`).join('')}</div>
         <div class="riga">

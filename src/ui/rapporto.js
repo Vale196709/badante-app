@@ -26,6 +26,7 @@ export const RAPPORTO_VUOTO = {
   fasciaOraria: '09:00–12:00',
   dataAssunzione: '',
   giorniProva: 8,
+  santoPatrono: '',
   dataCessazione: '',
   tredicesimaMensile: false,
   cuaf: true,
@@ -122,6 +123,8 @@ export async function mostraRapporto(root, { ricaricaDati, vai }) {
           ${campo('Fascia oraria abituale', 'fasciaOraria', d.fasciaOraria, 'placeholder="es. 09:00–12:00"')}
           <label>Periodo di prova (giorni di lavoro)<input name="giorniProva" type="number" min="0" max="60" value="${d.giorniProva}" /></label>
         </div>
+        <label>Santo patrono del comune dove si lavora (giorno/mese)<input name="santoPatrono" value="${d.santoPatrono ? `${d.santoPatrono.slice(3)}/${d.santoPatrono.slice(0, 2)}` : ''}" placeholder="es. 29/06 per Roma" inputmode="numeric" /></label>
+        <small class="nota">Il santo patrono è una festività retribuita come le altre (CCNL art. 16). Lascia vuoto se non lo vuoi contare.</small>
         <small class="nota">CCNL art. 12: 30 giorni di lavoro effettivo per i conviventi e per i livelli D e DS, 8 giorni per gli altri. Deve risultare per iscritto (lettera di assunzione). Durante la prova si può recedere senza preavviso.</small>
         <label class="spunta solo-mensile"><input type="checkbox" name="vittoAlloggio" ${d.vittoAlloggio ? 'checked' : ''} /> Vitto e alloggio forniti dal datore (entrano nel calcolo di 13ª, TFR e fascia INPS)</label>
         <label class="spunta"><input type="checkbox" name="tredicesimaMensile" ${d.tredicesimaMensile ? 'checked' : ''} /> Tredicesima pagata ogni mese (invece che a dicembre)</label>
@@ -214,6 +217,7 @@ export async function mostraRapporto(root, { ricaricaDati, vai }) {
     fasciaOraria: f.fasciaOraria.value.trim(),
     dataAssunzione: f.dataAssunzione.value,
     giorniProva: Number(f.giorniProva.value) || 0,
+    santoPatrono: (() => { const m = /^\s*(\d{1,2})\s*[\/.\-]\s*(\d{1,2})\s*$/.exec(f.santoPatrono.value); return m ? `${m[2].padStart(2, '0')}-${m[1].padStart(2, '0')}` : ''; })(),
     tredicesimaMensile: f.tredicesimaMensile.checked,
     cassaColf: f.cassaColf.checked,
     scattiAnzianita: f.scattiAnzianita.checked,
