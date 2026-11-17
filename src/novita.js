@@ -6,6 +6,8 @@ export const NOVITA = [
   { versione: '1.9.1', data: '2026-11-16', voci: [
     'Simulatore con quattro colonne: Attuale, Ipotesi A, Ipotesi B e Convivente, con i campi da modificare dentro la tabella',
     'Simulatore: detrazione del 19%, contributi deducibili, risparmio fiscale stimato e costo annuo dopo le agevolazioni',
+    'Conviventi: il valore di vitto e alloggio usato per 13ª e TFR ora è il valore giornaliero × 30, come prevede l\'art. 36 del CCNL (prima × 26)',
+    'Rapporto: nuovo campo "Santo patrono" (festività retribuita, CCNL art. 16)',
     'Periodo di prova: l\'app propone 30 giorni per conviventi e livelli D/DS e 8 per gli altri (CCNL art. 12); nei conteggi di fine rapporto durante la prova non c\'è preavviso',
     'Simulatore: pulsante per stampare o salvare in PDF il confronto',
     '"Attuale" è il rapporto non registrato (senza contributi, Cassa Colf, 13ª e TFR); le altre colonne sono rapporti regolari da confrontare',
