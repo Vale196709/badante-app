@@ -37,9 +37,9 @@ test('convivente: mese intero a paga fissa, contributi oltre 24 h, 13ª e TFR co
   assert.equal(c.voci.length, 1);
   assert.equal(c.contributi.fascia, 'oltre 24 ore settimanali');
   assert.equal(c.contributi.orarioTotale, 1.24);
-  assert.equal(c.vittoAlloggioMese, 173.16); // 6,66 × 26
-  assert.equal(c.accantonamenti.rateoTredicesima, 113.92); // (1.193,84 + 173,16) / 12
-  assert.equal(c.accantonamenti.tfrMese, 109.7);
+  assert.equal(c.vittoAlloggioMese, 199.8); // 6,66 × 30 (CCNL art. 36, comma 3)
+  assert.equal(c.accantonamenti.rateoTredicesima, 116.14); // (1.193,84 + 199,80) / 12
+  assert.equal(c.accantonamenti.tfrMese, 111.84);
   assert.deepEqual(c.avvisi, []);
 });
 
@@ -87,7 +87,7 @@ test('presenza notturna sotto le 24 ore: fascia sulla retribuzione oraria effett
 
 test('simulatore: convivente e confronto con il rapporto a ore', () => {
   const s = simulaCosto({ anno: 2026, oreSettimanaliTot: 54, tipologia: 'convivente', pagaMensile: 1193.84, vittoAlloggio: true, livello: 'CS' });
-  assert.equal(s.costoMensile, 1644.44);
+  assert.equal(s.costoMensile, 1648.8);
   assert.equal(s.minimo, 1193.84);
   const h = simulaCosto({ pagaOraria: 9, oreSettimanaliTot: 15, anno: 2026 });
   assert.equal(h.costoMensile, 776.89);
