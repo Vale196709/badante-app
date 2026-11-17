@@ -104,7 +104,7 @@ export function calendarioMese(rapporto, anno, mese) {
     giorni.push({
       data: iso,
       giornoSettimana: giornoSettimana(iso),
-      festivita: t.festivita.includes(iso),
+      festivita: t.festivita.includes(iso) || (!!rapporto.santoPatrono && iso.slice(5) === rapporto.santoPatrono),
       oreProgrammate: attivo ? rapporto.orario[giornoSettimana(iso)] || 0 : 0,
       attivo,
     });
@@ -138,10 +138,10 @@ export function normalizzaRapporto(d) {
 
 const giorniLavoroSettimana = (orario) => Object.values(orario || {}).filter((h) => h > 0).length;
 
-/** Valore convenzionale mensile di vitto e alloggio (26 giornate), se forniti in natura. */
+/** Valore convenzionale mensile di vitto e alloggio, se forniti in natura: valore giornaliero × 30 (CCNL art. 36, comma 3). */
 export function valoreVittoAlloggioMese(rapporto, anno) {
   if (!tipologia(rapporto).mensile || !rapporto.vittoAlloggio) return 0;
-  return euro(tabelleAnno(anno).vittoAlloggio.totale * 26);
+  return euro(tabelleAnno(anno).vittoAlloggio.totale * 30);
 }
 
 // ---------- Contributi ----------

@@ -167,8 +167,9 @@ export function festivitaAnno(anno) {
   return [...fisse.map((md) => `${anno}-${md}`), iso(pasquetta)].sort();
 }
 
-export function nomeFestivita(data) {
+export function nomeFestivita(data, santoPatrono) {
   const md = data.slice(5);
+  if (santoPatrono && md === santoPatrono) return 'Santo patrono';
   if (NOMI_FESTIVITA[md]) return NOMI_FESTIVITA[md];
   return 'Lunedì dell\'Angelo';
 }

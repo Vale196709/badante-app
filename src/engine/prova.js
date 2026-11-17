@@ -17,7 +17,7 @@ export function finePeriodoProva(rapporto) {
   let d = rapporto.dataAssunzione, contati = 0;
   for (let i = 0; i < 400 && contati < giorniProva; i++) {
     const dow = ((new Date(d + 'T00:00:00Z').getUTCDay() + 6) % 7) + 1;
-    if ((rapporto.orario[dow] || 0) > 0 && !festivitaAnno(Number(d.slice(0, 4))).includes(d)) contati++;
+    if ((rapporto.orario[dow] || 0) > 0 && !festivitaAnno(Number(d.slice(0, 4))).includes(d) && !(rapporto.santoPatrono && d.slice(5) === rapporto.santoPatrono)) contati++;
     if (contati < giorniProva) d = addGiorni(d, 1);
   }
   return d;
